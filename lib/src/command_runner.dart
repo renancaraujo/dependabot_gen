@@ -60,9 +60,9 @@ updates:
 
       final ignore = topLevelResults['ignore'] as List<String>;
 
-      final ecosystems = topLevelResults['ecosystems'] as Iterable<String>?;
+      final ecosystems = topLevelResults['ecosystems'] as Iterable<String>;
       for (final ecosystem in PackageEcosystem.values) {
-        if (ecosystems == null || (ecosystems.contains(ecosystem.name))) {
+        if (ecosystems.isEmpty || (ecosystems.contains(ecosystem.name))) {
           final pubItems = ecosystem.getEntries(_logger, ignore);
           output.writeAll(pubItems.map((e) => e.toString()));
         }
