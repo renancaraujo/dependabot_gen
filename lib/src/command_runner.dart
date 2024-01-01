@@ -1,83 +1,56 @@
-// Copyright (c) 2022, Very Good Ventures
-// https://verygood.ventures
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file or at
-// https://opensource.org/licenses/MIT.
-
-import 'dart:io';
-
+import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:cli_completion/cli_completion.dart';
+import 'package:dependabot_gen/src/commands/commands.dart';
+import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:path/path.dart' as path;
+import 'package:pub_updater/pub_updater.dart';
 
 const executableName = 'depgen';
 const packageName = 'dependabot_gen';
-const description = 'A Very Good Project created by Very Good CLI.';
+const description = 'Keep your dependabot.yaml up to date';
 
-class DependabotGenCommandRunner extends CommandRunner<int> {
+/// {@template dependabot_gen_command_runner}
+/// A [CommandRunner] for the depgen CLI.
+///
+/// ```
+/// $ depgen --version
+/// ```
+/// {@endtemplate}
+class DependabotGenCommandRunner extends CompletionCommandRunner<int> {
   /// {@macro dependabot_gen_command_runner}
   DependabotGenCommandRunner({
     Logger? logger,
+    PubUpdater? pubUpdater,
   })  : _logger = logger ?? Logger(),
+        _pubUpdater = pubUpdater ?? PubUpdater(),
         super(executableName, description) {
-    // Add root options and flags
-    argParser
-      ..addMultiOption('ignore')
-      ..addMultiOption(
-        'ecosystems',
-        allowed: PackageEcosystem.values.map((e) => e.name),
-      )
-      ..addFlag(
-        'include-gh-actions',
-        abbr: 'g',
-      )
-      ..addFlag(
-        'verbose',
-        help: 'Noisy logging, including all shell commands executed.',
-      );
+    argParser.addFlag(
+      'version',
+      abbr: 'v',
+      negatable: false,
+      help: 'Print the current version.',
+    );
+
+    // Add sub commands
+    addCommand(CreateCommand(logger: _logger));
+    addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
+  @override
+  void printUsage() => _logger.info(usage);
+
   final Logger _logger;
+  final PubUpdater _pubUpdater;
 
   @override
   Future<int> run(Iterable<String> args) async {
-    final output = StringBuffer('''
-version: 2
-updates:
-''');
-
     try {
       final topLevelResults = parse(args);
       if (topLevelResults['verbose'] == true) {
         _logger.level = Level.verbose;
       }
-      final includeGhActions = topLevelResults['include-gh-actions'] as bool;
-
-      if (includeGhActions) {
-        output.write(ConfigEntry.ghActions);
-      }
-
-      final ignore = topLevelResults['ignore'] as List<String>;
-
-      final ecosystems = topLevelResults['ecosystems'] as Iterable<String>;
-      for (final ecosystem in PackageEcosystem.values) {
-        if (ecosystems.isEmpty || (ecosystems.contains(ecosystem.name))) {
-          final pubItems = ecosystem.getEntries(_logger, ignore);
-          output.writeAll(pubItems.map((e) => e.toString()));
-        }
-      }
-
-      _logger.write(output.toString());
-      return ExitCode.success.code;
-    } on ProcessException catch (e, stackTrace) {
-      _logger
-        ..err('Things went south')
-        ..err(e.message)
-        ..err('$stackTrace')
-        ..info('')
-        ..info(usage);
-      return ExitCode.ioError.code;
+      return await runCommand(topLevelResults) ?? ExitCode.success.code;
     } on FormatException catch (e, stackTrace) {
       // On format errors, show the commands error message, root usage and
       // exit with an error code
@@ -97,116 +70,48 @@ updates:
       return ExitCode.usage.code;
     }
   }
-}
 
-enum PackageEcosystem {
-  cargo('Cargo.toml'),
-  npm('package.json'),
-  pub(
-    'pubspec.yaml',
-    ['./.tmp', './brick/__brick__', './.dart_tool'],
-  ),
-  composer('composer.json');
-
-  const PackageEcosystem(
-    this.indexFile, [
-    this.defaultIgnore = const [],
-  ]);
-
-  final String indexFile;
-  final Iterable<String> defaultIgnore;
-
-  Iterable<ConfigEntry> getEntries(
-    Logger logger, [
-    List<String> ignore = const [],
-  ]) sync* {
-    final effectiveIgnore = [...ignore, ...defaultIgnore];
-    final result = Process.runSync(
-      'find',
-      [
-        '.',
-        '-name',
-        indexFile,
-      ],
-      runInShell: true,
-    );
-    if (result.exitCode != 0) {
-      throw ProcessException(
-        'find',
-        [
-          '.',
-          '-name',
-          indexFile,
-        ],
-        'Things went south',
-        result.exitCode,
-      );
+  @override
+  Future<int?> runCommand(ArgResults topLevelResults) async {
+    // Fast track completion command
+    if (topLevelResults.command?.name == 'completion') {
+      await super.runCommand(topLevelResults);
+      return ExitCode.success.code;
     }
-    final stdout = result.stdout as String;
-    final paths = stdout
-        .split('\n')
-        .where((element) => element.isNotEmpty)
-        .map(path.dirname);
 
-    pans:
-    for (final pubPath in paths) {
-      for (final parent in effectiveIgnore) {
-        if (path.isWithin(parent, pubPath) || path.equals(parent, pubPath)) {
-          continue pans;
-        }
+    // Run the command or show version
+    final int? exitCode;
+    if (topLevelResults['version'] == true) {
+      _logger.info(packageVersion);
+      exitCode = ExitCode.success.code;
+    } else {
+      exitCode = await super.runCommand(topLevelResults);
+    }
+
+    // Check for updates
+    if (topLevelResults.command?.name != UpdateCommand.commandName) {
+      await _checkForUpdates();
+    }
+
+    return exitCode;
+  }
+
+  /// Checks if the current version (set by the build runner on the
+  /// version.dart file) is the most recent one. If not, show a prompt to the
+  /// user.
+  Future<void> _checkForUpdates() async {
+    try {
+      final latestVersion = await _pubUpdater.getLatestVersion(packageName);
+      final isUpToDate = packageVersion == latestVersion;
+      if (!isUpToDate) {
+        _logger
+          ..info('')
+          ..info(
+            '''
+${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u2192 ${lightCyan.wrap(latestVersion)}
+Run ${lightCyan.wrap('$executableName update')} to update''',
+          );
       }
-
-      final convertedPath =
-          pubPath.replaceAll('./', '/').replaceAll(RegExp(r'^\.$'), '/');
-
-      yield ConfigEntry(
-        ecosystemName: name,
-        directory: convertedPath,
-        schedule: const ConfigSchedule(interval: 'daily'),
-      );
-    }
-  }
-}
-
-class ConfigEntry {
-  const ConfigEntry({
-    required this.ecosystemName,
-    required this.directory,
-    required this.schedule,
-  });
-
-  static const ghActions = ConfigEntry(
-    ecosystemName: 'gh-actions',
-    directory: '/',
-    schedule: ConfigSchedule(interval: 'daily'),
-  );
-
-  final String ecosystemName;
-  final String directory;
-  final ConfigSchedule schedule;
-
-  @override
-  String toString() {
-    return '''
-  - package-ecosystem: "${ecosystemName}"
-    directory: "$directory"
-$schedule
-''';
-  }
-}
-
-class ConfigSchedule {
-  const ConfigSchedule({
-    required this.interval,
-  });
-
-  final String interval;
-
-  @override
-  String toString() {
-    return '''
-    schedule:
-      interval: "daily"
-''';
+    } catch (_) {}
   }
 }
