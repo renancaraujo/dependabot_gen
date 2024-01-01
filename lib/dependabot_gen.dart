@@ -6,7 +6,7 @@
 ///
 /// # see usage
 /// depgen --help
-/// 
+///
 /// # if you dont have a dependabot.yaml file, run
 /// dart pub global run dependabot_gen:depgen
 /// ```

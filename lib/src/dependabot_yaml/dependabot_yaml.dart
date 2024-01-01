@@ -1,7 +1,2 @@
 export 'get_file.dart';
-
-
-
-class DependabotSpec {
-  
-}
+export 'spec.dart';

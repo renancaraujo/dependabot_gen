@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:git/git.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
@@ -13,7 +15,10 @@ class CreateCommand extends Command<int> {
   /// {@macro create_command}
   CreateCommand({
     required Logger logger,
-  }) : _logger = logger;
+  }) : _logger = logger {
+    argParser.addOption('path', abbr: 'p', help: '''
+Path to the repository root.If ommited, the command will search for the closest git repository root from the current working directory.''');
+  }
 
   @override
   String get description => '''
@@ -24,19 +29,26 @@ A command which creates a new dependabot.yaml file in the repository root.''';
 
   final Logger _logger;
 
+  Future<Directory> _getRepositoryRoot() async {
+    final path = argResults?['path'] as String?;
+
+    if (path == null) {
+      return getRepositoryRoot();
+    }
+
+    return Directory(path);
+  }
+
   @override
   Future<int> run() async {
-    final repoRoot = await getRepositoryRoot();
-    
+    final repoRoot = await _getRepositoryRoot();
 
     final dependabotFile = getDependabotFile(repositoryRoot: repoRoot);
 
-    _logger.info('Creating dependabot.yaml in ${dependabotFile.path}');
+    _logger.info(
+      'Creating dependabot.yaml in ${jsonEncode(dependabotFile.toJson())}',
+    );
 
-
-
-
-    
     return ExitCode.success.code;
   }
 }
@@ -64,4 +76,3 @@ Future<Directory> getRepositoryRoot([
 
   return Directory(pp);
 }
-
