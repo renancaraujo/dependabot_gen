@@ -1,11 +1,11 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - directory: /
+    package-ecosystem: github-actions
     schedule:
-      interval: "daily"
-  - package-ecosystem: "pub"
-    directory: "/"
+      interval: daily
+  - directory: /
+    package-ecosystem: pub
     schedule:
-      interval: "daily"
+      interval: weekly

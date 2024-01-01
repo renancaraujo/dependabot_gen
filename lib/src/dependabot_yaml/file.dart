@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
+import 'package:yaml_edit/yaml_edit.dart';
 
 DependabotFile getDependabotFile({required Directory repositoryRoot}) {
   final filePath = p.join(repositoryRoot.path, '.github', 'dependabot.yaml');
@@ -13,10 +15,12 @@ DependabotFile getDependabotFile({required Directory repositoryRoot}) {
   return DependabotFile.fromFile(file);
 }
 
+@immutable
 class DependabotFile {
   const DependabotFile({
     required this.path,
     required this.content,
+    required this.editor,
   });
 
   factory DependabotFile.fromFile(File file) {
@@ -36,10 +40,29 @@ class DependabotFile {
     return DependabotFile(
       path: file.path,
       content: content,
+      editor: YamlEditor(contents),
     );
   }
 
   final String path;
 
   final DependabotSpec content;
+
+  final YamlEditor editor;
+
+  DependabotFile copyWith({
+    String? path,
+    DependabotSpec? content,
+  }) {
+    return DependabotFile(
+      path: path ?? this.path,
+      content: content ?? this.content,
+      editor: editor,
+    );
+  }
+
+  void writeToFile() {
+    editor.update([], content.toJson());
+    File(path).writeAsStringSync(editor.toString());
+  }
 }

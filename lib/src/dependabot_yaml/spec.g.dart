@@ -14,10 +14,10 @@ DependabotSpec _$DependabotSpecFromJson(Map json) => $checkedCreate(
           json,
           allowedKeys: const [
             'version',
-            'updates',
             'enable-beta-ecosystems',
             'ignore',
-            'registries'
+            'registries',
+            'updates'
           ],
           disallowNullValues: const [
             'enable-beta-ecosystems',
@@ -59,7 +59,6 @@ DependabotSpec _$DependabotSpecFromJson(Map json) => $checkedCreate(
 Map<String, dynamic> _$DependabotSpecToJson(DependabotSpec instance) {
   final val = <String, dynamic>{
     'version': _$DependabotVersionEnumMap[instance.version]!,
-    'updates': _updatesToJson(instance.updates),
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -71,6 +70,7 @@ Map<String, dynamic> _$DependabotSpecToJson(DependabotSpec instance) {
   writeNotNull('enable-beta-ecosystems', instance.enableBetaEcosystems);
   writeNotNull('ignore', _ignoresToJson(instance.ignore));
   writeNotNull('registries', instance.registries);
+  val['updates'] = _updatesToJson(instance.updates);
   return val;
 }
 
@@ -78,72 +78,119 @@ const _$DependabotVersionEnumMap = {
   DependabotVersion.v2: 2,
 };
 
-UpdateEntry _$UpdateEntryFromJson(Map json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['package-ecosystem'],
-    disallowNullValues: const [
-      'allow',
-      'assignees',
-      'commit-message',
-      'groups',
-      'ignore',
-      'insecure-external-code-execution',
-      'labels',
-      'milestone',
-      'open-pull-requests-limit',
-      'pull-request-branch-name',
-      'rebase-strategy',
-      'registries',
-      'reviewers',
-      'target-branch',
-      'vendor',
-      'versioning-strategy'
-    ],
-  );
-  return UpdateEntry(
-    directory: json['directory'] as String,
-    allow: (json['allow'] as List<dynamic>?)
-        ?.map((e) =>
-            const AllowedEntryConverter().fromJson(e as Map<String, dynamic>))
-        .toList(),
-    assignees:
-        (json['assignees'] as List<dynamic>?)?.map((e) => e as String).toList(),
-    commitMessage: json['commit-message'] == null
-        ? null
-        : CommitMessage.fromJson(
-            Map<String, dynamic>.from(json['commit-message'] as Map)),
-    groups: (json['groups'] as Map?)?.map(
-      (k, e) => MapEntry(k as String, e),
-    ),
-    ignore: (json['ignore'] as List<dynamic>?)
-        ?.map((e) => Ignore.fromJson(Map<String, dynamic>.from(e as Map)))
-        .toList(),
-    insecureExternalCodeExecution:
-        json['insecure-external-code-execution'] as String?,
-    labels:
-        (json['labels'] as List<dynamic>?)?.map((e) => e as String).toList(),
-    milestone: json['milestone'] as int?,
-    openPullRequestsLimit: json['open-pull-requests-limit'] as int?,
-    ecosystem: json['package-ecosystem'] as String,
-    pullRequestBranchName: json['pull-request-branch-name'] == null
-        ? null
-        : PullRequestBranchName.fromJson(
-            Map<String, dynamic>.from(json['pull-request-branch-name'] as Map)),
-    rebaseStrategy:
-        $enumDecodeNullable(_$RebaseStrategyEnumMap, json['rebase-strategy']),
-    registries: (json['registries'] as List<dynamic>?)
-        ?.map((e) => e as String)
-        .toList(),
-    reviewers: json['reviewers'] as String?,
-    schedule:
-        Schedule.fromJson(Map<String, dynamic>.from(json['schedule'] as Map)),
-    targetBranch: json['target-branch'] as String?,
-    vendor: json['vendor'] as bool?,
-    versioningStrategy: $enumDecodeNullable(
-        _$VersioningStrategyEnumMap, json['versioning-strategy']),
-  );
-}
+UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
+      'UpdateEntry',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const [
+            'directory',
+            'allow',
+            'assignees',
+            'commit-message',
+            'groups',
+            'ignore',
+            'insecure-external-code-execution',
+            'labels',
+            'milestone',
+            'open-pull-requests-limit',
+            'package-ecosystem',
+            'pull-request-branch-name',
+            'rebase-strategy',
+            'registries',
+            'reviewers',
+            'schedule',
+            'target-branch',
+            'vendor',
+            'versioning-strategy'
+          ],
+          requiredKeys: const ['package-ecosystem'],
+          disallowNullValues: const [
+            'allow',
+            'assignees',
+            'commit-message',
+            'groups',
+            'ignore',
+            'insecure-external-code-execution',
+            'labels',
+            'milestone',
+            'open-pull-requests-limit',
+            'pull-request-branch-name',
+            'rebase-strategy',
+            'registries',
+            'reviewers',
+            'target-branch',
+            'vendor',
+            'versioning-strategy'
+          ],
+        );
+        final val = UpdateEntry(
+          directory: $checkedConvert('directory', (v) => v as String),
+          ecosystem: $checkedConvert('package-ecosystem', (v) => v as String),
+          schedule: $checkedConvert('schedule',
+              (v) => Schedule.fromJson(Map<String, dynamic>.from(v as Map))),
+          allow: $checkedConvert(
+              'allow',
+              (v) => (v as List<dynamic>?)
+                  ?.map((e) => const AllowedEntryConverter()
+                      .fromJson(e as Map<String, dynamic>))
+                  .toList()),
+          assignees: $checkedConvert('assignees',
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+          commitMessage: $checkedConvert(
+              'commit-message',
+              (v) => v == null
+                  ? null
+                  : CommitMessage.fromJson(
+                      Map<String, dynamic>.from(v as Map))),
+          groups: $checkedConvert(
+              'groups',
+              (v) => (v as Map?)?.map(
+                    (k, e) => MapEntry(k as String, e),
+                  )),
+          ignore: $checkedConvert(
+              'ignore',
+              (v) => (v as List<dynamic>?)
+                  ?.map((e) =>
+                      Ignore.fromJson(Map<String, dynamic>.from(e as Map)))
+                  .toList()),
+          insecureExternalCodeExecution: $checkedConvert(
+              'insecure-external-code-execution', (v) => v as String?),
+          labels: $checkedConvert('labels',
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+          milestone: $checkedConvert('milestone', (v) => v as int?),
+          openPullRequestsLimit:
+              $checkedConvert('open-pull-requests-limit', (v) => v as int?),
+          pullRequestBranchName: $checkedConvert(
+              'pull-request-branch-name',
+              (v) => v == null
+                  ? null
+                  : PullRequestBranchName.fromJson(
+                      Map<String, dynamic>.from(v as Map))),
+          rebaseStrategy: $checkedConvert('rebase-strategy',
+              (v) => $enumDecodeNullable(_$RebaseStrategyEnumMap, v)),
+          registries: $checkedConvert('registries',
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+          reviewers: $checkedConvert('reviewers', (v) => v as String?),
+          targetBranch: $checkedConvert('target-branch', (v) => v as String?),
+          vendor: $checkedConvert('vendor', (v) => v as bool?),
+          versioningStrategy: $checkedConvert('versioning-strategy',
+              (v) => $enumDecodeNullable(_$VersioningStrategyEnumMap, v)),
+        );
+        return val;
+      },
+      fieldKeyMap: const {
+        'ecosystem': 'package-ecosystem',
+        'commitMessage': 'commit-message',
+        'insecureExternalCodeExecution': 'insecure-external-code-execution',
+        'openPullRequestsLimit': 'open-pull-requests-limit',
+        'pullRequestBranchName': 'pull-request-branch-name',
+        'rebaseStrategy': 'rebase-strategy',
+        'targetBranch': 'target-branch',
+        'versioningStrategy': 'versioning-strategy'
+      },
+    );
 
 Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
   final val = <String, dynamic>{
@@ -159,7 +206,7 @@ Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
   writeNotNull('allow',
       instance.allow?.map(const AllowedEntryConverter().toJson).toList());
   writeNotNull('assignees', instance.assignees);
-  writeNotNull('commit-message', instance.commitMessage);
+  writeNotNull('commit-message', instance.commitMessage?.toJson());
   writeNotNull('groups', instance.groups);
   writeNotNull('ignore', _ignoresToJson(instance.ignore));
   writeNotNull('insecure-external-code-execution',
@@ -168,12 +215,13 @@ Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
   writeNotNull('milestone', instance.milestone);
   writeNotNull('open-pull-requests-limit', instance.openPullRequestsLimit);
   val['package-ecosystem'] = instance.ecosystem;
-  writeNotNull('pull-request-branch-name', instance.pullRequestBranchName);
+  writeNotNull(
+      'pull-request-branch-name', instance.pullRequestBranchName?.toJson());
   writeNotNull(
       'rebase-strategy', _$RebaseStrategyEnumMap[instance.rebaseStrategy]);
   writeNotNull('registries', instance.registries);
   writeNotNull('reviewers', instance.reviewers);
-  val['schedule'] = instance.schedule;
+  val['schedule'] = instance.schedule.toJson();
   writeNotNull('target-branch', instance.targetBranch);
   writeNotNull('vendor', instance.vendor);
   writeNotNull('versioning-strategy',
@@ -194,19 +242,27 @@ const _$VersioningStrategyEnumMap = {
   VersioningStrategy.widen: 'widen',
 };
 
-Schedule _$ScheduleFromJson(Map json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['interval'],
-    disallowNullValues: const ['day', 'time', 'timezone'],
-  );
-  return Schedule(
-    interval: $enumDecode(_$ScheduleIntervalEnumMap, json['interval']),
-    day: $enumDecodeNullable(_$ScheduleDayEnumMap, json['day']),
-    time: json['time'] as String?,
-    timezone: json['timezone'] as String?,
-  );
-}
+Schedule _$ScheduleFromJson(Map json) => $checkedCreate(
+      'Schedule',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['interval', 'day', 'time', 'timezone'],
+          requiredKeys: const ['interval'],
+          disallowNullValues: const ['day', 'time', 'timezone'],
+        );
+        final val = Schedule(
+          interval: $checkedConvert(
+              'interval', (v) => $enumDecode(_$ScheduleIntervalEnumMap, v)),
+          day: $checkedConvert(
+              'day', (v) => $enumDecodeNullable(_$ScheduleDayEnumMap, v)),
+          time: $checkedConvert('time', (v) => v as String?),
+          timezone: $checkedConvert('timezone', (v) => v as String?),
+        );
+        return val;
+      },
+    );
 
 Map<String, dynamic> _$ScheduleToJson(Schedule instance) {
   final val = <String, dynamic>{
@@ -241,30 +297,45 @@ const _$ScheduleDayEnumMap = {
   ScheduleDay.sunday: 'sunday',
 };
 
-AllowDependency _$AllowDependencyFromJson(Map json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['dependency-name'],
-  );
-  return AllowDependency(
-    name: json['dependency-name'] as String,
-  );
-}
+AllowDependency _$AllowDependencyFromJson(Map json) => $checkedCreate(
+      'AllowDependency',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['dependency-name'],
+          requiredKeys: const ['dependency-name'],
+        );
+        final val = AllowDependency(
+          name: $checkedConvert('dependency-name', (v) => v as String),
+        );
+        return val;
+      },
+      fieldKeyMap: const {'name': 'dependency-name'},
+    );
 
 Map<String, dynamic> _$AllowDependencyToJson(AllowDependency instance) =>
     <String, dynamic>{
       'dependency-name': instance.name,
     };
 
-AllowDependencyType _$AllowDependencyTypeFromJson(Map json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['dependency-type'],
-  );
-  return AllowDependencyType(
-    dependencyType: json['dependency-type'] as String,
-  );
-}
+AllowDependencyType _$AllowDependencyTypeFromJson(Map json) => $checkedCreate(
+      'AllowDependencyType',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['dependency-type'],
+          requiredKeys: const ['dependency-type'],
+        );
+        final val = AllowDependencyType(
+          dependencyType:
+              $checkedConvert('dependency-type', (v) => v as String),
+        );
+        return val;
+      },
+      fieldKeyMap: const {'dependencyType': 'dependency-type'},
+    );
 
 Map<String, dynamic> _$AllowDependencyTypeToJson(
         AllowDependencyType instance) =>
@@ -272,17 +343,25 @@ Map<String, dynamic> _$AllowDependencyTypeToJson(
       'dependency-type': instance.dependencyType,
     };
 
-CommitMessage _$CommitMessageFromJson(Map json) {
-  $checkKeys(
-    json,
-    disallowNullValues: const ['prefix', 'prefix-development', 'include'],
-  );
-  return CommitMessage(
-    prefix: json['prefix'] as String?,
-    prefixDevelopment: json['prefix-development'] as String?,
-    include: json['include'] as String? ?? 'scope',
-  );
-}
+CommitMessage _$CommitMessageFromJson(Map json) => $checkedCreate(
+      'CommitMessage',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['prefix', 'prefix-development', 'include'],
+          disallowNullValues: const ['prefix', 'prefix-development', 'include'],
+        );
+        final val = CommitMessage(
+          prefix: $checkedConvert('prefix', (v) => v as String?),
+          prefixDevelopment:
+              $checkedConvert('prefix-development', (v) => v as String?),
+          include: $checkedConvert('include', (v) => v as String? ?? 'scope'),
+        );
+        return val;
+      },
+      fieldKeyMap: const {'prefixDevelopment': 'prefix-development'},
+    );
 
 Map<String, dynamic> _$CommitMessageToJson(CommitMessage instance) {
   final val = <String, dynamic>{};
@@ -299,21 +378,34 @@ Map<String, dynamic> _$CommitMessageToJson(CommitMessage instance) {
   return val;
 }
 
-Ignore _$IgnoreFromJson(Map json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['dependency-name'],
-    disallowNullValues: const ['versions', 'update-types'],
-  );
-  return Ignore(
-    dependencyName: json['dependency-name'] as String,
-    versions:
-        (json['versions'] as List<dynamic>?)?.map((e) => e as String).toList(),
-    updateTypes: (json['update-types'] as List<dynamic>?)
-        ?.map((e) => $enumDecode(_$UpdateTypeEnumMap, e))
-        .toList(),
-  );
-}
+Ignore _$IgnoreFromJson(Map json) => $checkedCreate(
+      'Ignore',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['dependency-name', 'versions', 'update-types'],
+          requiredKeys: const ['dependency-name'],
+          disallowNullValues: const ['versions', 'update-types'],
+        );
+        final val = Ignore(
+          dependencyName:
+              $checkedConvert('dependency-name', (v) => v as String),
+          versions: $checkedConvert('versions',
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+          updateTypes: $checkedConvert(
+              'update-types',
+              (v) => (v as List<dynamic>?)
+                  ?.map((e) => $enumDecode(_$UpdateTypeEnumMap, e))
+                  .toList()),
+        );
+        return val;
+      },
+      fieldKeyMap: const {
+        'dependencyName': 'dependency-name',
+        'updateTypes': 'update-types'
+      },
+    );
 
 Map<String, dynamic> _$IgnoreToJson(Ignore instance) {
   final val = <String, dynamic>{
@@ -339,8 +431,19 @@ const _$UpdateTypeEnumMap = {
 };
 
 PullRequestBranchName _$PullRequestBranchNameFromJson(Map json) =>
-    PullRequestBranchName(
-      separator: json['separator'] as String,
+    $checkedCreate(
+      'PullRequestBranchName',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['separator'],
+        );
+        final val = PullRequestBranchName(
+          separator: $checkedConvert('separator', (v) => v as String),
+        );
+        return val;
+      },
     );
 
 Map<String, dynamic> _$PullRequestBranchNameToJson(

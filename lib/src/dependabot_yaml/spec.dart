@@ -9,6 +9,7 @@ part 'spec.g.dart';
   anyMap: true,
   checked: true,
   disallowUnrecognizedKeys: true,
+  explicitToJson: true,
 )
 class DependabotSpec {
   DependabotSpec({
@@ -45,9 +46,6 @@ class DependabotSpec {
   @JsonKey(defaultValue: DependabotVersion.v2)
   final DependabotVersion version;
 
-  @JsonKey(toJson: _updatesToJson)
-  final List<UpdateEntry> updates;
-
   @JsonKey(disallowNullValue: true, name: 'enable-beta-ecosystems')
   final bool? enableBetaEcosystems;
 
@@ -57,6 +55,22 @@ class DependabotSpec {
   @JsonKey(disallowNullValue: true)
   // TODO(renancaraujo): Add support for registries
   final Map<String, dynamic>? registries;
+
+  @JsonKey(toJson: _updatesToJson)
+  final List<UpdateEntry> updates;
+
+  DependabotSpec copyWith({
+    DependabotVersion? version,
+    List<UpdateEntry>? updates,
+  }) {
+    return DependabotSpec(
+      version: version ?? this.version,
+      updates: updates ?? this.updates,
+      enableBetaEcosystems: enableBetaEcosystems,
+      ignore: ignore,
+      registries: registries,
+    );
+  }
 }
 
 enum DependabotVersion {
@@ -70,6 +84,9 @@ List<dynamic> _updatesToJson(List<UpdateEntry> updates) {
 
 @JsonSerializable(
   anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
+  explicitToJson: true,
 )
 class UpdateEntry {
   UpdateEntry({
@@ -159,13 +176,15 @@ class UpdateEntry {
 
 @JsonSerializable(
   anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
 )
 class Schedule {
   Schedule({
     required this.interval,
-    required this.day,
-    required this.time,
-    required this.timezone,
+    this.day,
+    this.time,
+    this.timezone,
   });
 
   factory Schedule.fromJson(Map<String, dynamic> json) =>
@@ -206,6 +225,8 @@ sealed class AllowEntry {}
 
 @JsonSerializable(
   anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
 )
 class AllowDependency extends AllowEntry {
   AllowDependency({
@@ -218,6 +239,8 @@ class AllowDependency extends AllowEntry {
 
 @JsonSerializable(
   anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
 )
 class AllowDependencyType extends AllowEntry {
   AllowDependencyType({
@@ -254,8 +277,10 @@ class AllowedEntryConverter
 }
 
 @JsonSerializable(
-  anyMap: true,
-)
+    anyMap: true,
+    checked: true,
+    disallowUnrecognizedKeys: true,
+    explicitToJson: true)
 class CommitMessage {
   CommitMessage({
     required this.prefix,
@@ -284,6 +309,8 @@ List<dynamic>? _ignoresToJson(List<Ignore>? ignore) {
 
 @JsonSerializable(
   anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
 )
 class Ignore {
   Ignore({
@@ -317,6 +344,8 @@ enum UpdateType {
 
 @JsonSerializable(
   anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
 )
 class PullRequestBranchName {
   PullRequestBranchName({required this.separator});
