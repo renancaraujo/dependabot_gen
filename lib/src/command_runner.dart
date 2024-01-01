@@ -6,8 +6,13 @@ import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
 
+/// The name of the executable.
 const executableName = 'depgen';
+
+/// The name of the package.
 const packageName = 'dependabot_gen';
+
+/// The description of the package.
 const description = 'Keep your dependabot.yaml up to date';
 
 /// {@template dependabot_gen_command_runner}

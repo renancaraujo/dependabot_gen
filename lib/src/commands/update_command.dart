@@ -23,6 +23,7 @@ class UpdateCommand extends Command<int> {
   @override
   String get description => 'Update depgen.';
 
+  /// The name of this command.
   static const String commandName = 'update';
 
   @override

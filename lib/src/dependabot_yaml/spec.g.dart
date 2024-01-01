@@ -133,7 +133,7 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
           allow: $checkedConvert(
               'allow',
               (v) => (v as List<dynamic>?)
-                  ?.map((e) => const AllowedEntryConverter()
+                  ?.map((e) => const _AllowedEntryConverter()
                       .fromJson(e as Map<String, dynamic>))
                   .toList()),
           assignees: $checkedConvert('assignees',
@@ -204,7 +204,7 @@ Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
   }
 
   writeNotNull('allow',
-      instance.allow?.map(const AllowedEntryConverter().toJson).toList());
+      instance.allow?.map(const _AllowedEntryConverter().toJson).toList());
   writeNotNull('assignees', instance.assignees);
   writeNotNull('commit-message', instance.commitMessage?.toJson());
   writeNotNull('groups', instance.groups);

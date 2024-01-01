@@ -1,10 +1,11 @@
-import 'dart:io';
-
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'spec.g.dart';
 
+/// {@template dependabot_spec}
+/// A representation of a dependabot.yaml file content.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
@@ -12,6 +13,7 @@ part 'spec.g.dart';
   explicitToJson: true,
 )
 class DependabotSpec {
+  /// {@macro dependabot_spec}
   DependabotSpec({
     required this.version,
     required this.updates,
@@ -20,9 +22,11 @@ class DependabotSpec {
     this.registries,
   });
 
+  /// Creates a new [DependabotSpec] from a JSON map.
   factory DependabotSpec.fromJson(Map<String, dynamic> json) =>
       _$DependabotSpecFromJson(json);
 
+  /// Creates a new [DependabotSpec] from a YAML string.
   factory DependabotSpec.parse(String yaml, {Uri? sourceUri}) {
     return checkedYamlDecode(
       yaml,
@@ -41,24 +45,32 @@ class DependabotSpec {
     );
   }
 
+  /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$DependabotSpecToJson(this);
 
+  /// The version of the dependabot spec.
   @JsonKey(defaultValue: DependabotVersion.v2)
   final DependabotVersion version;
 
+  /// Enable ecosystems that have beta-level support.
   @JsonKey(disallowNullValue: true, name: 'enable-beta-ecosystems')
   final bool? enableBetaEcosystems;
 
+  /// Ignore certain dependencies or versions
   @JsonKey(disallowNullValue: true, toJson: _ignoresToJson)
   final List<Ignore>? ignore;
 
+  /// A map of registries to their configuration.
   @JsonKey(disallowNullValue: true)
-  // TODO(renancaraujo): Add support for registries
   final Map<String, dynamic>? registries;
 
+  /// Element for each one package manager that you want GitHub Dependabot to
+  /// monitor for new versions.
   @JsonKey(toJson: _updatesToJson)
   final List<UpdateEntry> updates;
 
+  /// Creates a copy of this object with the given fields replaced with the
+  /// new values.
   DependabotSpec copyWith({
     DependabotVersion? version,
     List<UpdateEntry>? updates,
@@ -73,7 +85,9 @@ class DependabotSpec {
   }
 }
 
+/// The version of the dependabot spec.
 enum DependabotVersion {
+  /// Version 2 of the dependabot spec.
   @JsonValue(2)
   v2,
 }
@@ -82,6 +96,10 @@ List<dynamic> _updatesToJson(List<UpdateEntry> updates) {
   return updates.map((e) => e.toJson()).toList();
 }
 
+/// {@template update_entry}
+/// Element for each one package manager that GitHub Dependabot will
+/// monitor for new versions.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
@@ -89,6 +107,7 @@ List<dynamic> _updatesToJson(List<UpdateEntry> updates) {
   explicitToJson: true,
 )
 class UpdateEntry {
+  /// {@macro update_entry}
   UpdateEntry({
     required this.directory,
     required this.ecosystem,
@@ -111,75 +130,100 @@ class UpdateEntry {
     this.versioningStrategy,
   });
 
+  /// Creates a new [UpdateEntry] from a JSON map.
   factory UpdateEntry.fromJson(Map<String, dynamic> json) =>
       _$UpdateEntryFromJson(json);
 
+  /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$UpdateEntryToJson(this);
 
+  /// The directory where the manifest file is located.
   final String directory;
 
+  /// Customize which updates are allowed.
   @JsonKey(disallowNullValue: true)
-  @AllowedEntryConverter()
+  @_AllowedEntryConverter()
   final List<AllowEntry>? allow;
 
+  /// Assignees to set on pull requests.
   @JsonKey(disallowNullValue: true)
   final List<String>? assignees;
 
+  /// Commit message preferences.
   @JsonKey(disallowNullValue: true, name: 'commit-message')
   final CommitMessage? commitMessage;
 
-  // TODO(renancaraujo): Add support for groups
+  /// Group updates for certain dependencies.
   @JsonKey(disallowNullValue: true)
   final Map<String, dynamic>? groups;
 
+  /// Ignore certain dependencies or versions
   @JsonKey(disallowNullValue: true, toJson: _ignoresToJson)
   final List<Ignore>? ignore;
 
+  /// Allow or deny code execution in manifest files
   @JsonKey(disallowNullValue: true, name: 'insecure-external-code-execution')
   final String? insecureExternalCodeExecution;
 
+  /// Labels to set on pull requests.
   @JsonKey(disallowNullValue: true)
   final List<String>? labels;
 
+  /// Milestone to set on pull requests.
   @JsonKey(disallowNullValue: true)
   final int? milestone;
 
+  /// Limit the number of open pull requests.
   @JsonKey(disallowNullValue: true, name: 'open-pull-requests-limit')
   final int? openPullRequestsLimit;
 
+  /// The package manager to use.
   @JsonKey(required: true, name: 'package-ecosystem')
   final String ecosystem;
 
+  /// Change separator for pull request branch names.
   @JsonKey(disallowNullValue: true, name: 'pull-request-branch-name')
   final PullRequestBranchName? pullRequestBranchName;
 
+  /// Rebase strategy to use.
   @JsonKey(disallowNullValue: true, name: 'rebase-strategy')
   final RebaseStrategy? rebaseStrategy;
 
+  /// Private registries that Dependabot can access
   @JsonKey(disallowNullValue: true)
   final List<String>? registries;
 
+  /// Reviewers to request on pull requests.
   @JsonKey(disallowNullValue: true)
   final String? reviewers;
 
+  /// Schedule for Dependabot to update dependencies.
   final Schedule schedule;
 
+  /// The branch to create pull requests against.
   @JsonKey(disallowNullValue: true, name: 'target-branch')
   final String? targetBranch;
 
+  /// Raise pull requests to update vendored dependencies that are checked in
+  /// to the repository
   @JsonKey(disallowNullValue: true)
   final bool? vendor;
 
+  /// The strategy to use when updating versions.
   @JsonKey(disallowNullValue: true, name: 'versioning-strategy')
   final VersioningStrategy? versioningStrategy;
 }
 
+/// {@template schedule}
+/// Schedule for Dependabot to update dependencies.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
   disallowUnrecognizedKeys: true,
 )
 class Schedule {
+  /// {@macro schedule}
   Schedule({
     required this.interval,
     this.day,
@@ -187,73 +231,110 @@ class Schedule {
     this.timezone,
   });
 
+  /// Creates a new [Schedule] from a JSON map.
   factory Schedule.fromJson(Map<String, dynamic> json) =>
       _$ScheduleFromJson(json);
 
+  /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$ScheduleToJson(this);
 
+  /// The interval to use.
   @JsonKey(required: true)
   final ScheduleInterval interval;
 
+  /// Which day of the week to use.
   @JsonKey(disallowNullValue: true)
   final ScheduleDay? day;
 
+  /// The time of day to use.
   @JsonKey(disallowNullValue: true)
   final String? time;
 
+  /// The timezone to use.
   @JsonKey(disallowNullValue: true)
   final String? timezone;
 }
 
+/// Defines the interval for a [Schedule].
 enum ScheduleInterval {
+  /// Check for updates daily.
   daily,
+
+  /// Check for updates weekly.
   weekly,
+
+  /// Check for updates monthly.
   monthly,
 }
 
+/// Defines the day of the week for a [Schedule].
 enum ScheduleDay {
+  /// Check for updates on Monday.
   monday,
+
+  /// Check for updates on Tuesday.
   tuesday,
+
+  /// Check for updates on Wednesday.
   wednesday,
+
+  /// Check for updates on Thursday.
   thursday,
+
+  /// Check for updates on Friday.
   friday,
+
+  /// Check for updates on Saturday.
   saturday,
+
+  /// Check for updates on Sunday.
   sunday,
 }
 
+/// Generic type for allowed entries to be used by [UpdateEntry.allow].
 sealed class AllowEntry {}
 
+/// {@template allow_dependency}
+/// Allow updates for a specific dependency.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
   disallowUnrecognizedKeys: true,
 )
 class AllowDependency extends AllowEntry {
+  /// {@macro allow_dependency}
   AllowDependency({
     required this.name,
   });
 
+  /// The name of the dependency to allow.
   @JsonKey(required: true, name: 'dependency-name')
   final String name;
 }
 
+/// {@template allow_dependency_type}
+/// Allow updates for a specific dependency type.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
   disallowUnrecognizedKeys: true,
 )
 class AllowDependencyType extends AllowEntry {
+  /// {@macro allow_dependency_type}
   AllowDependencyType({
     required this.dependencyType,
   });
 
+  /// The type of the dependency to allow.
   @JsonKey(required: true, name: 'dependency-type')
   final String dependencyType;
 }
 
-class AllowedEntryConverter
+class _AllowedEntryConverter
     implements JsonConverter<AllowEntry, Map<String, dynamic>> {
-  const AllowedEntryConverter();
+  const _AllowedEntryConverter();
 
   @override
   AllowEntry fromJson(Map<String, dynamic> json) {
@@ -276,29 +357,39 @@ class AllowedEntryConverter
   }
 }
 
+/// {@template commit_message}
+/// Commit message preferences.
+/// {@endtemplate}
 @JsonSerializable(
-    anyMap: true,
-    checked: true,
-    disallowUnrecognizedKeys: true,
-    explicitToJson: true)
+  anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
+  explicitToJson: true,
+)
 class CommitMessage {
+  /// {@macro commit_message}
   CommitMessage({
     required this.prefix,
     required this.prefixDevelopment,
     required this.include,
   });
 
+  /// Creates a new [CommitMessage] from a JSON map.
   factory CommitMessage.fromJson(Map<String, dynamic> json) =>
       _$CommitMessageFromJson(json);
 
+  /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$CommitMessageToJson(this);
 
+  /// The prefix to use for commit messages.
   @JsonKey(disallowNullValue: true)
   final String? prefix;
 
+  /// The prefix to use for commit messages for development dependencies.
   @JsonKey(disallowNullValue: true, name: 'prefix-development')
   final String? prefixDevelopment;
 
+  /// The scope to use for commit messages.
   @JsonKey(defaultValue: 'scope', disallowNullValue: true)
   final String? include;
 }
@@ -307,65 +398,104 @@ List<dynamic>? _ignoresToJson(List<Ignore>? ignore) {
   return ignore?.map((e) => e.toJson()).toList();
 }
 
+/// {@template ignore}
+/// Ignore certain dependencies or versions.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
   disallowUnrecognizedKeys: true,
 )
 class Ignore {
+  /// {@macro ignore}
   Ignore({
     required this.dependencyName,
     required this.versions,
     required this.updateTypes,
   });
 
+  /// Creates a new [Ignore] from a JSON map.
   factory Ignore.fromJson(Map<String, dynamic> json) => _$IgnoreFromJson(json);
 
+  /// Converts this object to a JSON map.`
   Map<String, dynamic> toJson() => _$IgnoreToJson(this);
 
+  /// The name of the dependency to ignore.
   @JsonKey(required: true, name: 'dependency-name')
   final String dependencyName;
 
+  /// The versions of the dependency to ignore.
   @JsonKey(disallowNullValue: true)
   final List<String>? versions;
 
+  /// The types of updates to ignore.
   @JsonKey(disallowNullValue: true, name: 'update-types')
   final List<UpdateType>? updateTypes;
 }
 
+/// Types of updates to ignore.
 enum UpdateType {
+  /// Ignore major updates.
   @JsonValue('version-update:semver-major')
   major,
+
+  /// Ignore minor updates.
   @JsonValue('version-update:semver-minor')
   minor,
+
+  /// Ignore patch updates.
   @JsonValue('version-update:semver-patch')
   patch,
 }
 
+/// {@template pull_request_branch_name}
+/// Change separator for pull request branch names.
+/// {@endtemplate}
 @JsonSerializable(
   anyMap: true,
   checked: true,
   disallowUnrecognizedKeys: true,
 )
 class PullRequestBranchName {
+  /// {@macro pull_request_branch_name}
   PullRequestBranchName({required this.separator});
 
+  /// Creates a new [PullRequestBranchName] from a JSON map.
   factory PullRequestBranchName.fromJson(Map<String, dynamic> json) =>
       _$PullRequestBranchNameFromJson(json);
 
+  /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$PullRequestBranchNameToJson(this);
 
+  /// The separator to use.
   final String separator;
 }
 
-enum RebaseStrategy { auto, disabled }
-
-enum VersioningStrategy {
+/// Rebase strategy to use.
+enum RebaseStrategy {
+  /// Auto-rebase pull requests.
   auto,
+
+  /// Do not rebase pull requests automatically.
+  disabled,
+}
+
+/// The strategy to use when updating versions.
+enum VersioningStrategy {
+  /// Auto-detect the versioning strategy.
+  auto,
+
+  /// Use the lockfile only.
   increase,
+
+  /// Increase the version if necessary.
   @JsonValue('increase-if-necessary')
   increaseIfNecessary,
+
+  /// Use the lockfile only.
   @JsonValue('lockfile-only')
   lockfileOnly,
+
+  /// Increase the version if necessary.
   widen,
 }

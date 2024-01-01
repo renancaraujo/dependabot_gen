@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:args/command_runner.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:dependabot_gen/src/package_finder/package_finder.dart';
 import 'package:git/git.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
-
-import '../package_finder/package_finder.dart';
 
 /// {@template create_command}
 ///
@@ -46,7 +43,7 @@ A command which creates a new dependabot.yaml file in the repository root.''';
     final path = argResults?['path'] as String?;
 
     if (path == null) {
-      return getRepositoryRoot();
+      return _fetchRepositoryRoot();
     }
 
     return Directory(path);
@@ -111,7 +108,8 @@ A command which creates a new dependabot.yaml file in the repository root.''';
         );
       } else {
         _logger.info(
-          'Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}',
+          '''
+Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
         );
         currentUpdates.remove(existingEntry);
         entriesToAdd.add(existingEntry);
@@ -126,10 +124,10 @@ A command which creates a new dependabot.yaml file in the repository root.''';
     }
 
     dependabotFile
-      .copyWith(
-        content: dependabotFile.content.copyWith(updates: entriesToAdd),
-      )
-      .writeToFile();
+        .copyWith(
+          content: dependabotFile.content.copyWith(updates: entriesToAdd),
+        )
+        .writeToFile();
 
     _logger.info(
       'Finished creating dependabot.yaml in $repoRoot',
@@ -139,7 +137,7 @@ A command which creates a new dependabot.yaml file in the repository root.''';
   }
 }
 
-Future<Directory> getRepositoryRoot([
+Future<Directory> _fetchRepositoryRoot([
   String? path,
 ]) async {
   final current = p.absolute(path ?? Directory.current.path);
