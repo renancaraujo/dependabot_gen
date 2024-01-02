@@ -1,4 +1,4 @@
-import 'package:checked_yaml/checked_yaml.dart';
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'spec.g.dart';
@@ -12,9 +12,9 @@ part 'spec.g.dart';
   disallowUnrecognizedKeys: true,
   explicitToJson: true,
 )
-class DependabotSpec {
+class DependabotSpec extends Equatable {
   /// {@macro dependabot_spec}
-  DependabotSpec({
+  const DependabotSpec({
     required this.version,
     required this.updates,
     this.enableBetaEcosystems,
@@ -23,27 +23,8 @@ class DependabotSpec {
   });
 
   /// Creates a new [DependabotSpec] from a JSON map.
-  factory DependabotSpec.fromJson(Map<String, dynamic> json) =>
+  factory DependabotSpec.fromJson(Map<dynamic, dynamic> json) =>
       _$DependabotSpecFromJson(json);
-
-  /// Creates a new [DependabotSpec] from a YAML string.
-  factory DependabotSpec.parse(String yaml, {Uri? sourceUri}) {
-    return checkedYamlDecode(
-      yaml,
-      (m) {
-        if (m == null) {
-          throw CheckedFromJsonException(
-            m ?? {},
-            'DependabotSpec',
-            'yaml',
-            'Expected a Map<String, dynamic>, but got ${m.runtimeType}',
-          );
-        }
-        return _$DependabotSpecFromJson(m);
-      },
-      sourceUrl: sourceUri,
-    );
-  }
 
   /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$DependabotSpecToJson(this);
@@ -83,6 +64,15 @@ class DependabotSpec {
       registries: registries,
     );
   }
+
+  @override
+  List<Object?> get props => [
+        version,
+        updates,
+        enableBetaEcosystems,
+        ignore,
+        registries,
+      ];
 }
 
 /// The version of the dependabot spec.
@@ -106,9 +96,9 @@ List<dynamic> _updatesToJson(List<UpdateEntry> updates) {
   disallowUnrecognizedKeys: true,
   explicitToJson: true,
 )
-class UpdateEntry {
+class UpdateEntry extends Equatable {
   /// {@macro update_entry}
-  UpdateEntry({
+  const UpdateEntry({
     required this.directory,
     required this.ecosystem,
     required this.schedule,
@@ -137,8 +127,15 @@ class UpdateEntry {
   /// Converts this object to a JSON map.
   Map<String, dynamic> toJson() => _$UpdateEntryToJson(this);
 
+  /// The package manager to use.
+  @JsonKey(required: true, name: 'package-ecosystem')
+  final String ecosystem;
+
   /// The directory where the manifest file is located.
   final String directory;
+
+  /// Schedule for Dependabot to update dependencies.
+  final Schedule schedule;
 
   /// Customize which updates are allowed.
   @JsonKey(disallowNullValue: true)
@@ -177,10 +174,6 @@ class UpdateEntry {
   @JsonKey(disallowNullValue: true, name: 'open-pull-requests-limit')
   final int? openPullRequestsLimit;
 
-  /// The package manager to use.
-  @JsonKey(required: true, name: 'package-ecosystem')
-  final String ecosystem;
-
   /// Change separator for pull request branch names.
   @JsonKey(disallowNullValue: true, name: 'pull-request-branch-name')
   final PullRequestBranchName? pullRequestBranchName;
@@ -195,10 +188,7 @@ class UpdateEntry {
 
   /// Reviewers to request on pull requests.
   @JsonKey(disallowNullValue: true)
-  final String? reviewers;
-
-  /// Schedule for Dependabot to update dependencies.
-  final Schedule schedule;
+  final List<String>? reviewers;
 
   /// The branch to create pull requests against.
   @JsonKey(disallowNullValue: true, name: 'target-branch')
@@ -212,6 +202,29 @@ class UpdateEntry {
   /// The strategy to use when updating versions.
   @JsonKey(disallowNullValue: true, name: 'versioning-strategy')
   final VersioningStrategy? versioningStrategy;
+
+  @override
+  List<Object?> get props => [
+        ecosystem,
+        directory,
+        schedule,
+        allow,
+        assignees,
+        commitMessage,
+        groups,
+        ignore,
+        insecureExternalCodeExecution,
+        labels,
+        milestone,
+        openPullRequestsLimit,
+        pullRequestBranchName,
+        rebaseStrategy,
+        registries,
+        reviewers,
+        targetBranch,
+        vendor,
+        versioningStrategy,
+      ];
 }
 
 /// {@template schedule}
@@ -222,9 +235,9 @@ class UpdateEntry {
   checked: true,
   disallowUnrecognizedKeys: true,
 )
-class Schedule {
+class Schedule extends Equatable {
   /// {@macro schedule}
-  Schedule({
+  const Schedule({
     required this.interval,
     this.day,
     this.time,
@@ -253,6 +266,14 @@ class Schedule {
   /// The timezone to use.
   @JsonKey(disallowNullValue: true)
   final String? timezone;
+
+  @override
+  List<Object?> get props => [
+        interval,
+        day,
+        time,
+        timezone,
+      ];
 }
 
 /// Defines the interval for a [Schedule].
@@ -292,7 +313,9 @@ enum ScheduleDay {
 }
 
 /// Generic type for allowed entries to be used by [UpdateEntry.allow].
-sealed class AllowEntry {}
+sealed class AllowEntry extends Equatable {
+  const AllowEntry();
+}
 
 /// {@template allow_dependency}
 /// Allow updates for a specific dependency.
@@ -304,13 +327,16 @@ sealed class AllowEntry {}
 )
 class AllowDependency extends AllowEntry {
   /// {@macro allow_dependency}
-  AllowDependency({
+  const AllowDependency({
     required this.name,
   });
 
   /// The name of the dependency to allow.
   @JsonKey(required: true, name: 'dependency-name')
   final String name;
+
+  @override
+  List<Object?> get props => [name];
 }
 
 /// {@template allow_dependency_type}
@@ -323,13 +349,16 @@ class AllowDependency extends AllowEntry {
 )
 class AllowDependencyType extends AllowEntry {
   /// {@macro allow_dependency_type}
-  AllowDependencyType({
+  const AllowDependencyType({
     required this.dependencyType,
   });
 
   /// The type of the dependency to allow.
   @JsonKey(required: true, name: 'dependency-type')
   final String dependencyType;
+
+  @override
+  List<Object?> get props => [dependencyType];
 }
 
 class _AllowedEntryConverter
@@ -366,9 +395,9 @@ class _AllowedEntryConverter
   disallowUnrecognizedKeys: true,
   explicitToJson: true,
 )
-class CommitMessage {
+class CommitMessage extends Equatable {
   /// {@macro commit_message}
-  CommitMessage({
+  const CommitMessage({
     required this.prefix,
     required this.prefixDevelopment,
     required this.include,
@@ -392,6 +421,13 @@ class CommitMessage {
   /// The scope to use for commit messages.
   @JsonKey(defaultValue: 'scope', disallowNullValue: true)
   final String? include;
+
+  @override
+  List<Object?> get props => [
+        prefix,
+        prefixDevelopment,
+        include,
+      ];
 }
 
 List<dynamic>? _ignoresToJson(List<Ignore>? ignore) {
@@ -406,9 +442,9 @@ List<dynamic>? _ignoresToJson(List<Ignore>? ignore) {
   checked: true,
   disallowUnrecognizedKeys: true,
 )
-class Ignore {
+class Ignore extends Equatable {
   /// {@macro ignore}
-  Ignore({
+  const Ignore({
     required this.dependencyName,
     required this.versions,
     required this.updateTypes,
@@ -431,6 +467,13 @@ class Ignore {
   /// The types of updates to ignore.
   @JsonKey(disallowNullValue: true, name: 'update-types')
   final List<UpdateType>? updateTypes;
+
+  @override
+  List<Object?> get props => [
+        dependencyName,
+        versions,
+        updateTypes,
+      ];
 }
 
 /// Types of updates to ignore.
@@ -456,9 +499,9 @@ enum UpdateType {
   checked: true,
   disallowUnrecognizedKeys: true,
 )
-class PullRequestBranchName {
+class PullRequestBranchName extends Equatable {
   /// {@macro pull_request_branch_name}
-  PullRequestBranchName({required this.separator});
+  const PullRequestBranchName({required this.separator});
 
   /// Creates a new [PullRequestBranchName] from a JSON map.
   factory PullRequestBranchName.fromJson(Map<String, dynamic> json) =>
@@ -469,6 +512,11 @@ class PullRequestBranchName {
 
   /// The separator to use.
   final String separator;
+
+  @override
+  List<Object?> get props => [
+        separator,
+      ];
 }
 
 /// Rebase strategy to use.

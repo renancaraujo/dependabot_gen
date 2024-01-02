@@ -83,7 +83,7 @@ A command which creates a new dependabot.yaml file in the repository root.''';
         element.finder
             .findUpdateEntries(
               repoRoot: repoRoot,
-              schedule: Schedule(
+              schedule: const Schedule(
                 interval: ScheduleInterval.daily,
               ),
             )

@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
@@ -35,13 +37,27 @@ class DependabotFile {
 
     DependabotSpec content;
     if (contents.isEmpty) {
-      content = DependabotSpec(
+      content = const DependabotSpec(
         version: DependabotVersion.v2,
         updates: [],
         enableBetaEcosystems: true,
       );
     } else {
-      content = DependabotSpec.parse(contents, sourceUri: file.uri);
+      content = checkedYamlDecode(
+        contents,
+        (m) {
+          if (m == null) {
+            throw CheckedFromJsonException(
+              m ?? {},
+              'DependabotSpec',
+              'yaml',
+              'Expected a Map<String, dynamic>, but got ${m.runtimeType}',
+            );
+          }
+          return DependabotSpec.fromJson(m);
+        },
+        sourceUrl: file.uri,
+      );
     }
 
     return DependabotFile._(

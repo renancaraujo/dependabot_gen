@@ -10,6 +10,7 @@ dependencies:
   args: ^2.4.1
   checked_yaml: ^2.0.3
   cli_completion: ^0.4.0
+  equatable: ^2.0.5
   git: ^2.2.1
   json_annotation: ^4.8.1
   mason_logger: ^0.2.5

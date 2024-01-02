@@ -85,7 +85,9 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
         $checkKeys(
           json,
           allowedKeys: const [
+            'package-ecosystem',
             'directory',
+            'schedule',
             'allow',
             'assignees',
             'commit-message',
@@ -95,12 +97,10 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
             'labels',
             'milestone',
             'open-pull-requests-limit',
-            'package-ecosystem',
             'pull-request-branch-name',
             'rebase-strategy',
             'registries',
             'reviewers',
-            'schedule',
             'target-branch',
             'vendor',
             'versioning-strategy'
@@ -172,7 +172,8 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
               (v) => $enumDecodeNullable(_$RebaseStrategyEnumMap, v)),
           registries: $checkedConvert('registries',
               (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
-          reviewers: $checkedConvert('reviewers', (v) => v as String?),
+          reviewers: $checkedConvert('reviewers',
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
           targetBranch: $checkedConvert('target-branch', (v) => v as String?),
           vendor: $checkedConvert('vendor', (v) => v as bool?),
           versioningStrategy: $checkedConvert('versioning-strategy',
@@ -194,7 +195,9 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
 
 Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
   final val = <String, dynamic>{
+    'package-ecosystem': instance.ecosystem,
     'directory': instance.directory,
+    'schedule': instance.schedule.toJson(),
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -214,14 +217,12 @@ Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
   writeNotNull('labels', instance.labels);
   writeNotNull('milestone', instance.milestone);
   writeNotNull('open-pull-requests-limit', instance.openPullRequestsLimit);
-  val['package-ecosystem'] = instance.ecosystem;
   writeNotNull(
       'pull-request-branch-name', instance.pullRequestBranchName?.toJson());
   writeNotNull(
       'rebase-strategy', _$RebaseStrategyEnumMap[instance.rebaseStrategy]);
   writeNotNull('registries', instance.registries);
   writeNotNull('reviewers', instance.reviewers);
-  val['schedule'] = instance.schedule.toJson();
   writeNotNull('target-branch', instance.targetBranch);
   writeNotNull('vendor', instance.vendor);
   writeNotNull('versioning-strategy',
