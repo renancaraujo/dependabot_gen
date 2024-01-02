@@ -190,7 +190,9 @@ abstract interface class PackageEcosystemFinder {
   Iterable<UpdateEntry> findUpdateEntries({
     required Directory repoRoot,
     required Schedule schedule,
-    Set<String> ignore = const {},
+    required Set<String>? assignees,
+    required Set<String>? labels,
+    required Set<String>? ignoreFinding,
   });
 
   /// The name of the package ecosystem.
@@ -221,13 +223,17 @@ class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
   Iterable<UpdateEntry> findUpdateEntries({
     required Directory repoRoot,
     required Schedule schedule,
-    Set<String> ignore = const {},
+    required Set<String>? assignees,
+    required Set<String>? labels,
+    required Set<String>? ignoreFinding,
   }) sync* {
     if (repoHeuristics(repoRoot)) {
       yield UpdateEntry(
         directory: '/',
         ecosystem: ecosystem,
         schedule: schedule,
+        assignees: assignees,
+        labels: labels,
       );
     }
   }
@@ -253,19 +259,23 @@ class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
   Iterable<UpdateEntry> findUpdateEntries({
     required Directory repoRoot,
     required Schedule schedule,
-    Set<String> ignore = const {},
+    required Set<String>? assignees,
+    required Set<String>? labels,
+    required Set<String>? ignoreFinding,
   }) sync* {
     final paths = _findFilesRecursivelyOn(
       directory: repoRoot,
       withNames: indexFiles,
-    ).where((element) => element.isNotIgnored()).map((e) => e.path);
+    ).where((e) => e.isNotIgnored()).map((e) => e.path);
 
     outer:
     for (final manifestPath in paths) {
-      for (final parent in ignore) {
-        if (p.isWithin(parent, manifestPath) ||
-            p.equals(parent, manifestPath)) {
-          continue outer;
+      if (ignoreFinding != null) {
+        for (final parent in ignoreFinding) {
+          if (p.isWithin(parent, manifestPath) ||
+              p.equals(parent, manifestPath)) {
+            continue outer;
+          }
         }
       }
 
@@ -281,6 +291,8 @@ class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
         directory: convertedPath,
         ecosystem: ecosystem,
         schedule: schedule,
+        assignees: assignees,
+        labels: labels,
       );
     }
   }

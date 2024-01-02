@@ -137,7 +137,7 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
                       .fromJson(e as Map<String, dynamic>))
                   .toList()),
           assignees: $checkedConvert('assignees',
-              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toSet()),
           commitMessage: $checkedConvert(
               'commit-message',
               (v) => v == null
@@ -156,9 +156,11 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
                       Ignore.fromJson(Map<String, dynamic>.from(e as Map)))
                   .toList()),
           insecureExternalCodeExecution: $checkedConvert(
-              'insecure-external-code-execution', (v) => v as String?),
+              'insecure-external-code-execution',
+              (v) => $enumDecodeNullable(
+                  _$InsecureExternalCodeExecutionEnumMap, v)),
           labels: $checkedConvert('labels',
-              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toSet()),
           milestone: $checkedConvert('milestone', (v) => v as int?),
           openPullRequestsLimit:
               $checkedConvert('open-pull-requests-limit', (v) => v as int?),
@@ -208,13 +210,15 @@ Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
 
   writeNotNull('allow',
       instance.allow?.map(const _AllowedEntryConverter().toJson).toList());
-  writeNotNull('assignees', instance.assignees);
+  writeNotNull('assignees', instance.assignees?.toList());
   writeNotNull('commit-message', instance.commitMessage?.toJson());
   writeNotNull('groups', instance.groups);
   writeNotNull('ignore', _ignoresToJson(instance.ignore));
-  writeNotNull('insecure-external-code-execution',
-      instance.insecureExternalCodeExecution);
-  writeNotNull('labels', instance.labels);
+  writeNotNull(
+      'insecure-external-code-execution',
+      _$InsecureExternalCodeExecutionEnumMap[
+          instance.insecureExternalCodeExecution]);
+  writeNotNull('labels', instance.labels?.toList());
   writeNotNull('milestone', instance.milestone);
   writeNotNull('open-pull-requests-limit', instance.openPullRequestsLimit);
   writeNotNull(
@@ -229,6 +233,11 @@ Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
       _$VersioningStrategyEnumMap[instance.versioningStrategy]);
   return val;
 }
+
+const _$InsecureExternalCodeExecutionEnumMap = {
+  InsecureExternalCodeExecution.allow: 'allow',
+  InsecureExternalCodeExecution.deny: 'deny',
+};
 
 const _$RebaseStrategyEnumMap = {
   RebaseStrategy.auto: 'auto',

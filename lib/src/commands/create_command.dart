@@ -21,12 +21,13 @@ class CreateCommand extends Command<int> {
         'ecosystems',
         allowed: PackageEcosystem.values.map((e) => e.name),
         defaultsTo: PackageEcosystem.values.map((e) => e.name),
+        help: 'The package ecosystems to update in the dependabot.yaml file.',
       )
       ..addOption(
-        'path',
-        abbr: 'p',
+        'repoRoot',
+        abbr: 'r',
         help: '''
-Path to the repository root.If ommited, the command will search for the closest git repository root from the current working directory.''',
+Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''',
       );
   }
 
@@ -40,7 +41,7 @@ A command which creates a new dependabot.yaml file in the repository root.''';
   final Logger _logger;
 
   Future<Directory> _getRepositoryRoot() async {
-    final path = argResults?['path'] as String?;
+    final path = argResults?['repoRoot'] as String?;
 
     if (path == null) {
       return _fetchRepositoryRoot();
@@ -80,14 +81,15 @@ A command which creates a new dependabot.yaml file in the repository root.''';
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
       (previousValue, element) {
-        element.finder
-            .findUpdateEntries(
-              repoRoot: repoRoot,
-              schedule: const Schedule(
-                interval: ScheduleInterval.daily,
-              ),
-            )
-            .forEach(previousValue.add);
+        element.finder.findUpdateEntries(
+          repoRoot: repoRoot,
+          schedule: const Schedule(
+            interval: ScheduleInterval.weekly,
+          ),
+          assignees: const {},
+          labels: const {},
+          ignoreFinding: const {},
+        ).forEach(previousValue.add);
 
         return previousValue;
       },
@@ -117,6 +119,23 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
     }
 
     for (final entry in currentUpdates) {
+      var dir = entry.directory;
+      if (dir.startsWith('/')) {
+        dir = dir.substring(1);
+      }
+      final exists = Directory(
+        p.join(repoRoot.path, dir),
+      ).existsSync();
+
+      // Preserve unsupported ecosystems
+      if (exists) {
+        entriesToAdd.add(entry);
+        _logger.info(
+          'Preserved ${entry.ecosystem} entry for ${entry.directory}',
+        );
+        continue;
+      }
+
       _logger.warn(
         'Removed ${entry.ecosystem} entry for ${entry.directory}',
         tag: '-',

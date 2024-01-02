@@ -11,7 +11,7 @@
             "type": "dart",
             "program": "bin/depgen.dart",
             "args": [
-                "create"
+                "create", "--repoRoot", "../../temp/dependabot-core/"
             ]
         },
     ]

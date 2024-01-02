@@ -100,7 +100,7 @@ void main() {
                 AllowDependencyType(dependencyType: 'direct'),
                 AllowDependency(name: 'flame_*'),
               ],
-              assignees: ['renancaraujo'],
+              assignees: {'renancaraujo'},
               commitMessage: CommitMessage(
                 prefix: 'chore(deps):',
                 prefixDevelopment: 'chore(deps-dev):',
@@ -117,8 +117,9 @@ void main() {
                   ],
                 ),
               ],
-              insecureExternalCodeExecution: 'allow',
-              labels: ['dependencies'],
+              insecureExternalCodeExecution:
+                  InsecureExternalCodeExecution.allow,
+              labels: {'dependencies'},
               milestone: 4,
               openPullRequestsLimit: 6,
               pullRequestBranchName: PullRequestBranchName(separator: '--'),
@@ -172,7 +173,7 @@ void main() {
                     AllowDependencyType(dependencyType: 'direct'),
                     AllowDependency(name: 'flame_*'),
                   ],
-                  assignees: ['renancaraujo'],
+                  assignees: {'renancaraujo'},
                   commitMessage: CommitMessage(
                     prefix: 'chore(deps):',
                     prefixDevelopment: 'chore(deps-dev):',
@@ -189,8 +190,9 @@ void main() {
                       ],
                     ),
                   ],
-                  insecureExternalCodeExecution: 'allow',
-                  labels: ['dependencies'],
+                  insecureExternalCodeExecution:
+                      InsecureExternalCodeExecution.allow,
+                  labels: {'dependencies'},
                   milestone: 4,
                   openPullRequestsLimit: 6,
                   pullRequestBranchName: PullRequestBranchName(separator: '--'),

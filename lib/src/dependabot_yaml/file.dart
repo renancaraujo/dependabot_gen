@@ -12,9 +12,15 @@ import 'package:yaml_edit/yaml_edit.dart';
 /// If the file does not exist, it will be created.
 DependabotFile getDependabotFile({required Directory repositoryRoot}) {
   final filePath = p.join(repositoryRoot.path, '.github', 'dependabot.yaml');
-  final file = File(filePath);
+  final filePath2 = p.join(repositoryRoot.path, '.github', 'dependabot.yml');
+  var file = File(filePath);
+
   if (!file.existsSync()) {
-    file.createSync(recursive: true);
+    file = File(filePath2);
+  }
+
+  if (!file.existsSync()) {
+    file = File(filePath)..createSync(recursive: true);
   }
 
   return DependabotFile.fromFile(file);

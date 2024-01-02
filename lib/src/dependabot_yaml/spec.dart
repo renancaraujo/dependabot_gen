@@ -144,7 +144,7 @@ class UpdateEntry extends Equatable {
 
   /// Assignees to set on pull requests.
   @JsonKey(disallowNullValue: true)
-  final List<String>? assignees;
+  final Set<String>? assignees;
 
   /// Commit message preferences.
   @JsonKey(disallowNullValue: true, name: 'commit-message')
@@ -160,11 +160,11 @@ class UpdateEntry extends Equatable {
 
   /// Allow or deny code execution in manifest files
   @JsonKey(disallowNullValue: true, name: 'insecure-external-code-execution')
-  final String? insecureExternalCodeExecution;
+  final InsecureExternalCodeExecution? insecureExternalCodeExecution;
 
   /// Labels to set on pull requests.
   @JsonKey(disallowNullValue: true)
-  final List<String>? labels;
+  final Set<String>? labels;
 
   /// Milestone to set on pull requests.
   @JsonKey(disallowNullValue: true)
@@ -546,4 +546,15 @@ enum VersioningStrategy {
 
   /// Increase the version if necessary.
   widen,
+}
+
+/// Allow or deny code execution in manifest files.
+enum InsecureExternalCodeExecution {
+  /// Allow code execution in manifest files.
+  @JsonValue('allow')
+  allow,
+
+  /// Deny code execution in manifest files.
+  @JsonValue('deny')
+  deny,
 }
