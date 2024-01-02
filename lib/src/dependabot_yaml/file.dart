@@ -26,7 +26,6 @@ class DependabotFile {
   const DependabotFile._({
     required this.path,
     required this.content,
-    required this.editor,
   });
 
   /// Creates a new [DependabotFile] from the given [file].
@@ -63,7 +62,6 @@ class DependabotFile {
     return DependabotFile._(
       path: file.path,
       content: content,
-      editor: YamlEditor(contents),
     );
   }
 
@@ -73,9 +71,6 @@ class DependabotFile {
   /// The content of the dependabot.yaml file represented as a [DependabotSpec].
   final DependabotSpec content;
 
-  /// The [YamlEditor] used to update the dependabot.yaml file on [writeToFile].
-  final YamlEditor editor;
-
   /// Creates a copy of this [DependabotFile] with the given fields replaced.
   DependabotFile copyWith({
     String? path,
@@ -84,13 +79,12 @@ class DependabotFile {
     return DependabotFile._(
       path: path ?? this.path,
       content: content ?? this.content,
-      editor: editor,
     );
   }
 
   /// Writes the [content] to the dependabot.yaml file.
   void writeToFile() {
-    editor.update([], content.toJson());
+    final editor = YamlEditor('')..update([], content.toJson());
     File(path).writeAsStringSync(editor.toString());
   }
 }
