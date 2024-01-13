@@ -190,8 +190,9 @@ abstract interface class PackageEcosystemFinder {
   Iterable<UpdateEntry> findUpdateEntries({
     required Directory repoRoot,
     required Schedule schedule,
-    required Set<String>? assignees,
+    required String? targetBranch,
     required Set<String>? labels,
+    required int? milestone,
     required Set<String>? ignoreFinding,
   });
 
@@ -223,8 +224,9 @@ class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
   Iterable<UpdateEntry> findUpdateEntries({
     required Directory repoRoot,
     required Schedule schedule,
-    required Set<String>? assignees,
+    required String? targetBranch,
     required Set<String>? labels,
+    required int? milestone,
     required Set<String>? ignoreFinding,
   }) sync* {
     if (repoHeuristics(repoRoot)) {
@@ -232,8 +234,9 @@ class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
         directory: '/',
         ecosystem: ecosystem,
         schedule: schedule,
-        assignees: assignees,
+        targetBranch: targetBranch,
         labels: labels,
+        milestone: milestone,
       );
     }
   }
@@ -259,8 +262,9 @@ class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
   Iterable<UpdateEntry> findUpdateEntries({
     required Directory repoRoot,
     required Schedule schedule,
-    required Set<String>? assignees,
+    required String? targetBranch,
     required Set<String>? labels,
+    required int? milestone,
     required Set<String>? ignoreFinding,
   }) sync* {
     final paths = _findFilesRecursivelyOn(
@@ -291,8 +295,9 @@ class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
         directory: convertedPath,
         ecosystem: ecosystem,
         schedule: schedule,
-        assignees: assignees,
+        targetBranch: targetBranch,
         labels: labels,
+        milestone: milestone,
       );
     }
   }

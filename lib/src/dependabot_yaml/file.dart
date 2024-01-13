@@ -27,12 +27,12 @@ DependabotFile getDependabotFile({required Directory repositoryRoot}) {
 }
 
 /// Represents a dependabot.yaml file with its [path] and [content].
-@immutable
 class DependabotFile {
-  const DependabotFile._({
-    required this.path,
-    required this.content,
-  });
+  DependabotFile._(
+    this.path,
+    this._content,
+    this._editor,
+  );
 
   /// Creates a new [DependabotFile] from the given [file].
   ///
@@ -63,33 +63,53 @@ class DependabotFile {
         sourceUrl: file.uri,
       );
     }
+    final editor = YamlEditor(contents);
 
-    return DependabotFile._(
-      path: file.path,
-      content: content,
-    );
+    return DependabotFile._(file.path, content, editor);
   }
 
   /// The path to the dependabot.yaml file.
   final String path;
 
   /// The content of the dependabot.yaml file represented as a [DependabotSpec].
-  final DependabotSpec content;
+  DependabotSpec _content;
 
-  /// Creates a copy of this [DependabotFile] with the given fields replaced.
-  DependabotFile copyWith({
-    String? path,
-    DependabotSpec? content,
-  }) {
-    return DependabotFile._(
-      path: path ?? this.path,
-      content: content ?? this.content,
-    );
+  final YamlEditor _editor;
+
+  Iterable<UpdateEntry> get updates => _content.updates;
+
+  void commitChanges() {
+    File(path).writeAsStringSync(_editor.toString());
   }
 
-  /// Writes the [content] to the dependabot.yaml file.
-  void writeToFile() {
-    final editor = YamlEditor('')..update([], content.toJson());
-    File(path).writeAsStringSync(editor.toString());
+  void addUpdateEntry(UpdateEntry newEntry) {
+    _content = _content.copyWith(
+      updates: [
+        ..._content.updates,
+        newEntry,
+      ],
+    );
+    _editor.appendToList(['updates'], newEntry.toJson());
+  }
+
+  void removeUpdateEntry(UpdateEntry entry) {
+    final index = _content.updates.indexWhere(
+      (element) =>
+          element.directory == entry.directory &&
+          element.ecosystem == entry.ecosystem,
+    );
+
+    if (index == -1) {
+      return;
+    }
+
+    _content = _content.copyWith(
+      updates: [
+        ..._content.updates.take(index),
+        ..._content.updates.skip(index + 1),
+      ],
+    );
+
+    _editor.remove(['updates', index]);
   }
 }

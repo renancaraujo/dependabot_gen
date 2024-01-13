@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:collection/collection.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:dependabot_gen/src/package_finder/package_finder.dart';
 import 'package:git/git.dart';
@@ -24,16 +25,37 @@ class CreateCommand extends Command<int> {
         defaultsTo: PackageEcosystem.values.map((e) => e.name),
         help: 'The package ecosystems to update in the dependabot.yaml file.',
       )
-      ..addOption(
+      ..addMultiOption(
         'ignore-paths',
         abbr: 'i',
-        help: 'Paths to ignore when searching for packages. Example: "__brick__/**"',
+        help:
+            'Paths to ignore when searching for packages. Example: "__brick__/**"',
       )
       ..addOption(
         'repo-root',
         abbr: 'r',
         help: '''
 Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''',
+      )
+      ..addOption(
+        'schedule-interval',
+        abbr: 'I',
+        allowed: ScheduleInterval.values.map((e) => e.name),
+        defaultsTo: ScheduleInterval.weekly.name,
+        help: 'The interval to check for updates on new update entries '
+            '(does not affect existing ones).',
+      )
+      ..addOption(
+        'target-branch',
+        help: 'The target branch to create pull requests against.',
+      )
+      ..addMultiOption(
+        'labels',
+        help: 'Labels to add to the pull requests.',
+      )
+      ..addOption(
+        'milestone',
+        help: 'The milestone to add to the pull requests. Must be a number.',
       )
       ..addFlag(
         'silent',
@@ -59,7 +81,7 @@ Will keep existing entries and add new ones if needed.
   final Logger _logger;
 
   Future<Directory> _getRepositoryRoot() async {
-    final path = argResults!['repoRoot'] as String?;
+    final path = argResults!['repo-root'] as String?;
 
     if (path == null) {
       return _fetchRepositoryRoot();
@@ -71,17 +93,13 @@ Will keep existing entries and add new ones if needed.
   List<PackageEcosystem> _getEcosystems() {
     final ecosystems = argResults!['ecosystems'] as List<String>;
 
-    return ecosystems.map((e) {
-      final found = PackageEcosystem.values.firstWhere(
-        (element) => element.name == e,
-        orElse: () => throw UsageException(
-          'Could not find an ecosystem named "$e".',
-          usage,
-        ),
-      );
-
-      return found;
-    }).toList();
+    return ecosystems
+        .map(
+          (e) => PackageEcosystem.values.firstWhere(
+            (element) => element.name == e,
+          ),
+        )
+        .toList();
   }
 
   Level _getLogLevel() {
@@ -106,6 +124,51 @@ Will keep existing entries and add new ones if needed.
     return Level.info;
   }
 
+  Schedule _getSchedule() {
+    final interval = argResults!['schedule-interval'] as String;
+
+    final intervalSchedule = ScheduleInterval.values
+        .firstWhere((element) => element.name == interval);
+
+    return Schedule(
+      interval: intervalSchedule,
+    );
+  }
+
+  Set<String>? _getIgnorePaths() {
+    final ignorePaths = argResults!['ignore-paths'] as List<String>;
+
+    if (ignorePaths.isEmpty) {
+      return null;
+    }
+
+    return ignorePaths.toSet();
+  }
+
+  String? _getTargetBranch() {
+    final targetBranch = argResults!['target-branch'] as String?;
+
+    return targetBranch;
+  }
+
+  Set<String>? _getLabels() {
+    final labels = argResults!['labels'] as List<String>;
+
+    if (labels.isEmpty) {
+      return null;
+    }
+
+    return labels.toSet();
+  }
+
+  int? _getMilestone() {
+    final milestoneRaw = argResults!['milestone'] as String?;
+
+    final milestone = int.tryParse(milestoneRaw ?? '');
+
+    return milestone;
+  }
+
   @override
   Future<int> run() async {
     _logger.level = _getLogLevel();
@@ -123,40 +186,40 @@ Will keep existing entries and add new ones if needed.
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
       (previousValue, element) {
-        element.finder.findUpdateEntries(
-          repoRoot: repoRoot,
-          schedule: const Schedule(
-            interval: ScheduleInterval.weekly,
-          ),
-          assignees: const {},
-          labels: const {},
-          ignoreFinding: const {},
-        ).forEach(previousValue.add);
+        element.finder
+            .findUpdateEntries(
+              repoRoot: repoRoot,
+              schedule: _getSchedule(),
+              targetBranch: _getTargetBranch(),
+              labels: _getLabels(),
+              milestone: _getMilestone(),
+              ignoreFinding: _getIgnorePaths(),
+            )
+            .forEach(previousValue.add);
 
         return previousValue;
       },
     );
 
-    final currentUpdates = [...dependabotFile.content.updates];
-    final entriesToAdd = <UpdateEntry>[];
-    for (final newEntry in newEntries) {
-      final existingEntry = currentUpdates.where((element) {
-        return element.directory == newEntry.directory &&
-            element.ecosystem == newEntry.ecosystem;
-      }).firstOrNull;
+    final currentUpdates = dependabotFile.updates;
 
-      if (existingEntry == null) {
-        entriesToAdd.add(newEntry);
-        _logger.success(
-          'Added ${newEntry.ecosystem} entry for ${newEntry.directory}',
-        );
-      } else {
+    for (final newEntry in newEntries) {
+      final entryExists = currentUpdates.firstWhereOrNull((element) {
+            return element.directory == newEntry.directory &&
+                element.ecosystem == newEntry.ecosystem;
+          }) !=
+          null;
+
+      if (entryExists) {
         _logger.info(
           '''
 Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
         );
-        currentUpdates.remove(existingEntry);
-        entriesToAdd.add(existingEntry);
+      } else {
+        _logger.success(
+          'Added ${newEntry.ecosystem} entry for ${newEntry.directory}',
+        );
+        dependabotFile.addUpdateEntry(newEntry);
       }
     }
 
@@ -165,30 +228,23 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
       if (dir.startsWith('/')) {
         dir = dir.substring(1);
       }
-      final exists = Directory(
-        p.join(repoRoot.path, dir),
-      ).existsSync();
+      final exists = Directory(p.join(repoRoot.path, dir)).existsSync();
 
-      // Preserve unsupported ecosystems
       if (exists) {
-        entriesToAdd.add(entry);
         _logger.info(
           'Preserved ${entry.ecosystem} entry for ${entry.directory}',
         );
         continue;
       }
 
+      dependabotFile.removeUpdateEntry(entry);
       _logger.warn(
         'Removed ${entry.ecosystem} entry for ${entry.directory}',
         tag: '-',
       );
     }
 
-    dependabotFile
-        .copyWith(
-          content: dependabotFile.content.copyWith(updates: entriesToAdd),
-        )
-        .writeToFile();
+    dependabotFile.commitChanges();
 
     _logger.info(
       'Finished creating dependabot.yaml in $repoRoot',
