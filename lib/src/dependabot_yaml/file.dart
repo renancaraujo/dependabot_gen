@@ -45,7 +45,6 @@ class DependabotFile {
       content = const DependabotSpec(
         version: DependabotVersion.v2,
         updates: [],
-        enableBetaEcosystems: true,
       );
     } else {
       content = checkedYamlDecode(

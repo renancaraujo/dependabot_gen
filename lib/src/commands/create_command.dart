@@ -19,21 +19,39 @@ class CreateCommand extends Command<int> {
     argParser
       ..addMultiOption(
         'ecosystems',
+        abbr: 'e',
         allowed: PackageEcosystem.values.map((e) => e.name),
         defaultsTo: PackageEcosystem.values.map((e) => e.name),
         help: 'The package ecosystems to update in the dependabot.yaml file.',
       )
       ..addOption(
-        'repoRoot',
+        'ignore-paths',
+        abbr: 'i',
+        help: 'Paths to ignore when searching for packages. Example: "__brick__/**"',
+      )
+      ..addOption(
+        'repo-root',
         abbr: 'r',
         help: '''
 Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''',
+      )
+      ..addFlag(
+        'silent',
+        abbr: 'S',
+        help: 'Silences all output.',
+      )
+      ..addFlag(
+        'verbose',
+        abbr: 'V',
+        help: 'Verbose output.',
       );
   }
 
   @override
   String get description => '''
-A command which creates a new dependabot.yaml file in the repository root.''';
+Create or updates the dependabot.yaml file in the current repository. 
+Will keep existing entries and add new ones if needed.
+''';
 
   @override
   String get name => 'create';
@@ -41,7 +59,7 @@ A command which creates a new dependabot.yaml file in the repository root.''';
   final Logger _logger;
 
   Future<Directory> _getRepositoryRoot() async {
-    final path = argResults?['repoRoot'] as String?;
+    final path = argResults!['repoRoot'] as String?;
 
     if (path == null) {
       return _fetchRepositoryRoot();
@@ -51,7 +69,7 @@ A command which creates a new dependabot.yaml file in the repository root.''';
   }
 
   List<PackageEcosystem> _getEcosystems() {
-    final ecosystems = argResults?['ecosystems'] as List<String>;
+    final ecosystems = argResults!['ecosystems'] as List<String>;
 
     return ecosystems.map((e) {
       final found = PackageEcosystem.values.firstWhere(
@@ -66,14 +84,38 @@ A command which creates a new dependabot.yaml file in the repository root.''';
     }).toList();
   }
 
+  Level _getLogLevel() {
+    final silent = argResults!['silent'] as bool;
+    final verbose = argResults!['verbose'] as bool;
+
+    if (verbose && silent) {
+      throw UsageException(
+        'Both --verbose and --silent were provided. '
+        "Its like asking for a hot ice cube. Just doesn't work, does it?",
+        usage,
+      );
+    }
+
+    if (verbose) {
+      return Level.verbose;
+    }
+    if (silent) {
+      return Level.quiet;
+    }
+
+    return Level.info;
+  }
+
   @override
   Future<int> run() async {
+    _logger.level = _getLogLevel();
+
     final repoRoot = await _getRepositoryRoot();
 
     final dependabotFile = getDependabotFile(repositoryRoot: repoRoot);
 
     _logger.info(
-      'Creating dependabot.yaml in $repoRoot',
+      'Creating dependabot.yaml in ${dependabotFile.path}}',
     );
 
     final ecosystems = _getEcosystems();

@@ -1,5 +1,5 @@
 name: dependabot_gen
-description: Keep your dependabot.yaml up to date
+description: Generate a dependabot.yaml and keep it up to date. Dependabot Gen is a CLI used to disccover packages in a repository that can be canve its dependencies monitored by Dependabot.
 version: 0.1.0
 publish_to: none
 
