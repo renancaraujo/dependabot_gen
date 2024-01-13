@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
 
@@ -26,7 +25,7 @@ DependabotFile getDependabotFile({required Directory repositoryRoot}) {
   return DependabotFile.fromFile(file);
 }
 
-/// Represents a dependabot.yaml file with its [path] and [content].
+/// Represents a dependabot.yaml file with its [path].
 class DependabotFile {
   DependabotFile._(
     this.path,
@@ -76,12 +75,13 @@ class DependabotFile {
 
   final YamlEditor _editor;
 
+  /// The current updates in the dependabot.yaml file.
   Iterable<UpdateEntry> get updates => _content.updates;
 
-  void commitChanges() {
-    File(path).writeAsStringSync(_editor.toString());
-  }
-
+  /// Adds a new [UpdateEntry] to the dependabot.yaml file.
+  ///
+  /// Does not immediately save the changes to the file.
+  /// For that, call [commitChanges].
   void addUpdateEntry(UpdateEntry newEntry) {
     _content = _content.copyWith(
       updates: [
@@ -92,6 +92,10 @@ class DependabotFile {
     _editor.appendToList(['updates'], newEntry.toJson());
   }
 
+  /// Removes an [UpdateEntry] from the dependabot.yaml file.
+  ///
+  /// Does not immediately save the changes to the file.
+  /// For that, call [commitChanges].
   void removeUpdateEntry(UpdateEntry entry) {
     final index = _content.updates.indexWhere(
       (element) =>
@@ -111,5 +115,10 @@ class DependabotFile {
     );
 
     _editor.remove(['updates', index]);
+  }
+
+  /// Saves the changes to the actual dependabot.yaml file.
+  void commitChanges() {
+    File(path).writeAsStringSync(_editor.toString());
   }
 }

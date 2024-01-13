@@ -36,7 +36,7 @@ Will keep existing entries and add new ones if needed.
 
   @override
   Future<int> run() async {
-    logger.level = getLogLevel();
+    logger.level = logLevel;
     final repoRoot = await getRepositoryRoot();
 
     final dependabotFile = getDependabotFile(repositoryRoot: repoRoot);
@@ -45,7 +45,6 @@ Will keep existing entries and add new ones if needed.
       'Creating dependabot.yaml in ${dependabotFile.path}}',
     );
 
-    final ecosystems = getEcosystems();
 
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
@@ -53,11 +52,11 @@ Will keep existing entries and add new ones if needed.
         element.finder
             .findUpdateEntries(
               repoRoot: repoRoot,
-              schedule: getSchedule(),
-              targetBranch: getTargetBranch(),
-              labels: getLabels(),
-              milestone: getMilestone(),
-              ignoreFinding: getIgnorePaths(),
+              schedule: schedule,
+              targetBranch: targetBranch,
+              labels: labels,
+              milestone: milestone,
+              ignoreFinding: ignorePaths,
             )
             .forEach(previousValue.add);
 

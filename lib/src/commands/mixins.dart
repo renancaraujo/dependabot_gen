@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs
-
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -10,21 +8,31 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
+/// {@template mixins_command}
+/// A subclass of [Command] that allwos usages of mixins to add options.
+/// {@endtemplate}
 abstract class MixinsCommand<T> extends Command<T> {
+  /// {@macro mixins_command}
   MixinsCommand({
     required Logger logger,
   }) : _logger = logger {
     addOptions();
   }
 
+  /// Adds options to the command.
   @mustCallSuper
+  @protected
   void addOptions() {}
 
   final Logger _logger;
 
+  /// The [Logger] for this command.
   Logger get logger => _logger;
 }
 
+/// Adds the `--silent` and `--verbose` options to the command.
+///
+/// Get the log level with [logLevel].
 mixin LoggerLevelOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -42,7 +50,8 @@ mixin LoggerLevelOption<T> on MixinsCommand<T> {
       );
   }
 
-  Level getLogLevel() {
+  /// Gets the [Level] for the logger.
+  Level get logLevel {
     final silent = argResults!['silent'] as bool;
     final verbose = argResults!['verbose'] as bool;
 
@@ -65,6 +74,9 @@ mixin LoggerLevelOption<T> on MixinsCommand<T> {
   }
 }
 
+/// Adds the `--schedule-interval` option to the command.
+///
+/// Get the [Schedule] with [schedule].
 mixin ScheduleOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -79,7 +91,8 @@ mixin ScheduleOption<T> on MixinsCommand<T> {
     );
   }
 
-  Schedule getSchedule() {
+  /// Gets the [Schedule] for the command.
+  Schedule get schedule {
     final interval = argResults!['schedule-interval'] as String;
 
     final intervalSchedule = ScheduleInterval.values
@@ -91,6 +104,7 @@ mixin ScheduleOption<T> on MixinsCommand<T> {
   }
 }
 
+/// Adds the `--target-branch` option to the command.
 mixin TargetBranchOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -101,11 +115,11 @@ mixin TargetBranchOption<T> on MixinsCommand<T> {
     );
   }
 
-  String? getTargetBranch() {
-    return argResults!['target-branch'] as String?;
-  }
+  /// Gets the target branch for the command.
+  String? get targetBranch => argResults!['target-branch'] as String?;
 }
 
+/// Adds the `--ignore-paths` option to the command.
 mixin IgnorePathsOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -118,7 +132,8 @@ mixin IgnorePathsOption<T> on MixinsCommand<T> {
     );
   }
 
-  Set<String>? getIgnorePaths() {
+  /// Gets the paths to ignore for the command.
+  Set<String>? get ignorePaths {
     final ignorePaths = argResults!['ignore-paths'] as List<String>;
 
     if (ignorePaths.isEmpty) {
@@ -129,6 +144,7 @@ mixin IgnorePathsOption<T> on MixinsCommand<T> {
   }
 }
 
+/// Adds the `--labels` option to the command.
 mixin LabelsOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -139,7 +155,8 @@ mixin LabelsOption<T> on MixinsCommand<T> {
     );
   }
 
-  Set<String>? getLabels() {
+  /// Gets the labels.
+  Set<String>? get labels {
     final labels = argResults!['labels'] as List<String>;
 
     if (labels.isEmpty) {
@@ -150,6 +167,7 @@ mixin LabelsOption<T> on MixinsCommand<T> {
   }
 }
 
+/// Adds the `--milestone` option to the command.
 mixin MilestoneOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -160,7 +178,8 @@ mixin MilestoneOption<T> on MixinsCommand<T> {
     );
   }
 
-  int? getMilestone() {
+  /// Gets the milestone.
+  int? get milestone {
     final milestoneRaw = argResults!['milestone'] as String?;
 
     final milestone = int.tryParse(milestoneRaw ?? '');
@@ -169,6 +188,8 @@ mixin MilestoneOption<T> on MixinsCommand<T> {
   }
 }
 
+
+/// Adds the `--ecosystems` option to the command.
 mixin EcosystemsOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -182,7 +203,8 @@ mixin EcosystemsOption<T> on MixinsCommand<T> {
     );
   }
 
-  Set<PackageEcosystem> getEcosystems() {
+  /// Gets the ecosystems.
+  Set<PackageEcosystem> get ecosystems {
     final ecosystems = argResults!['ecosystems'] as List<String>;
 
     return ecosystems
@@ -195,6 +217,7 @@ mixin EcosystemsOption<T> on MixinsCommand<T> {
   }
 }
 
+/// Adds the `--repo-root` option to the command.
 mixin RepositoryRootOption<T> on MixinsCommand<T> {
   @override
   void addOptions() {
@@ -207,6 +230,7 @@ Path to the repository root. If ommited, the command will search for the closest
     );
   }
 
+  /// Gets the repository root.
   Future<Directory> getRepositoryRoot() async {
     final path = argResults!['repo-root'] as String?;
 
