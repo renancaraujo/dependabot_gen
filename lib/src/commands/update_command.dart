@@ -21,7 +21,7 @@ class UpdateCommand extends Command<int> {
   final PubUpdater _pubUpdater;
 
   @override
-  String get description => 'Update depgen.';
+  String get description => 'Updates this CLI.';
 
   /// The name of this command.
   static const String commandName = 'update';
