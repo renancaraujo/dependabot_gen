@@ -53,11 +53,10 @@ class DependabotSpec extends Equatable {
   /// Creates a copy of this object with the given fields replaced with the
   /// new values.
   DependabotSpec copyWith({
-    DependabotVersion? version,
     List<UpdateEntry>? updates,
   }) {
     return DependabotSpec(
-      version: version ?? this.version,
+      version: version,
       updates: updates ?? this.updates,
       enableBetaEcosystems: enableBetaEcosystems,
       ignore: ignore,
