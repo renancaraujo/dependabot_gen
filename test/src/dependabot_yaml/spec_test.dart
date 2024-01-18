@@ -1,12 +1,21 @@
 import 'dart:convert';
 
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:test/test.dart';
 
 const _kCompleteJson = '''
 {
   "version": 2,
   "enable-beta-ecosystems": true,
+  "registries": {
+    "npm-npmjs": {
+      "type": "npm-registry",
+      "url": "https://registry.npmjs.org",
+      "username": "octocat",
+      "password": "1234"
+    }
+  },
   "updates": [
     {
       "package-ecosystem": "pub",
@@ -80,12 +89,42 @@ const _kRequiredOnlyJson = '''
   ]
 }''';
 
+const _kInvalidAllowedJson = '''
+{
+  "version": 2,
+  "updates": [
+    {
+      "package-ecosystem": "pub",
+      "directory": "/",
+      "schedule": {
+        "interval": "monthly"
+      },
+      "allow": [
+        {
+          "dependency-type": "direct"
+        },
+        {
+          "bananas": "what?*"
+        }
+      ]
+    }
+  ]
+}''';
+
 void main() {
   group('$DependabotSpec', () {
     group('to json', () {
       test('all values', () {
         const spec = DependabotSpec(
           version: DependabotVersion.v2,
+          registries: <String, dynamic>{
+            'npm-npmjs': {
+              'type': 'npm-registry',
+              'url': 'https://registry.npmjs.org',
+              'username': 'octocat',
+              'password': '1234',
+            },
+          },
           updates: [
             UpdateEntry(
               directory: '/',
@@ -224,6 +263,15 @@ void main() {
               ],
             ),
           ),
+        );
+      });
+
+      test('invalid "allow" entry', () {
+        expect(
+          () => DependabotSpec.fromJson(
+            jsonDecode(_kInvalidAllowedJson) as Map<String, dynamic>,
+          ),
+          throwsA(isA<CheckedFromJsonException>()),
         );
       });
     });

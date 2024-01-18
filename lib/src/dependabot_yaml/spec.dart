@@ -70,7 +70,6 @@ class DependabotSpec extends Equatable {
         updates,
         enableBetaEcosystems,
         ignore,
-        registries,
       ];
 }
 
@@ -373,7 +372,13 @@ class _AllowedEntryConverter
       return _$AllowDependencyTypeFromJson(json);
     }
 
-    throw Exception('Unknown type for "allow": $json');
+    throw CheckedFromJsonException(
+      json,
+      '',
+      'AllowEntry',
+      'Unknown type for "allow": $json',
+      badKey: true,
+    );
   }
 
   @override

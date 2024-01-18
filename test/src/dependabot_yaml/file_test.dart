@@ -7,19 +7,19 @@ import 'package:test/test.dart';
 
 import '../../utils.dart';
 
-const _validDependabotYaml = '''
+const _kValidDependabotYaml = '''
 version: 2
 registries:
   maven-github:
     type: maven-repository
     url: https://maven.pkg.github.com/octocat
     username: octocat
-    password: 1234
+    password: '1234'
   npm-npmjs:
     type: npm-registry
     url: https://registry.npmjs.org
     username: octocat
-    password: 1234
+    password: '1234'
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -87,7 +87,7 @@ updates:
             - "gocardless-*"
 ''';
 
-const _invalidDependabotYaml = '''
+const _kInvalidDependabotYaml = '''
 version: 1
 updates:
   - package-ecosystem: github-actions
@@ -100,7 +100,7 @@ void main() {
   group('$DependabotFile', () {
     group('fromFile', () {
       test('from a valid dependabot file', () {
-        final file = createFile(_validDependabotYaml);
+        final file = createFile(_kValidDependabotYaml);
         final dependabotFile = DependabotFile.fromFile(file);
 
         expect(dependabotFile.path, file.path);
@@ -116,7 +116,7 @@ void main() {
       });
 
       test('from an invalid dependabot file', () {
-        final file = createFile(_invalidDependabotYaml);
+        final file = createFile(_kInvalidDependabotYaml);
 
         expect(
           () => DependabotFile.fromFile(file),
@@ -210,7 +210,7 @@ updates: []
 
     group('editing', () {
       test('adding and removing update entries', () {
-        final file = createFile(_validDependabotYaml);
+        final file = createFile(_kValidDependabotYaml);
         final dependabotFile = DependabotFile.fromFile(file);
         expect(dependabotFile.updates, hasLength(3));
 
