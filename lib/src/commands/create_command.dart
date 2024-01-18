@@ -48,8 +48,8 @@ Will keep existing entries and add new ones if needed.
 
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
-      (previousValue, element) {
-        element.finder
+      (previousValue, ecosystem) {
+        ecosystem
             .findUpdateEntries(
               repoRoot: repoRoot,
               schedule: schedule,

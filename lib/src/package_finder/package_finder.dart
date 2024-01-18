@@ -8,49 +8,67 @@ import 'package:path/path.dart' as p;
 /// The package ecosystems supported by dependabot.
 enum PackageEcosystem {
   /// The GitHub Actions package ecosystem for GitHub Actions.
-  githubActions(PackageEcosystemFinder.githubActions),
+  githubActions(_PackageEcosystemFinder.githubActions),
 
   /// The Docker package ecosystem.
-  docker(PackageEcosystemFinder.docker),
+  docker(_PackageEcosystemFinder.docker),
 
   /// The git submodule package ecosystem.
-  gitModules(PackageEcosystemFinder.gitModules),
+  gitModules(_PackageEcosystemFinder.gitModules),
 
   /// The pub package ecosystem for Dart.
-  pub(PackageEcosystemFinder.pub),
+  pub(_PackageEcosystemFinder.pub),
 
   /// The go.mod package ecosystem for Go.
-  gomod(PackageEcosystemFinder.gomod),
+  gomod(_PackageEcosystemFinder.gomod),
 
   /// The Maven package ecosystem for JVM languages.
-  maven(PackageEcosystemFinder.maven),
+  maven(_PackageEcosystemFinder.maven),
 
   /// The npm package ecosystem for JavaScript.
-  npm(PackageEcosystemFinder.npm),
+  npm(_PackageEcosystemFinder.npm),
 
   /// LOL
-  composer(PackageEcosystemFinder.composer),
+  composer(_PackageEcosystemFinder.composer),
 
   /// The pip package ecosystem for Python.
-  pip(PackageEcosystemFinder.pip),
+  pip(_PackageEcosystemFinder.pip),
 
   /// The bundler package ecosystem for Ruby.
-  bundler(PackageEcosystemFinder.bundler),
+  bundler(_PackageEcosystemFinder.bundler),
 
   /// The cargo package ecosystem for Rust.
-  cargo(PackageEcosystemFinder.cargo),
+  cargo(_PackageEcosystemFinder.cargo),
 
   /// The nuget package ecosystem for .NET.
-  nuget(PackageEcosystemFinder.nuget),
+  nuget(_PackageEcosystemFinder.nuget),
 
   /// The hex package ecosystem for Elixir.
-  hex(PackageEcosystemFinder.hex),
+  hex(_PackageEcosystemFinder.hex),
   ;
 
-  const PackageEcosystem(this.finder);
+  const PackageEcosystem(this._finder);
 
-  /// The respective [PackageEcosystemFinder] for this [PackageEcosystem].
-  final PackageEcosystemFinder finder;
+  /// The respective [_PackageEcosystemFinder] for this [PackageEcosystem].
+  final _PackageEcosystemFinder _finder;
+
+  /// Finds the packages that may have its dependencies updated by dependabot.
+  Iterable<UpdateEntry> findUpdateEntries({
+    required Directory repoRoot,
+    required Schedule schedule,
+    required String? targetBranch,
+    required Set<String>? labels,
+    required int? milestone,
+    required Set<String>? ignoreFinding,
+  }) =>
+      _finder.findUpdateEntries(
+        repoRoot: repoRoot,
+        schedule: schedule,
+        targetBranch: targetBranch,
+        labels: labels,
+        milestone: milestone,
+        ignoreFinding: ignoreFinding,
+      );
 }
 
 /// A class that encapsulates the logic to find packages that may have
@@ -60,9 +78,9 @@ enum PackageEcosystem {
 /// package ecosystem (e.g. pub, npm, etc) according to the how
 /// the package ecosystem is structured.
 @immutable
-sealed class PackageEcosystemFinder {
+abstract interface class _PackageEcosystemFinder {
   /// Finder for the pub package ecosystem.
-  static const pub = ManifestPackageEcosystemFinder._(
+  static const pub = _ManifestPackageEcosystemFinder(
     ecosystem: 'pub',
     indexFiles: {
       'pubspec.yaml',
@@ -70,7 +88,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the go.mod package ecosystem.
-  static const gomod = ManifestPackageEcosystemFinder._(
+  static const gomod = _ManifestPackageEcosystemFinder(
     ecosystem: 'gomod',
     indexFiles: {
       'go.mod',
@@ -78,7 +96,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the Maven package ecosystem.
-  static const maven = ManifestPackageEcosystemFinder._(
+  static const maven = _ManifestPackageEcosystemFinder(
     ecosystem: 'maven',
     indexFiles: {
       'pom.xml',
@@ -86,7 +104,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the npm package ecosystem.
-  static const npm = ManifestPackageEcosystemFinder._(
+  static const npm = _ManifestPackageEcosystemFinder(
     ecosystem: 'npm',
     indexFiles: {
       'package.json',
@@ -94,7 +112,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// LOL
-  static const composer = ManifestPackageEcosystemFinder._(
+  static const composer = _ManifestPackageEcosystemFinder(
     ecosystem: 'composer',
     indexFiles: {
       'composer.json',
@@ -102,7 +120,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the pip package ecosystem.
-  static const pip = ManifestPackageEcosystemFinder._(
+  static const pip = _ManifestPackageEcosystemFinder(
     ecosystem: 'pip',
     indexFiles: {
       'requirements.txt',
@@ -112,7 +130,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the bundler package ecosystem.
-  static const bundler = ManifestPackageEcosystemFinder._(
+  static const bundler = _ManifestPackageEcosystemFinder(
     ecosystem: 'bundler',
     indexFiles: {
       'Gemfile',
@@ -120,7 +138,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the cargo package ecosystem.
-  static const cargo = ManifestPackageEcosystemFinder._(
+  static const cargo = _ManifestPackageEcosystemFinder(
     ecosystem: 'cargo',
     indexFiles: {
       'Cargo.toml',
@@ -128,7 +146,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the nuget package ecosystem.
-  static const nuget = ManifestPackageEcosystemFinder._(
+  static const nuget = _ManifestPackageEcosystemFinder(
     ecosystem: 'nuget',
     indexFiles: {
       '.nuspec',
@@ -137,7 +155,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the hex package ecosystem.
-  static const hex = ManifestPackageEcosystemFinder._(
+  static const hex = _ManifestPackageEcosystemFinder(
     ecosystem: 'mix',
     indexFiles: {
       'mix.exs',
@@ -145,7 +163,7 @@ sealed class PackageEcosystemFinder {
   );
 
   /// Finder for the GitHub Actions package ecosystem.
-  static const githubActions = HeuristicPackageEcosystemFinder._(
+  static const githubActions = _HeuristicPackageEcosystemFinder(
     ecosystem: 'github-actions',
     directory: '/',
     repoHeuristics: _githubActionsHeuristics,
@@ -159,7 +177,7 @@ sealed class PackageEcosystemFinder {
   }
 
   /// Finder for the Docker package ecosystem.
-  static const docker = HeuristicPackageEcosystemFinder._(
+  static const docker = _HeuristicPackageEcosystemFinder(
     ecosystem: 'docker',
     directory: '/',
     repoHeuristics: _dockerHeuristics,
@@ -173,7 +191,7 @@ sealed class PackageEcosystemFinder {
   }
 
   /// Finder for the git submodule package ecosystem.
-  static const gitModules = HeuristicPackageEcosystemFinder._(
+  static const gitModules = _HeuristicPackageEcosystemFinder(
     ecosystem: 'git-submodule',
     directory: '/',
     repoHeuristics: _gitmodulesHeuristics,
@@ -201,11 +219,11 @@ sealed class PackageEcosystemFinder {
 }
 
 /// {@template heuristic_package_ecosystem_finder}
-/// A [PackageEcosystemFinder] that uses heuristics to find packages.
+/// A [_PackageEcosystemFinder] that uses heuristics to find packages.
 /// {@endtemplate}
-final class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
+class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro heuristic_package_ecosystem_finder}
-  const HeuristicPackageEcosystemFinder._({
+  const _HeuristicPackageEcosystemFinder({
     required this.ecosystem,
     required this.directory,
     required this.repoHeuristics,
@@ -243,11 +261,11 @@ final class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
 }
 
 /// {@template manifest_package_ecosystem_finder}
-/// A [PackageEcosystemFinder] that uses a list of index files to find packages.
+/// A [_PackageEcosystemFinder] that uses a list of index files to find packages.
 /// {@endtemplate}
-final class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
+final class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro manifest_package_ecosystem_finder}
-  const ManifestPackageEcosystemFinder._({
+  const _ManifestPackageEcosystemFinder({
     required this.indexFiles,
     required this.ecosystem,
   });
