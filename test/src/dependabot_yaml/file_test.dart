@@ -291,12 +291,12 @@ registries:
     type: maven-repository
     url: https://maven.pkg.github.com/octocat
     username: octocat
-    password: 1234
+    password: '1234'
   npm-npmjs:
     type: npm-registry
     url: https://registry.npmjs.org
     username: octocat
-    password: 1234
+    password: '1234'
 updates:
   - package-ecosystem: github-actions
     directory: /

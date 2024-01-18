@@ -60,9 +60,9 @@ enum PackageEcosystem {
 /// package ecosystem (e.g. pub, npm, etc) according to the how
 /// the package ecosystem is structured.
 @immutable
-abstract interface class PackageEcosystemFinder {
+sealed class PackageEcosystemFinder {
   /// Finder for the pub package ecosystem.
-  static const pub = ManifestPackageEcosystemFinder(
+  static const pub = ManifestPackageEcosystemFinder._(
     ecosystem: 'pub',
     indexFiles: {
       'pubspec.yaml',
@@ -70,7 +70,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the go.mod package ecosystem.
-  static const gomod = ManifestPackageEcosystemFinder(
+  static const gomod = ManifestPackageEcosystemFinder._(
     ecosystem: 'gomod',
     indexFiles: {
       'go.mod',
@@ -78,7 +78,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the Maven package ecosystem.
-  static const maven = ManifestPackageEcosystemFinder(
+  static const maven = ManifestPackageEcosystemFinder._(
     ecosystem: 'maven',
     indexFiles: {
       'pom.xml',
@@ -86,7 +86,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the npm package ecosystem.
-  static const npm = ManifestPackageEcosystemFinder(
+  static const npm = ManifestPackageEcosystemFinder._(
     ecosystem: 'npm',
     indexFiles: {
       'package.json',
@@ -94,7 +94,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// LOL
-  static const composer = ManifestPackageEcosystemFinder(
+  static const composer = ManifestPackageEcosystemFinder._(
     ecosystem: 'composer',
     indexFiles: {
       'composer.json',
@@ -102,7 +102,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the pip package ecosystem.
-  static const pip = ManifestPackageEcosystemFinder(
+  static const pip = ManifestPackageEcosystemFinder._(
     ecosystem: 'pip',
     indexFiles: {
       'requirements.txt',
@@ -112,7 +112,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the bundler package ecosystem.
-  static const bundler = ManifestPackageEcosystemFinder(
+  static const bundler = ManifestPackageEcosystemFinder._(
     ecosystem: 'bundler',
     indexFiles: {
       'Gemfile',
@@ -120,7 +120,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the cargo package ecosystem.
-  static const cargo = ManifestPackageEcosystemFinder(
+  static const cargo = ManifestPackageEcosystemFinder._(
     ecosystem: 'cargo',
     indexFiles: {
       'Cargo.toml',
@@ -128,7 +128,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the nuget package ecosystem.
-  static const nuget = ManifestPackageEcosystemFinder(
+  static const nuget = ManifestPackageEcosystemFinder._(
     ecosystem: 'nuget',
     indexFiles: {
       '.nuspec',
@@ -137,7 +137,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the hex package ecosystem.
-  static const hex = ManifestPackageEcosystemFinder(
+  static const hex = ManifestPackageEcosystemFinder._(
     ecosystem: 'mix',
     indexFiles: {
       'mix.exs',
@@ -145,7 +145,7 @@ abstract interface class PackageEcosystemFinder {
   );
 
   /// Finder for the GitHub Actions package ecosystem.
-  static const githubActions = HeuristicPackageEcosystemFinder(
+  static const githubActions = HeuristicPackageEcosystemFinder._(
     ecosystem: 'github-actions',
     directory: '/',
     repoHeuristics: _githubActionsHeuristics,
@@ -159,7 +159,7 @@ abstract interface class PackageEcosystemFinder {
   }
 
   /// Finder for the Docker package ecosystem.
-  static const docker = HeuristicPackageEcosystemFinder(
+  static const docker = HeuristicPackageEcosystemFinder._(
     ecosystem: 'docker',
     directory: '/',
     repoHeuristics: _dockerHeuristics,
@@ -173,7 +173,7 @@ abstract interface class PackageEcosystemFinder {
   }
 
   /// Finder for the git submodule package ecosystem.
-  static const gitModules = HeuristicPackageEcosystemFinder(
+  static const gitModules = HeuristicPackageEcosystemFinder._(
     ecosystem: 'git-submodule',
     directory: '/',
     repoHeuristics: _gitmodulesHeuristics,
@@ -203,9 +203,9 @@ abstract interface class PackageEcosystemFinder {
 /// {@template heuristic_package_ecosystem_finder}
 /// A [PackageEcosystemFinder] that uses heuristics to find packages.
 /// {@endtemplate}
-class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
+final class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
   /// {@macro heuristic_package_ecosystem_finder}
-  const HeuristicPackageEcosystemFinder({
+  const HeuristicPackageEcosystemFinder._({
     required this.ecosystem,
     required this.directory,
     required this.repoHeuristics,
@@ -245,9 +245,9 @@ class HeuristicPackageEcosystemFinder implements PackageEcosystemFinder {
 /// {@template manifest_package_ecosystem_finder}
 /// A [PackageEcosystemFinder] that uses a list of index files to find packages.
 /// {@endtemplate}
-class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
+final class ManifestPackageEcosystemFinder implements PackageEcosystemFinder {
   /// {@macro manifest_package_ecosystem_finder}
-  const ManifestPackageEcosystemFinder({
+  const ManifestPackageEcosystemFinder._({
     required this.indexFiles,
     required this.ecosystem,
   });
