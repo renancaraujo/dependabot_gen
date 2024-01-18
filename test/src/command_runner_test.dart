@@ -22,7 +22,7 @@ ${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u219
 Run ${lightCyan.wrap('$executableName update')} to update''';
 
 void main() {
-  group('DependabotGenCommandRunner', () {
+  group('$DependabotGenCommandRunner', () {
     late PubUpdater pubUpdater;
     late Logger logger;
     late DependabotGenCommandRunner commandRunner;
@@ -140,6 +140,14 @@ void main() {
         final result = await commandRunner.run(['--version']);
         expect(result, equals(ExitCode.success.code));
         verify(() => logger.info(packageVersion)).called(1);
+      });
+    });
+
+    group('--help', () {
+      test('calls logger info', () async {
+        final result = await commandRunner.run(['--help']);
+        expect(result, equals(ExitCode.success.code));
+        verify(() => logger.info(any())).called(1);
       });
     });
   });
