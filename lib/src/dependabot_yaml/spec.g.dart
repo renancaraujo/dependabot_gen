@@ -133,8 +133,8 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
           allow: $checkedConvert(
               'allow',
               (v) => (v as List<dynamic>?)
-                  ?.map((e) => const _AllowedEntryConverter()
-                      .fromJson(e as Map<String, dynamic>))
+                  ?.map(
+                      (e) => const _AllowedEntryConverter().fromJson(e as Map))
                   .toList()),
           assignees: $checkedConvert('assignees',
               (v) => (v as List<dynamic>?)?.map((e) => e as String).toSet()),

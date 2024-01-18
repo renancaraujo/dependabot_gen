@@ -27,7 +27,7 @@ class DependabotSpec extends Equatable {
       _$DependabotSpecFromJson(json);
 
   /// Converts this object to a JSON map.
-  Map<String, dynamic> toJson() => _$DependabotSpecToJson(this);
+  Map<dynamic, dynamic> toJson() => _$DependabotSpecToJson(this);
 
   /// The version of the dependabot spec.
   @JsonKey(defaultValue: DependabotVersion.v2)
@@ -121,11 +121,11 @@ class UpdateEntry extends Equatable {
   });
 
   /// Creates a new [UpdateEntry] from a JSON map.
-  factory UpdateEntry.fromJson(Map<String, dynamic> json) =>
+  factory UpdateEntry.fromJson(Map<dynamic, dynamic> json) =>
       _$UpdateEntryFromJson(json);
 
   /// Converts this object to a JSON map.
-  Map<String, dynamic> toJson() => _$UpdateEntryToJson(this);
+  Map<dynamic, dynamic> toJson() => _$UpdateEntryToJson(this);
 
   /// The package manager to use.
   @JsonKey(required: true, name: 'package-ecosystem')
@@ -245,11 +245,11 @@ class Schedule extends Equatable {
   });
 
   /// Creates a new [Schedule] from a JSON map.
-  factory Schedule.fromJson(Map<String, dynamic> json) =>
+  factory Schedule.fromJson(Map<dynamic, dynamic> json) =>
       _$ScheduleFromJson(json);
 
   /// Converts this object to a JSON map.
-  Map<String, dynamic> toJson() => _$ScheduleToJson(this);
+  Map<dynamic, dynamic> toJson() => _$ScheduleToJson(this);
 
   /// The interval to use.
   @JsonKey(required: true)
@@ -362,11 +362,11 @@ class AllowDependencyType extends AllowEntry {
 }
 
 class _AllowedEntryConverter
-    implements JsonConverter<AllowEntry, Map<String, dynamic>> {
+    implements JsonConverter<AllowEntry, Map<dynamic, dynamic>> {
   const _AllowedEntryConverter();
 
   @override
-  AllowEntry fromJson(Map<String, dynamic> json) {
+  AllowEntry fromJson(Map<dynamic, dynamic> json) {
     if (json['dependency-name'] is String) {
       return _$AllowDependencyFromJson(json);
     }
@@ -378,7 +378,7 @@ class _AllowedEntryConverter
   }
 
   @override
-  Map<String, dynamic> toJson(AllowEntry object) {
+  Map<dynamic, dynamic> toJson(AllowEntry object) {
     return switch (object) {
       final AllowDependency dep => _$AllowDependencyToJson(dep),
       final AllowDependencyType depType => _$AllowDependencyTypeToJson(depType),
@@ -404,11 +404,11 @@ class CommitMessage extends Equatable {
   });
 
   /// Creates a new [CommitMessage] from a JSON map.
-  factory CommitMessage.fromJson(Map<String, dynamic> json) =>
+  factory CommitMessage.fromJson(Map<dynamic, dynamic> json) =>
       _$CommitMessageFromJson(json);
 
   /// Converts this object to a JSON map.
-  Map<String, dynamic> toJson() => _$CommitMessageToJson(this);
+  Map<dynamic, dynamic> toJson() => _$CommitMessageToJson(this);
 
   /// The prefix to use for commit messages.
   @JsonKey(disallowNullValue: true)
@@ -451,10 +451,10 @@ class Ignore extends Equatable {
   });
 
   /// Creates a new [Ignore] from a JSON map.
-  factory Ignore.fromJson(Map<String, dynamic> json) => _$IgnoreFromJson(json);
+  factory Ignore.fromJson(Map<dynamic, dynamic> json) => _$IgnoreFromJson(json);
 
   /// Converts this object to a JSON map.`
-  Map<String, dynamic> toJson() => _$IgnoreToJson(this);
+  Map<dynamic, dynamic> toJson() => _$IgnoreToJson(this);
 
   /// The name of the dependency to ignore.
   @JsonKey(required: true, name: 'dependency-name')
@@ -504,11 +504,11 @@ class PullRequestBranchName extends Equatable {
   const PullRequestBranchName({required this.separator});
 
   /// Creates a new [PullRequestBranchName] from a JSON map.
-  factory PullRequestBranchName.fromJson(Map<String, dynamic> json) =>
+  factory PullRequestBranchName.fromJson(Map<dynamic, dynamic> json) =>
       _$PullRequestBranchNameFromJson(json);
 
   /// Converts this object to a JSON map.
-  Map<String, dynamic> toJson() => _$PullRequestBranchNameToJson(this);
+  Map<dynamic, dynamic> toJson() => _$PullRequestBranchNameToJson(this);
 
   /// The separator to use.
   final String separator;

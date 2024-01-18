@@ -3,27 +3,10 @@ import 'dart:io';
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
-
-/// Retrieves the [DependabotFile] for the given [repositoryRoot].
-///
-/// If the file does not exist, it will be created.
-DependabotFile getDependabotFile({required Directory repositoryRoot}) {
-  final filePath = p.join(repositoryRoot.path, '.github', 'dependabot.yaml');
-  final filePath2 = p.join(repositoryRoot.path, '.github', 'dependabot.yml');
-  var file = File(filePath);
-
-  if (!file.existsSync()) {
-    file = File(filePath2);
-  }
-
-  if (!file.existsSync()) {
-    file = File(filePath)..createSync(recursive: true);
-  }
-
-  return DependabotFile.fromFile(file);
-}
+import 'package:yaml_writer/yaml_writer.dart';
 
 /// Represents a dependabot.yaml file with its [path].
 class DependabotFile {
@@ -36,8 +19,9 @@ class DependabotFile {
   /// Creates a new [DependabotFile] from the given [file].
   ///
   /// If the file is empty, a default [DependabotSpec] will be created.
+  @visibleForTesting
   factory DependabotFile.fromFile(File file) {
-    final contents = file.readAsStringSync();
+    var contents = file.existsSync() ? file.readAsStringSync() : '';
 
     DependabotSpec content;
     if (contents.isEmpty) {
@@ -45,6 +29,7 @@ class DependabotFile {
         version: DependabotVersion.v2,
         updates: [],
       );
+      contents = YAMLWriter().write(content);
     } else {
       content = checkedYamlDecode(
         contents,
@@ -62,9 +47,29 @@ class DependabotFile {
         sourceUrl: file.uri,
       );
     }
+
     final editor = YamlEditor(contents);
 
     return DependabotFile._(file.path, content, editor);
+  }
+
+  /// Retrieves the [DependabotFile] for the given [repositoryRoot].
+  ///
+  /// If the file does not exist, it will be created.
+  factory DependabotFile.fromRepositoryRoot(Directory repositoryRoot) {
+    final filePath = p.join(repositoryRoot.path, '.github', 'dependabot.yml');
+    final filePath2 = p.join(repositoryRoot.path, '.github', 'dependabot.yaml');
+    var file = File(filePath);
+
+    if (!file.existsSync()) {
+      file = File(filePath2);
+    }
+
+    if (!file.existsSync()) {
+      file = File(filePath);
+    }
+
+    return DependabotFile.fromFile(file);
   }
 
   /// The path to the dependabot.yaml file.
@@ -81,7 +86,7 @@ class DependabotFile {
   /// Adds a new [UpdateEntry] to the dependabot.yaml file.
   ///
   /// Does not immediately save the changes to the file.
-  /// For that, call [commitChanges].
+  /// For that, call [saveToFile].
   void addUpdateEntry(UpdateEntry newEntry) {
     _content = _content.copyWith(
       updates: [
@@ -95,30 +100,36 @@ class DependabotFile {
   /// Removes an [UpdateEntry] from the dependabot.yaml file.
   ///
   /// Does not immediately save the changes to the file.
-  /// For that, call [commitChanges].
-  void removeUpdateEntry(UpdateEntry entry) {
-    final index = _content.updates.indexWhere(
-      (element) =>
-          element.directory == entry.directory &&
-          element.ecosystem == entry.ecosystem,
-    );
+  /// For that, call [saveToFile].
+  void removeUpdateEntry({
+    required String directory,
+    required String ecosystem,
+  }) {
+    final matchingEntries = [..._content.updates].indexed.where(
+          (e) => e.$2.directory == directory && e.$2.ecosystem == ecosystem,
+        );
 
-    if (index == -1) {
+    if (matchingEntries.isEmpty) {
       return;
     }
 
-    _content = _content.copyWith(
-      updates: [
-        ..._content.updates.take(index),
-        ..._content.updates.skip(index + 1),
-      ],
+    _content.updates.removeWhere(
+      (e) => e.directory == directory && e.ecosystem == ecosystem,
     );
 
-    _editor.remove(['updates', index]);
+    for (final (index, _) in matchingEntries) {
+      _editor.remove(['updates', index]);
+    }
   }
 
   /// Saves the changes to the actual dependabot.yaml file.
-  void commitChanges() {
-    File(path).writeAsStringSync(_editor.toString());
+  void saveToFile() {
+    final file = File(path);
+
+    if (!file.existsSync()) {
+      file.createSync(recursive: true);
+    }
+
+    file.writeAsStringSync(_editor.toString());
   }
 }

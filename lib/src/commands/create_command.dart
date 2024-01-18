@@ -36,15 +36,15 @@ Will keep existing entries and add new ones if needed.
 
   @override
   Future<int> run() async {
-    logger.level = logLevel;
+    super.run();
+
     final repoRoot = await getRepositoryRoot();
 
-    final dependabotFile = getDependabotFile(repositoryRoot: repoRoot);
+    final dependabotFile = DependabotFile.fromRepositoryRoot(repoRoot);
 
     logger.info(
       'Creating dependabot.yaml in ${dependabotFile.path}}',
     );
-
 
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
@@ -100,13 +100,16 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
         continue;
       }
 
-      dependabotFile.removeUpdateEntry(entry);
+      dependabotFile.removeUpdateEntry(
+        ecosystem: entry.ecosystem,
+        directory: entry.directory,
+      );
       logger.info(
         yellow.wrap('Removed ${entry.ecosystem} entry for ${entry.directory}'),
       );
     }
 
-    dependabotFile.commitChanges();
+    dependabotFile.saveToFile();
 
     logger.info('Finished creating dependabot.yaml in $repoRoot');
 

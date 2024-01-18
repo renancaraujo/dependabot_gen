@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -28,6 +30,12 @@ abstract class MixinsCommand<T> extends Command<T> {
 
   /// The [Logger] for this command.
   Logger get logger => _logger;
+
+  @mustCallSuper
+  @override
+  FutureOr<T>? run() {
+    return null;
+  }
 }
 
 /// Adds the `--silent` and `--verbose` options to the command.
@@ -71,6 +79,14 @@ mixin LoggerLevelOption<T> on MixinsCommand<T> {
     }
 
     return Level.info;
+  }
+
+  @mustCallSuper
+  @override
+  FutureOr<T>? run() {
+    super.run();
+    logger.level = logLevel;
+    return null;
   }
 }
 
@@ -187,7 +203,6 @@ mixin MilestoneOption<T> on MixinsCommand<T> {
     return milestone;
   }
 }
-
 
 /// Adds the `--ecosystems` option to the command.
 mixin EcosystemsOption<T> on MixinsCommand<T> {
