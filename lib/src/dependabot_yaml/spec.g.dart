@@ -34,16 +34,14 @@ DependabotSpec _$DependabotSpecFromJson(Map json) => $checkedCreate(
           updates: $checkedConvert(
               'updates',
               (v) => (v as List<dynamic>)
-                  .map((e) =>
-                      UpdateEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+                  .map((e) => UpdateEntry.fromJson(e as Map))
                   .toList()),
           enableBetaEcosystems:
               $checkedConvert('enable-beta-ecosystems', (v) => v as bool?),
           ignore: $checkedConvert(
               'ignore',
               (v) => (v as List<dynamic>?)
-                  ?.map((e) =>
-                      Ignore.fromJson(Map<String, dynamic>.from(e as Map)))
+                  ?.map((e) => Ignore.fromJson(e as Map))
                   .toList()),
           registries: $checkedConvert(
               'registries',
@@ -128,8 +126,8 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
         final val = UpdateEntry(
           directory: $checkedConvert('directory', (v) => v as String),
           ecosystem: $checkedConvert('package-ecosystem', (v) => v as String),
-          schedule: $checkedConvert('schedule',
-              (v) => Schedule.fromJson(Map<String, dynamic>.from(v as Map))),
+          schedule:
+              $checkedConvert('schedule', (v) => Schedule.fromJson(v as Map)),
           allow: $checkedConvert(
               'allow',
               (v) => (v as List<dynamic>?)
@@ -138,12 +136,8 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
                   .toList()),
           assignees: $checkedConvert('assignees',
               (v) => (v as List<dynamic>?)?.map((e) => e as String).toSet()),
-          commitMessage: $checkedConvert(
-              'commit-message',
-              (v) => v == null
-                  ? null
-                  : CommitMessage.fromJson(
-                      Map<String, dynamic>.from(v as Map))),
+          commitMessage: $checkedConvert('commit-message',
+              (v) => v == null ? null : CommitMessage.fromJson(v as Map)),
           groups: $checkedConvert(
               'groups',
               (v) => (v as Map?)?.map(
@@ -152,8 +146,7 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
           ignore: $checkedConvert(
               'ignore',
               (v) => (v as List<dynamic>?)
-                  ?.map((e) =>
-                      Ignore.fromJson(Map<String, dynamic>.from(e as Map)))
+                  ?.map((e) => Ignore.fromJson(e as Map))
                   .toList()),
           insecureExternalCodeExecution: $checkedConvert(
               'insecure-external-code-execution',
@@ -166,10 +159,8 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
               $checkedConvert('open-pull-requests-limit', (v) => v as int?),
           pullRequestBranchName: $checkedConvert(
               'pull-request-branch-name',
-              (v) => v == null
-                  ? null
-                  : PullRequestBranchName.fromJson(
-                      Map<String, dynamic>.from(v as Map))),
+              (v) =>
+                  v == null ? null : PullRequestBranchName.fromJson(v as Map)),
           rebaseStrategy: $checkedConvert('rebase-strategy',
               (v) => $enumDecodeNullable(_$RebaseStrategyEnumMap, v)),
           registries: $checkedConvert('registries',
