@@ -10,7 +10,7 @@ import 'package:path/path.dart' as p;
 ///
 /// `depgen create` command which creates a new dependabot.yaml file.
 /// {@endtemplate}
-class CreateCommand extends MixinsCommand<int>
+class CreateCommand extends DependabotGenCommand
     with
         EcosystemsOption,
         LoggerLevelOption,
@@ -27,8 +27,8 @@ class CreateCommand extends MixinsCommand<int>
 
   @override
   String get description => '''
-Create or updates the dependabot.yaml file in the current repository. 
-Will keep existing entries and add new ones if needed.
+Create or update the dependabot.yaml file in a repository. 
+Will keep existing entries and add new ones for possibly uncovered packages.
 ''';
 
   @override
@@ -36,7 +36,10 @@ Will keep existing entries and add new ones if needed.
 
   @override
   Future<int> run() async {
-    super.run();
+    final ret = await super.run();
+    if (ret != null) {
+      return ret;
+    }
 
     final repoRoot = await getRepositoryRoot();
 

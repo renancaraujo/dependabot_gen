@@ -8,49 +8,136 @@ import 'package:path/path.dart' as p;
 /// The package ecosystems supported by dependabot.
 enum PackageEcosystem {
   /// The GitHub Actions package ecosystem for GitHub Actions.
-  githubActions(_PackageEcosystemFinder.githubActions),
+  githubActions(
+    ecosystemName: 'github-actions',
+    _HeuristicPackageEcosystemFinder(
+      directory: '/',
+      repoHeuristics: _githubActionsHeuristics,
+    ),
+  ),
 
   /// The Docker package ecosystem.
-  docker(_PackageEcosystemFinder.docker),
+  docker(
+    _HeuristicPackageEcosystemFinder(
+      directory: '/',
+      repoHeuristics: _dockerHeuristics,
+    ),
+  ),
 
   /// The git submodule package ecosystem.
-  gitModules(_PackageEcosystemFinder.gitModules),
+  gitModules(
+    ecosystemName: 'git-submodule',
+    _HeuristicPackageEcosystemFinder(
+      directory: '/',
+      repoHeuristics: _gitmodulesHeuristics,
+    ),
+  ),
 
   /// The pub package ecosystem for Dart.
-  pub(_PackageEcosystemFinder.pub),
+  pub(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'pubspec.yaml',
+      },
+    ),
+  ),
 
   /// The go.mod package ecosystem for Go.
-  gomod(_PackageEcosystemFinder.gomod),
+  gomod(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'go.mod',
+      },
+    ),
+  ),
 
   /// The Maven package ecosystem for JVM languages.
-  maven(_PackageEcosystemFinder.maven),
+  maven(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'pom.xml',
+      },
+    ),
+  ),
 
   /// The npm package ecosystem for JavaScript.
-  npm(_PackageEcosystemFinder.npm),
+  npm(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'package.json',
+      },
+    ),
+  ),
 
   /// LOL
-  composer(_PackageEcosystemFinder.composer),
+  composer(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'composer.json',
+      },
+    ),
+  ),
 
   /// The pip package ecosystem for Python.
-  pip(_PackageEcosystemFinder.pip),
+  pip(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'requirements.txt',
+        'Pipfile',
+        'pyproject.toml',
+      },
+    ),
+  ),
 
   /// The bundler package ecosystem for Ruby.
-  bundler(_PackageEcosystemFinder.bundler),
+  bundler(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'Gemfile',
+      },
+    ),
+  ),
 
   /// The cargo package ecosystem for Rust.
-  cargo(_PackageEcosystemFinder.cargo),
+  cargo(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'Cargo.toml',
+      },
+    ),
+  ),
 
   /// The nuget package ecosystem for .NET.
-  nuget(_PackageEcosystemFinder.nuget),
+  nuget(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        '.nuspec',
+        '.csproj',
+      },
+    ),
+  ),
 
   /// The hex package ecosystem for Elixir.
-  hex(_PackageEcosystemFinder.hex),
+  hex(
+    ecosystemName: 'mix',
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'mix.exs',
+      },
+    ),
+  ),
   ;
 
-  const PackageEcosystem(this._finder);
+  const PackageEcosystem(
+    this._finder, {
+    this.ecosystemName,
+  });
 
   /// The respective [_PackageEcosystemFinder] for this [PackageEcosystem].
   final _PackageEcosystemFinder _finder;
+
+  /// The name of the package ecosystem if it's different from [name].
+  final String? ecosystemName;
 
   /// Finds the packages that may have its dependencies updated by dependabot.
   Iterable<UpdateEntry> findUpdateEntries({
@@ -62,6 +149,7 @@ enum PackageEcosystem {
     required Set<String>? ignoreFinding,
   }) =>
       _finder.findUpdateEntries(
+        ecosystem: ecosystemName ?? name,
         repoRoot: repoRoot,
         schedule: schedule,
         targetBranch: targetBranch,
@@ -69,6 +157,27 @@ enum PackageEcosystem {
         milestone: milestone,
         ignoreFinding: ignoreFinding,
       );
+}
+
+bool _githubActionsHeuristics(Directory repoRoot) {
+  final workflows = Directory(
+    p.join(repoRoot.path, '.github', 'workflows'),
+  );
+  return workflows.existsSync();
+}
+
+bool _dockerHeuristics(Directory repoRoot) {
+  final dockerfile = File(
+    p.join(repoRoot.path, 'Dockerfile'),
+  );
+  return dockerfile.existsSync();
+}
+
+bool _gitmodulesHeuristics(Directory repoRoot) {
+  final gitModules = File(
+    p.join(repoRoot.path, '.gitmodules'),
+  );
+  return gitModules.existsSync();
 }
 
 /// A class that encapsulates the logic to find packages that may have
@@ -79,133 +188,9 @@ enum PackageEcosystem {
 /// the package ecosystem is structured.
 @immutable
 abstract interface class _PackageEcosystemFinder {
-  /// Finder for the pub package ecosystem.
-  static const pub = _ManifestPackageEcosystemFinder(
-    ecosystem: 'pub',
-    indexFiles: {
-      'pubspec.yaml',
-    },
-  );
-
-  /// Finder for the go.mod package ecosystem.
-  static const gomod = _ManifestPackageEcosystemFinder(
-    ecosystem: 'gomod',
-    indexFiles: {
-      'go.mod',
-    },
-  );
-
-  /// Finder for the Maven package ecosystem.
-  static const maven = _ManifestPackageEcosystemFinder(
-    ecosystem: 'maven',
-    indexFiles: {
-      'pom.xml',
-    },
-  );
-
-  /// Finder for the npm package ecosystem.
-  static const npm = _ManifestPackageEcosystemFinder(
-    ecosystem: 'npm',
-    indexFiles: {
-      'package.json',
-    },
-  );
-
-  /// LOL
-  static const composer = _ManifestPackageEcosystemFinder(
-    ecosystem: 'composer',
-    indexFiles: {
-      'composer.json',
-    },
-  );
-
-  /// Finder for the pip package ecosystem.
-  static const pip = _ManifestPackageEcosystemFinder(
-    ecosystem: 'pip',
-    indexFiles: {
-      'requirements.txt',
-      'Pipfile',
-      'pyproject.toml',
-    },
-  );
-
-  /// Finder for the bundler package ecosystem.
-  static const bundler = _ManifestPackageEcosystemFinder(
-    ecosystem: 'bundler',
-    indexFiles: {
-      'Gemfile',
-    },
-  );
-
-  /// Finder for the cargo package ecosystem.
-  static const cargo = _ManifestPackageEcosystemFinder(
-    ecosystem: 'cargo',
-    indexFiles: {
-      'Cargo.toml',
-    },
-  );
-
-  /// Finder for the nuget package ecosystem.
-  static const nuget = _ManifestPackageEcosystemFinder(
-    ecosystem: 'nuget',
-    indexFiles: {
-      '.nuspec',
-      '.csproj',
-    },
-  );
-
-  /// Finder for the hex package ecosystem.
-  static const hex = _ManifestPackageEcosystemFinder(
-    ecosystem: 'mix',
-    indexFiles: {
-      'mix.exs',
-    },
-  );
-
-  /// Finder for the GitHub Actions package ecosystem.
-  static const githubActions = _HeuristicPackageEcosystemFinder(
-    ecosystem: 'github-actions',
-    directory: '/',
-    repoHeuristics: _githubActionsHeuristics,
-  );
-
-  static bool _githubActionsHeuristics(Directory repoRoot) {
-    final workflows = Directory(
-      p.join(repoRoot.path, '.github', 'workflows'),
-    );
-    return workflows.existsSync();
-  }
-
-  /// Finder for the Docker package ecosystem.
-  static const docker = _HeuristicPackageEcosystemFinder(
-    ecosystem: 'docker',
-    directory: '/',
-    repoHeuristics: _dockerHeuristics,
-  );
-
-  static bool _dockerHeuristics(Directory repoRoot) {
-    final dockerfile = File(
-      p.join(repoRoot.path, 'Dockerfile'),
-    );
-    return dockerfile.existsSync();
-  }
-
-  /// Finder for the git submodule package ecosystem.
-  static const gitModules = _HeuristicPackageEcosystemFinder(
-    ecosystem: 'git-submodule',
-    directory: '/',
-    repoHeuristics: _gitmodulesHeuristics,
-  );
-
-  static bool _gitmodulesHeuristics(Directory repoRoot) {
-    final gitModules = File(
-      p.join(repoRoot.path, '.gitmodules'),
-    );
-    return gitModules.existsSync();
-  }
-
   /// Finds the packages that may have its dependencies updated by dependabot.
   Iterable<UpdateEntry> findUpdateEntries({
+    required String ecosystem,
     required Directory repoRoot,
     required Schedule schedule,
     required String? targetBranch,
@@ -213,9 +198,6 @@ abstract interface class _PackageEcosystemFinder {
     required int? milestone,
     required Set<String>? ignoreFinding,
   });
-
-  /// The name of the package ecosystem.
-  String get ecosystem;
 }
 
 /// {@template heuristic_package_ecosystem_finder}
@@ -224,13 +206,9 @@ abstract interface class _PackageEcosystemFinder {
 class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro heuristic_package_ecosystem_finder}
   const _HeuristicPackageEcosystemFinder({
-    required this.ecosystem,
     required this.directory,
     required this.repoHeuristics,
   });
-
-  @override
-  final String ecosystem;
 
   /// The directory where the package manifests are located.
   final String directory;
@@ -240,6 +218,7 @@ class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
 
   @override
   Iterable<UpdateEntry> findUpdateEntries({
+    required String ecosystem,
     required Directory repoRoot,
     required Schedule schedule,
     required String? targetBranch,
@@ -261,23 +240,21 @@ class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
 }
 
 /// {@template manifest_package_ecosystem_finder}
-/// A [_PackageEcosystemFinder] that uses a list of index files to find packages.
+/// A [_PackageEcosystemFinder] that uses a list of index files to
+/// find packages.
 /// {@endtemplate}
-final class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
+class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro manifest_package_ecosystem_finder}
   const _ManifestPackageEcosystemFinder({
     required this.indexFiles,
-    required this.ecosystem,
   });
-
-  @override
-  final String ecosystem;
 
   /// The index files used to find the package manifests.
   final Set<String> indexFiles;
 
   @override
   Iterable<UpdateEntry> findUpdateEntries({
+    required String ecosystem,
     required Directory repoRoot,
     required Schedule schedule,
     required String? targetBranch,

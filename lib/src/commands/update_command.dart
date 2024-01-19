@@ -9,7 +9,7 @@ import 'package:pub_updater/pub_updater.dart';
 /// {@template update_command}
 /// A command which updates the CLI.
 /// {@endtemplate}
-class UpdateCommand extends MixinsCommand<int> with LoggerLevelOption {
+class UpdateCommand extends DependabotGenCommand with LoggerLevelOption {
   /// {@macro update_command}
   UpdateCommand({
     required super.logger,
@@ -29,7 +29,11 @@ class UpdateCommand extends MixinsCommand<int> with LoggerLevelOption {
 
   @override
   Future<int> run() async {
-    super.run();
+    final ret = await super.run();
+    if (ret != null) {
+      return ret;
+    }
+
     final updateCheckProgress = logger.progress('Checking for updates');
     late final String latestVersion;
     try {

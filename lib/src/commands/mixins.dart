@@ -13,9 +13,9 @@ import 'package:path/path.dart' as p;
 /// {@template mixins_command}
 /// A subclass of [Command] that allwos usages of mixins to add options.
 /// {@endtemplate}
-abstract class MixinsCommand<T> extends Command<T> {
+abstract class DependabotGenCommand extends Command<int?> {
   /// {@macro mixins_command}
-  MixinsCommand({
+  DependabotGenCommand({
     required Logger logger,
   }) : _logger = logger {
     addOptions();
@@ -33,7 +33,20 @@ abstract class MixinsCommand<T> extends Command<T> {
 
   @mustCallSuper
   @override
-  FutureOr<T>? run() {
+  Future<int?> run() async {
+    // test if git is instaleld in the PATH
+    final result = await Process.run('git', ['--version']);
+
+    if (result.exitCode != 0) {
+      _logger.err(
+        'Git is not installed or not in the PATH, make sure git available in '
+        'your PATH.',
+      );
+      return ExitCode.unavailable.code;
+    }
+
+    // if not, throw an error
+
     return null;
   }
 }
@@ -41,7 +54,7 @@ abstract class MixinsCommand<T> extends Command<T> {
 /// Adds the `--silent` and `--verbose` options to the command.
 ///
 /// Get the log level with [logLevel].
-mixin LoggerLevelOption<T> on MixinsCommand<T> {
+mixin LoggerLevelOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -83,8 +96,11 @@ mixin LoggerLevelOption<T> on MixinsCommand<T> {
 
   @mustCallSuper
   @override
-  FutureOr<T>? run() {
-    super.run();
+  Future<int?> run() async {
+    final ret = await super.run();
+    if (ret != null) {
+      return ret;
+    }
     logger.level = logLevel;
     return null;
   }
@@ -93,7 +109,7 @@ mixin LoggerLevelOption<T> on MixinsCommand<T> {
 /// Adds the `--schedule-interval` option to the command.
 ///
 /// Get the [Schedule] with [schedule].
-mixin ScheduleOption<T> on MixinsCommand<T> {
+mixin ScheduleOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -121,7 +137,7 @@ mixin ScheduleOption<T> on MixinsCommand<T> {
 }
 
 /// Adds the `--target-branch` option to the command.
-mixin TargetBranchOption<T> on MixinsCommand<T> {
+mixin TargetBranchOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -136,7 +152,7 @@ mixin TargetBranchOption<T> on MixinsCommand<T> {
 }
 
 /// Adds the `--ignore-paths` option to the command.
-mixin IgnorePathsOption<T> on MixinsCommand<T> {
+mixin IgnorePathsOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -161,7 +177,7 @@ mixin IgnorePathsOption<T> on MixinsCommand<T> {
 }
 
 /// Adds the `--labels` option to the command.
-mixin LabelsOption<T> on MixinsCommand<T> {
+mixin LabelsOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -184,7 +200,7 @@ mixin LabelsOption<T> on MixinsCommand<T> {
 }
 
 /// Adds the `--milestone` option to the command.
-mixin MilestoneOption<T> on MixinsCommand<T> {
+mixin MilestoneOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -205,7 +221,7 @@ mixin MilestoneOption<T> on MixinsCommand<T> {
 }
 
 /// Adds the `--ecosystems` option to the command.
-mixin EcosystemsOption<T> on MixinsCommand<T> {
+mixin EcosystemsOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();
@@ -233,7 +249,7 @@ mixin EcosystemsOption<T> on MixinsCommand<T> {
 }
 
 /// Adds the `--repo-root` option to the command.
-mixin RepositoryRootOption<T> on MixinsCommand<T> {
+mixin RepositoryRootOption on DependabotGenCommand {
   @override
   void addOptions() {
     super.addOptions();

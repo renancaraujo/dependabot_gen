@@ -22,7 +22,7 @@ const description = 'Keep your dependabot.yaml up to date';
 /// $ depgen --version
 /// ```
 /// {@endtemplate}
-class DependabotGenCommandRunner extends CompletionCommandRunner<int> {
+class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
   /// {@macro dependabot_gen_command_runner}
   DependabotGenCommandRunner({
     Logger? logger,
