@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dependabot_gen/src/commands/mixins.dart';
+import 'package:dependabot_gen/src/commands/command_base.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
@@ -10,7 +10,7 @@ import 'package:path/path.dart' as p;
 ///
 /// `depgen create` command which creates a new dependabot.yaml file.
 /// {@endtemplate}
-class CreateCommand extends DependabotGenCommand
+class CreateCommand extends CommandBase
     with
         EcosystemsOption,
         LoggerLevelOption,

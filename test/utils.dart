@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 
 File createFile(String content, [String name = 'dependabot.yaml']) {
@@ -32,4 +33,26 @@ Directory prepareFixture(List<String> fixturePath) {
   }
 
   return sisDir;
+}
+
+void runCommand(
+  String line, {
+  String? workingDirectory,
+  Map<String, String>? environment,
+  Logger? logger,
+}) {
+  final [command, ...args] = line.split(' ');
+  final result = Process.runSync(
+    command,
+    args,
+    runInShell: true,
+    workingDirectory: workingDirectory,
+    environment: environment,
+  );
+
+  if (result.exitCode != 0) {
+    logger?.err(result.stdout as String);
+    logger?.err(result.stderr as String);
+    throw Exception('Failed to run command "$line"');
+  }
 }

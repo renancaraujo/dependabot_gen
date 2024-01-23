@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dependabot_gen/src/command_runner.dart';
-import 'package:dependabot_gen/src/commands/mixins.dart';
+import 'package:dependabot_gen/src/commands/command_base.dart';
 import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
@@ -9,7 +9,7 @@ import 'package:pub_updater/pub_updater.dart';
 /// {@template update_command}
 /// A command which updates the CLI.
 /// {@endtemplate}
-class UpdateCommand extends DependabotGenCommand with LoggerLevelOption {
+class UpdateCommand extends CommandBase with LoggerLevelOption {
   /// {@macro update_command}
   UpdateCommand({
     required super.logger,

@@ -11,7 +11,6 @@ enum PackageEcosystem {
   githubActions(
     ecosystemName: 'github-actions',
     _HeuristicPackageEcosystemFinder(
-      directory: '/',
       repoHeuristics: _githubActionsHeuristics,
     ),
   ),
@@ -19,7 +18,6 @@ enum PackageEcosystem {
   /// The Docker package ecosystem.
   docker(
     _HeuristicPackageEcosystemFinder(
-      directory: '/',
       repoHeuristics: _dockerHeuristics,
     ),
   ),
@@ -28,16 +26,33 @@ enum PackageEcosystem {
   gitModules(
     ecosystemName: 'git-submodule',
     _HeuristicPackageEcosystemFinder(
-      directory: '/',
       repoHeuristics: _gitmodulesHeuristics,
     ),
   ),
 
-  /// The pub package ecosystem for Dart.
-  pub(
+  /// The bundler package ecosystem for Ruby.
+  bundler(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        'pubspec.yaml',
+        'Gemfile',
+      },
+    ),
+  ),
+
+  /// The cargo package ecosystem for Rust.
+  cargo(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'Cargo.toml',
+      },
+    ),
+  ),
+
+  /// LOL
+  composer(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'composer.json',
       },
     ),
   ),
@@ -47,6 +62,16 @@ enum PackageEcosystem {
     _ManifestPackageEcosystemFinder(
       indexFiles: {
         'go.mod',
+      },
+    ),
+  ),
+
+  /// The hex package ecosystem for Elixir.
+  hex(
+    ecosystemName: 'mix',
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'mix.exs',
       },
     ),
   ),
@@ -69,11 +94,12 @@ enum PackageEcosystem {
     ),
   ),
 
-  /// LOL
-  composer(
+  /// The nuget package ecosystem for .NET.
+  nuget(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        'composer.json',
+        '.nuspec',
+        '.csproj',
       },
     ),
   ),
@@ -89,40 +115,20 @@ enum PackageEcosystem {
     ),
   ),
 
-  /// The bundler package ecosystem for Ruby.
-  bundler(
+  /// The pub package ecosystem for Dart.
+  pub(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        'Gemfile',
+        'pubspec.yaml',
       },
     ),
   ),
 
-  /// The cargo package ecosystem for Rust.
-  cargo(
+  /// The swift package ecosystem for Swift.
+  swift(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        'Cargo.toml',
-      },
-    ),
-  ),
-
-  /// The nuget package ecosystem for .NET.
-  nuget(
-    _ManifestPackageEcosystemFinder(
-      indexFiles: {
-        '.nuspec',
-        '.csproj',
-      },
-    ),
-  ),
-
-  /// The hex package ecosystem for Elixir.
-  hex(
-    ecosystemName: 'mix',
-    _ManifestPackageEcosystemFinder(
-      indexFiles: {
-        'mix.exs',
+        'Package.swift',
       },
     ),
   ),
@@ -206,12 +212,8 @@ abstract interface class _PackageEcosystemFinder {
 class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro heuristic_package_ecosystem_finder}
   const _HeuristicPackageEcosystemFinder({
-    required this.directory,
     required this.repoHeuristics,
   });
-
-  /// The directory where the package manifests are located.
-  final String directory;
 
   /// The heuristics to find the package manifests.
   final bool Function(Directory repoRoot) repoHeuristics;
@@ -284,7 +286,11 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
       );
 
       // replace '.' and './' with '/' (only if it's at the beginning)
-      final convertedPath = dirPath.replaceFirst(RegExp(r'^\.\/?'), '/');
+      var convertedPath = dirPath.replaceFirst(RegExp(r'^\.\/?'), '/');
+
+      if (!convertedPath.startsWith('/')) {
+        convertedPath = '/$convertedPath';
+      }
 
       yield UpdateEntry(
         directory: convertedPath,
@@ -316,6 +322,7 @@ extension on File {
     final result = Process.runSync(
       'git',
       'check-ignore $path --quiet'.split(' '),
+      workingDirectory: p.dirname(path),
     );
 
     return result.exitCode != 0;
