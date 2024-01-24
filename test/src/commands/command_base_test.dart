@@ -4,9 +4,13 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dependabot_gen/src/commands/command_base.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/spec.dart';
+import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
+
+import '../../utils.dart';
 
 class MockLogger extends Mock implements Logger {}
 
@@ -36,6 +40,27 @@ class ScheduleOptionCommand extends TestCommand with ScheduleOption {
 
 class TargetBranchOptionCommand extends TestCommand with TargetBranchOption {
   TargetBranchOptionCommand({required super.logger, super.runProcess});
+}
+
+class IgnorePathsOptionCommand extends TestCommand with IgnorePathsOption {
+  IgnorePathsOptionCommand({required super.logger, super.runProcess});
+}
+
+class LabelsOptionCommand extends TestCommand with LabelsOption {
+  LabelsOptionCommand({required super.logger, super.runProcess});
+}
+
+class MilestoneOptionCommand extends TestCommand with MilestoneOption {
+  MilestoneOptionCommand({required super.logger, super.runProcess});
+}
+
+class EcosystemsOptionCommand extends TestCommand with EcosystemsOption {
+  EcosystemsOptionCommand({required super.logger, super.runProcess});
+}
+
+class RepositoryRootOptionCommand extends TestCommand
+    with RepositoryRootOption {
+  RepositoryRootOptionCommand({required super.logger, super.runProcess});
 }
 
 void main() {
@@ -170,7 +195,10 @@ void main() {
 The interval to check for updates on new update entries (does not affect existing ones).''')
             .having((e) => e.defaultsTo, 'defaultsTo', 'weekly')
             .having(
-                (e) => e.allowed, 'allowed', ['daily', 'weekly', 'monthly']),
+              (e) => e.allowed,
+              'allowed',
+              ['daily', 'weekly', 'monthly'],
+            ),
       );
     });
 
@@ -243,6 +271,245 @@ The target branch to create pull requests against.'''),
     });
   });
 
+  group('IgnorePathsOption', () {
+    test('adds options', () {
+      final command = IgnorePathsOptionCommand(logger: logger);
 
-  group('', () {});
+      expect(
+        command.argParser.options['ignore-paths'],
+        isA<Option>().having((e) => e.help, 'help', '''
+Paths to ignore when searching for packages. Example: "__brick__/**"'''),
+      );
+    });
+
+    test('sets ignore paths', () async {
+      final command = IgnorePathsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--ignore-paths', 'test,example'],
+      );
+      expect(command.ignorePaths, ['test', 'example']);
+    });
+
+    test('sets ignore paths as null by default', () async {
+      final command = IgnorePathsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse([]);
+      expect(command.ignorePaths, isNull);
+    });
+  });
+
+  group('LabelsOption', () {
+    test('adds options', () {
+      final command = LabelsOptionCommand(logger: logger);
+
+      expect(
+        command.argParser.options['labels'],
+        isA<Option>().having((e) => e.help, 'help', '''
+Labels to add to the pull requests.'''),
+      );
+    });
+
+    test('sets labels', () async {
+      final command = LabelsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--labels', 'test,example'],
+      );
+      expect(command.labels, ['test', 'example']);
+    });
+
+    test('sets labels as null by default', () async {
+      final command = LabelsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse([]);
+      expect(command.labels, isNull);
+    });
+  });
+
+  group('MilestoneOption', () {
+    test('adds options', () {
+      final command = MilestoneOptionCommand(logger: logger);
+
+      expect(
+        command.argParser.options['milestone'],
+        isA<Option>().having((e) => e.help, 'help', '''
+The milestone to add to the pull requests. Must be a number.'''),
+      );
+    });
+
+    test('sets milestone', () async {
+      final command = MilestoneOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--milestone', '1'],
+      );
+      expect(command.milestone, 1);
+    });
+
+    test('sets milestone as null by default', () async {
+      final command = MilestoneOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse([]);
+      expect(command.milestone, isNull);
+    });
+  });
+
+  group('EcosystemsOption', () {
+    test('adds options', () {
+      final command = EcosystemsOptionCommand(logger: logger);
+
+      expect(
+        command.argParser.options['ecosystems'],
+        isA<Option>()
+            .having((e) => e.help, 'help', '''
+The package ecosystems to consider when searching for packages. Defaults to all available.''')
+            .having(
+              (e) => e.defaultsTo,
+              'defaultsTo',
+              PackageEcosystem.values.map((e) => e.name),
+            )
+            .having(
+              (e) => e.allowed,
+              'allowed',
+              PackageEcosystem.values.map((e) => e.name),
+            )
+            .having((e) => e.abbr, 'abbr', 'e'),
+      );
+
+      expect(
+        command.argParser.options['ignore-ecosystems'],
+        isA<Option>()
+            .having((e) => e.help, 'help', '''
+The package ecosystems to ignore when searching for packages. Defaults to none.''')
+            .having((e) => e.defaultsTo, 'defaultsTo', <String>[])
+            .having(
+              (e) => e.allowed,
+              'allowed',
+              PackageEcosystem.values.map((e) => e.name),
+            )
+            .having((e) => e.abbr, 'abbr', null),
+      );
+    });
+
+    test('defaults to all envs', () {
+      final command = EcosystemsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        [],
+      );
+      expect(command.ecosystems, [
+        PackageEcosystem.githubActions,
+        PackageEcosystem.docker,
+        PackageEcosystem.gitModules,
+        PackageEcosystem.bundler,
+        PackageEcosystem.cargo,
+        PackageEcosystem.composer,
+        PackageEcosystem.gomod,
+        PackageEcosystem.hex,
+        PackageEcosystem.maven,
+        PackageEcosystem.npm,
+        PackageEcosystem.nuget,
+        PackageEcosystem.pip,
+        PackageEcosystem.pub,
+        PackageEcosystem.swift,
+      ]);
+    });
+
+    test('ignore without included', () {
+      final command = EcosystemsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--ignore-ecosystems', 'githubActions,npm'],
+      );
+      expect(command.ecosystems, [
+        PackageEcosystem.docker,
+        PackageEcosystem.gitModules,
+        PackageEcosystem.bundler,
+        PackageEcosystem.cargo,
+        PackageEcosystem.composer,
+        PackageEcosystem.gomod,
+        PackageEcosystem.hex,
+        PackageEcosystem.maven,
+        PackageEcosystem.nuget,
+        PackageEcosystem.pip,
+        PackageEcosystem.pub,
+        PackageEcosystem.swift,
+      ]);
+    });
+
+    test('include without ignore', () {
+      final command = EcosystemsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--ecosystems', 'githubActions,npm'],
+      );
+      expect(command.ecosystems, [
+        PackageEcosystem.githubActions,
+        PackageEcosystem.npm,
+      ]);
+    });
+
+    test('include and ignore', () {
+      final command = EcosystemsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--ecosystems', 'githubActions,npm', '--ignore-ecosystems', 'npm'],
+      );
+      expect(command.ecosystems, [
+        PackageEcosystem.githubActions,
+      ]);
+    });
+  });
+
+  group('RepositoryRootOption', () {
+    test('adds options', () {
+      final command = RepositoryRootOptionCommand(logger: logger);
+
+      expect(
+        command.argParser.options['repo-root'],
+        isA<Option>().having((e) => e.help, 'help', '''
+Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''').having((e) => e.abbr, 'abbr', 'r'),
+      );
+    });
+
+    test('when reporoot is specified', () async {
+      final command = RepositoryRootOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--repo-root', 'my/path'],
+      );
+
+      final repoRoot = await command.getRepositoryRoot();
+
+      expect(repoRoot.path, 'my/path');
+
+      expect(command.workingDir, Directory.current.path);
+    });
+
+    test(
+        'if reporoot is not specified, '
+        'fetch the a git root containing cwd', () async {
+      final empty = prepareFixture(['empty']);
+      final internal = p.join(empty.path, 'internal');
+
+      runCommand('git init', workingDirectory: empty.path);
+
+      final command = RepositoryRootOptionCommand(logger: logger);
+      command
+        ..argResults = command.argParser.parse([])
+        ..testWorkingDir = internal;
+
+      final repoRoot = await command.getRepositoryRoot();
+
+      expect(repoRoot.absolute.existsSync(), true);
+    });
+
+    test(
+        'if reporoot is not specified, '
+        'throw if not ina  git repo', () async {
+      final empty = prepareFixture(['empty']);
+      final internal = p.join(empty.path, 'internal');
+
+
+      final command = RepositoryRootOptionCommand(logger: logger);
+      command
+        ..argResults = command.argParser.parse([])
+        ..testWorkingDir = internal;
+
+      await expectLater(
+        command.getRepositoryRoot(),
+        throwsA(isA<UsageException>()),
+      );
+    });
+  });
 }

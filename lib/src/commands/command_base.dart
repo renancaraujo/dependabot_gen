@@ -131,7 +131,6 @@ mixin ScheduleOption on CommandBase {
       'schedule-interval',
       abbr: 'I',
       allowed: ScheduleInterval.values.map((e) => e.name),
-
       defaultsTo: ScheduleInterval.weekly.name,
       help: 'The interval to check for updates on new update entries '
           '(does not affect existing ones).',
@@ -299,25 +298,37 @@ Path to the repository root. If ommited, the command will search for the closest
     return Directory(path);
   }
 
-  Future<Directory> _fetchRepositoryRoot([
-    String? path,
-  ]) async {
-    final current = p.absolute(path ?? Directory.current.path);
+  /// For testing puposes only, overrides the current working directory.
+  @visibleForTesting
+  String? testWorkingDir;
 
-    final pr = await runGit(
-      ['rev-parse', '--git-dir'],
-      processWorkingDir: current,
-    );
+  /// For testing puposes only, gets the current working directory.
+  @visibleForTesting
+  String get workingDir => testWorkingDir ?? Directory.current.path;
 
-    final gitDirPath = (pr.stdout as String).trim();
+  Future<Directory> _fetchRepositoryRoot() async {
+    final current = p.absolute(workingDir);
 
-    if (p.basename(gitDirPath) != '.git') {
-      throw UsageException(
-        'Could not find a git repository in the current directory.',
-        'Run this command from a path within a git repository.',
+    ProcessResult pr;
+
+    try {
+      pr = await runGit(
+        ['rev-parse', '--git-dir'],
+        processWorkingDir: current,
       );
+    } on ProcessException catch (e) {
+      if (e.message.contains('not a git repository')) {
+        throw UsageException(
+          'Could not find a git repository in the current directory.',
+          'Run this command from a path within a git repository or specify the '
+              '--repo-root option.',
+        );
+      }
+      rethrow;
     }
 
+    final gitDirPath = (pr.stdout as String).trim();
+    if (p.basename(gitDirPath) != '.git') {}
     final pp = p.dirname(p.absolute(gitDirPath));
 
     return Directory(pp);
