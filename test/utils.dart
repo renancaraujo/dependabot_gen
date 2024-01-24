@@ -9,7 +9,10 @@ File createFile(String content, [String name = 'dependabot.yaml']) {
   )..writeAsStringSync(content);
 }
 
-Directory prepareFixture(List<String> fixturePath) {
+Directory prepareFixture(
+  List<String> fixturePath, {
+  bool withGit = false,
+}) {
   final currentDir = Directory(
     p.join('test', 'fixtures', p.joinAll(fixturePath)),
   );
@@ -30,6 +33,10 @@ Directory prepareFixture(List<String> fixturePath) {
     } else {
       throw UnsupportedError('Unsupported entity: $entity');
     }
+  }
+
+  if (withGit) {
+    runCommand('git init', workingDirectory: sisDir.path);
   }
 
   return sisDir;

@@ -47,6 +47,9 @@ abstract class CommandBase extends Command<int?> {
   /// The [Logger] for this command.
   Logger get logger => _logger;
 
+  @override
+  void printUsage() => _logger.info(usage);
+
   @mustCallSuper
   @override
   Future<int?> run() async {

@@ -1,0 +1,10 @@
+version: 2 #keep this comment
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly #keep this comment
+  - package-ecosystem: pub # this entry si extraneous
+    directory: /
+    schedule:
+      interval: monthly

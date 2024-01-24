@@ -12,7 +12,10 @@ void main() {
     late Directory repoRoot;
 
     setUp(() {
-      repoRoot = prepareFixture(['package_ecosystem', 'packages']);
+      repoRoot = prepareFixture(
+        ['package_ecosystem', 'packages'],
+        withGit: true,
+      );
     });
 
     test('finds entries', () {
@@ -191,7 +194,6 @@ void main() {
       File(p.join(repoRoot.path, '.gitignore'))
           .writeAsStringSync('packages/pip/p1');
 
-      runCommand('git init', workingDirectory: repoRoot.path);
       runCommand('git add --all', workingDirectory: repoRoot.path);
 
       expect(

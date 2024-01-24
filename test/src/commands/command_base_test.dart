@@ -479,10 +479,9 @@ Path to the repository root. If ommited, the command will search for the closest
     test(
         'if reporoot is not specified, '
         'fetch the a git root containing cwd', () async {
-      final empty = prepareFixture(['empty']);
+      final empty = prepareFixture(['empty'], withGit: true);
       final internal = p.join(empty.path, 'internal');
 
-      runCommand('git init', workingDirectory: empty.path);
 
       final command = RepositoryRootOptionCommand(logger: logger);
       command
