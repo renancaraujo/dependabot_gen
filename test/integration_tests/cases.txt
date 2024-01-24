@@ -1,8 +1,0 @@
-
-
-
-- usage message
-- discovers new entries maintaning existing (AND COMMENTS on root and entries) removing extraneous, valdiate ,essages
-- 
-
-
