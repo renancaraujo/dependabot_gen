@@ -1,23 +1,37 @@
 import 'dart:async';
-
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
-import 'package:dependabot_gen/src/package_finder/package_finder.dart';
+import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:git/git.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
+/// Typedef for [Process.runSync].
+typedef ProcessRunSync = ProcessResult Function(
+  String executable,
+  List<String> arguments,
+);
+
+/// Default [ProcessRunSync]
+ProcessResult defaultRunProcess(
+  String executable,
+  List<String> arguments,
+) =>
+    Process.runSync(executable, arguments);
+
 /// {@template mixins_command}
 /// A subclass of [Command] that allwos usages of mixins to add options.
 /// {@endtemplate}
-abstract class DependabotGenCommand extends Command<int?> {
+abstract class CommandBase extends Command<int?> {
   /// {@macro mixins_command}
-  DependabotGenCommand({
+  CommandBase({
     required Logger logger,
-  }) : _logger = logger {
+    @visibleForTesting ProcessRunSync runProcess = defaultRunProcess,
+  })  : _logger = logger,
+        _runProcess = runProcess {
     addOptions();
   }
 
@@ -28,14 +42,18 @@ abstract class DependabotGenCommand extends Command<int?> {
 
   final Logger _logger;
 
+  final ProcessRunSync _runProcess;
+
   /// The [Logger] for this command.
   Logger get logger => _logger;
+
+  @override
+  void printUsage() => _logger.info(usage);
 
   @mustCallSuper
   @override
   Future<int?> run() async {
-    // test if git is instaleld in the PATH
-    final result = await Process.run('git', ['--version']);
+    final result = _runProcess('git', ['--version']);
 
     if (result.exitCode != 0) {
       _logger.err(
@@ -45,16 +63,14 @@ abstract class DependabotGenCommand extends Command<int?> {
       return ExitCode.unavailable.code;
     }
 
-    // if not, throw an error
-
     return null;
   }
 }
 
 /// Adds the `--silent` and `--verbose` options to the command.
 ///
-/// Get the log level with [logLevel].
-mixin LoggerLevelOption on DependabotGenCommand {
+/// Get the log level with [_logLevel].
+mixin LoggerLevelOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -63,16 +79,18 @@ mixin LoggerLevelOption on DependabotGenCommand {
         'silent',
         abbr: 'S',
         help: 'Silences all output.',
+        negatable: false,
       )
       ..addFlag(
         'verbose',
         abbr: 'V',
-        help: 'Verbose output.',
+        help: 'Show verbose output.',
+        negatable: false,
       );
   }
 
   /// Gets the [Level] for the logger.
-  Level get logLevel {
+  Level get _logLevel {
     final silent = argResults!['silent'] as bool;
     final verbose = argResults!['verbose'] as bool;
 
@@ -94,14 +112,13 @@ mixin LoggerLevelOption on DependabotGenCommand {
     return Level.info;
   }
 
-  @mustCallSuper
   @override
   Future<int?> run() async {
     final ret = await super.run();
     if (ret != null) {
       return ret;
     }
-    logger.level = logLevel;
+    logger.level = _logLevel;
     return null;
   }
 }
@@ -109,7 +126,7 @@ mixin LoggerLevelOption on DependabotGenCommand {
 /// Adds the `--schedule-interval` option to the command.
 ///
 /// Get the [Schedule] with [schedule].
-mixin ScheduleOption on DependabotGenCommand {
+mixin ScheduleOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -137,7 +154,7 @@ mixin ScheduleOption on DependabotGenCommand {
 }
 
 /// Adds the `--target-branch` option to the command.
-mixin TargetBranchOption on DependabotGenCommand {
+mixin TargetBranchOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -152,7 +169,7 @@ mixin TargetBranchOption on DependabotGenCommand {
 }
 
 /// Adds the `--ignore-paths` option to the command.
-mixin IgnorePathsOption on DependabotGenCommand {
+mixin IgnorePathsOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -177,7 +194,7 @@ mixin IgnorePathsOption on DependabotGenCommand {
 }
 
 /// Adds the `--labels` option to the command.
-mixin LabelsOption on DependabotGenCommand {
+mixin LabelsOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -200,7 +217,7 @@ mixin LabelsOption on DependabotGenCommand {
 }
 
 /// Adds the `--milestone` option to the command.
-mixin MilestoneOption on DependabotGenCommand {
+mixin MilestoneOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -221,22 +238,33 @@ mixin MilestoneOption on DependabotGenCommand {
 }
 
 /// Adds the `--ecosystems` option to the command.
-mixin EcosystemsOption on DependabotGenCommand {
+mixin EcosystemsOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
-    argParser.addMultiOption(
-      'ecosystems',
-      abbr: 'e',
-      allowed: PackageEcosystem.values.map((e) => e.name),
-      defaultsTo: PackageEcosystem.values.map((e) => e.name),
-      help: 'The package ecosystems to update in the dependabot.yaml file.',
-    );
+    argParser
+      ..addMultiOption(
+        'ecosystems',
+        abbr: 'e',
+        allowed: PackageEcosystem.values.map((e) => e.name),
+        defaultsTo: PackageEcosystem.values.map((e) => e.name),
+        help: 'The package ecosystems to consider when searching for packages. '
+            'Defaults to all available.',
+      )
+      ..addMultiOption(
+        'ignore-ecosystems',
+        allowed: PackageEcosystem.values.map((e) => e.name),
+        defaultsTo: [],
+        help: 'The package ecosystems to ignore when searching for packages. '
+            'Defaults to none.',
+      );
   }
 
   /// Gets the ecosystems.
   Set<PackageEcosystem> get ecosystems {
     final ecosystems = argResults!['ecosystems'] as List<String>;
+    final ignoreEcosystems =
+        (argResults!['ignore-ecosystems'] as List<String>).toSet();
 
     return ecosystems
         .map(
@@ -244,12 +272,13 @@ mixin EcosystemsOption on DependabotGenCommand {
             (element) => element.name == e,
           ),
         )
+        .where((e) => !ignoreEcosystems.contains(e.name))
         .toSet();
   }
 }
 
 /// Adds the `--repo-root` option to the command.
-mixin RepositoryRootOption on DependabotGenCommand {
+mixin RepositoryRootOption on CommandBase {
   @override
   void addOptions() {
     super.addOptions();
@@ -272,25 +301,37 @@ Path to the repository root. If ommited, the command will search for the closest
     return Directory(path);
   }
 
-  Future<Directory> _fetchRepositoryRoot([
-    String? path,
-  ]) async {
-    final current = p.absolute(path ?? Directory.current.path);
+  /// For testing puposes only, overrides the current working directory.
+  @visibleForTesting
+  String? testWorkingDir;
 
-    final pr = await runGit(
-      ['rev-parse', '--git-dir'],
-      processWorkingDir: current,
-    );
+  /// For testing puposes only, gets the current working directory.
+  @visibleForTesting
+  String get workingDir => testWorkingDir ?? Directory.current.path;
 
-    final gitDirPath = (pr.stdout as String).trim();
+  Future<Directory> _fetchRepositoryRoot() async {
+    final current = p.absolute(workingDir);
 
-    if (p.basename(gitDirPath) != '.git') {
-      throw UsageException(
-        'Could not find a git repository in the current directory.',
-        'Run this command from a path within a git repository.',
+    ProcessResult pr;
+
+    try {
+      pr = await runGit(
+        ['rev-parse', '--git-dir'],
+        processWorkingDir: current,
       );
+    } on ProcessException catch (e) {
+      if (e.message.contains('not a git repository')) {
+        throw UsageException(
+          'Could not find a git repository in the current directory.',
+          'Run this command from a path within a git repository or specify the '
+              '--repo-root option.',
+        );
+      }
+      rethrow;
     }
 
+    final gitDirPath = (pr.stdout as String).trim();
+    if (p.basename(gitDirPath) != '.git') {}
     final pp = p.dirname(p.absolute(gitDirPath));
 
     return Directory(pp);

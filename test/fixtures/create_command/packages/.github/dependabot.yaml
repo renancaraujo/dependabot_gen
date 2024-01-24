@@ -1,0 +1,14 @@
+version: 2 #keep this comment
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly #keep this comment
+  - package-ecosystem: pub # this entry is extraneous, should be removed
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: oogabooga # this entry belongs to an ecossytem we dont know, preserve it
+    directory: /
+    schedule:
+      interval: monthly

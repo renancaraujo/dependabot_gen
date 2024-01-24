@@ -1,16 +1,14 @@
-import 'dart:io';
-
 import 'package:collection/collection.dart';
-import 'package:dependabot_gen/src/commands/mixins.dart';
+import 'package:dependabot_gen/src/commands/command_base.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:path/path.dart' as p;
 
 /// {@template create_command}
 ///
 /// `depgen create` command which creates a new dependabot.yaml file.
 /// {@endtemplate}
-class CreateCommand extends DependabotGenCommand
+class CreateCommand extends CommandBase
     with
         EcosystemsOption,
         LoggerLevelOption,
@@ -46,7 +44,7 @@ Will keep existing entries and add new ones for possibly uncovered packages.
     final dependabotFile = DependabotFile.fromRepositoryRoot(repoRoot);
 
     logger.info(
-      'Creating dependabot.yaml in ${dependabotFile.path}}',
+      'Creating dependabot.yaml in ${dependabotFile.path}',
     );
 
     final newEntries = ecosystems.fold(
@@ -90,13 +88,16 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
     }
 
     for (final entry in currentUpdates) {
-      var dir = entry.directory;
-      if (dir.startsWith('/')) {
-        dir = dir.substring(1);
-      }
-      final exists = Directory(p.join(repoRoot.path, dir)).existsSync();
+      final isUnknownEcoststem =
+          !PackageEcosystem.values.map((e) => e.name).contains(entry.ecosystem);
 
-      if (exists) {
+      final wasItFound = newEntries.firstWhereOrNull((element) {
+            return element.directory == entry.directory &&
+                element.ecosystem == entry.ecosystem;
+          }) !=
+          null;
+
+      if (isUnknownEcoststem || wasItFound) {
         logger.info(
           'Preserved ${entry.ecosystem} entry for ${entry.directory}',
         );
@@ -114,7 +115,7 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
 
     dependabotFile.saveToFile();
 
-    logger.info('Finished creating dependabot.yaml in $repoRoot');
+    logger.info('Finished creating dependabot.yaml in ${dependabotFile.path}');
 
     return ExitCode.success.code;
   }

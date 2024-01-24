@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:cli_completion/cli_completion.dart';
 import 'package:dependabot_gen/src/command_runner.dart';
 import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
@@ -98,11 +97,10 @@ void main() {
       verifyNever(() => logger.info(updatePrompt));
     });
 
-    test('can be instantiated without an explicit analytics/logger instance',
-        () {
+    test('can be instantiated without an explicit logger instance', () {
       final commandRunner = DependabotGenCommandRunner();
       expect(commandRunner, isNotNull);
-      expect(commandRunner, isA<CompletionCommandRunner<int>>());
+      expect(commandRunner, isA<DependabotGenCommandRunner>());
     });
 
     test('handles FormatException', () async {
