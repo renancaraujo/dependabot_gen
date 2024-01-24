@@ -7,6 +7,13 @@ import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
+/// A dummy [UpdateEntry] used to create a default dependabot.yaml file.
+const kDummyEntry = UpdateEntry(
+  directory: 'dummy',
+  ecosystem: 'dummy',
+  schedule: Schedule(interval: ScheduleInterval.monthly),
+);
+
 /// Represents a dependabot.yaml file with its [path].
 class DependabotFile {
   DependabotFile._(
@@ -26,9 +33,9 @@ class DependabotFile {
     if (contents.isEmpty) {
       content = const DependabotSpec(
         version: DependabotVersion.v2,
-        updates: [],
+        updates: [kDummyEntry],
       );
-      contents = YAMLWriter().write(content);
+      contents = YamlWriter().write(content);
     } else {
       content = checkedYamlDecode(
         contents,
@@ -77,13 +84,24 @@ class DependabotFile {
   /// Does not immediately save the changes to the file.
   /// For that, call [saveToFile].
   void addUpdateEntry(UpdateEntry newEntry) {
+    final hasDummy =
+        _content.updates.isNotEmpty && _content.updates.first == kDummyEntry;
+    if (hasDummy) {
+      _content = _content.copyWith(updates: []);
+    }
+
     _content = _content.copyWith(
       updates: [
         ..._content.updates,
         newEntry,
       ],
     );
+
     _editor.appendToList(['updates'], newEntry.toJson());
+
+    if (hasDummy) {
+      _editor.remove(['updates', 0]);
+    }
   }
 
   /// Removes an [UpdateEntry] from the dependabot.yaml file.
@@ -113,6 +131,13 @@ class DependabotFile {
 
   /// Saves the changes to the actual dependabot.yaml file.
   void saveToFile() {
+    if (_content.updates.length == 1 && _content.updates.first == kDummyEntry) {
+      _content = _content.copyWith(
+        updates: [],
+      );
+      _editor.remove(['updates', 0]);
+    }
+
     final file = File(path);
 
     if (!file.existsSync()) {

@@ -28,6 +28,7 @@ void main() {
       pubUpdater = _MockPubUpdater();
       logger = _MockLogger();
       commandRunner = DependabotGenCommandRunner(
+        executableName: 'depgen',
         logger: logger,
         pubUpdater: pubUpdater,
       );

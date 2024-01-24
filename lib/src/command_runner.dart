@@ -6,9 +6,6 @@ import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
 
-/// The name of the executable.
-const executableName = 'depgen';
-
 /// The name of the package.
 const packageName = 'dependabot_gen';
 
@@ -25,6 +22,7 @@ const description = 'Keep your dependabot.yaml up to date';
 class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
   /// {@macro dependabot_gen_command_runner}
   DependabotGenCommandRunner({
+    required String executableName,
     Logger? logger,
     PubUpdater? pubUpdater,
   })  : _logger = logger ?? Logger(),
