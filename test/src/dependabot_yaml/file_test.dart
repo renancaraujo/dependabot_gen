@@ -112,7 +112,7 @@ void main() {
         final dependabotFile = DependabotFile.fromFile(file);
 
         expect(dependabotFile.path, file.path);
-        expect(dependabotFile.updates, hasLength(0));
+        expect(dependabotFile.updates, [kDummyEntry]);
       });
 
       test('from an invalid dependabot file', () {
@@ -141,14 +141,15 @@ void main() {
 
         expect(File(dependabotFile.path).existsSync(), false);
 
-        expect(dependabotFile.updates, hasLength(0));
+        expect(dependabotFile.updates, [kDummyEntry]);
 
         dependabotFile.saveToFile();
 
         expect(File(dependabotFile.path).existsSync(), true);
         expect(File(dependabotFile.path).readAsStringSync(), '''
 version: 2
-updates: []
+updates: 
+  []
 ''');
       });
 
@@ -168,14 +169,15 @@ updates: []
 
         expect(File(dependabotFile.path).existsSync(), true);
 
-        expect(dependabotFile.updates, hasLength(0));
+        expect(dependabotFile.updates, [kDummyEntry]);
 
         dependabotFile.saveToFile();
 
         expect(File(dependabotFile.path).existsSync(), true);
         expect(File(dependabotFile.path).readAsStringSync(), '''
 version: 2
-updates: []
+updates: 
+  []
 ''');
       });
 

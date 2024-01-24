@@ -65,7 +65,8 @@ Will keep existing entries and add new ones for possibly uncovered packages.
       },
     );
 
-    final currentUpdates = dependabotFile.updates;
+    final currentUpdates =
+        dependabotFile.updates.whereNot((element) => element == kDummyEntry);
 
     for (final newEntry in newEntries) {
       final entryExists = currentUpdates.firstWhereOrNull((element) {

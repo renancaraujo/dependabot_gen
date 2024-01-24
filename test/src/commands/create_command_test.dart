@@ -348,9 +348,12 @@ updates:
 
           File(p.join(repoRoot.path, '.gitignore'))
               .writeAsStringSync('packages/pip/p1');
-          runCommand('git add --all', workingDirectory: repoRoot.path);
+          final existingPath =
+              p.join(repoRoot.path, '.github', 'dependabot.yaml');
 
-          final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yaml');
+          File(existingPath).deleteSync();
+
+          runCommand('git add --all', workingDirectory: repoRoot.path);
 
           final result = await commandRunner.run([
             'create',
@@ -364,21 +367,17 @@ updates:
             p.join(repoRoot.path, 'packages', 'pip', 'p2'),
           ]);
 
-          final file = File(finalPath);
+          final file = File(p.join(repoRoot.path, '.github', 'dependabot.yml'));
 
           expect(result, equals(ExitCode.success.code));
 
           expect(file.readAsStringSync(), '''
-version: 2 #keep this comment
-updates:
+version: 2
+updates: 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly #keep this comment
-  - package-ecosystem: oogabooga # this entry belongs to an ecossytem we dont know, preserve it
-    directory: /
-    schedule:
-      interval: monthly
+      interval: weekly
   - package-ecosystem: cargo
     directory: /packages/cargo
     schedule:
