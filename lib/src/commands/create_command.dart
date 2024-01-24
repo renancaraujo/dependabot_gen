@@ -65,8 +65,9 @@ Will keep existing entries and add new ones for possibly uncovered packages.
       },
     );
 
-    final currentUpdates =
-        dependabotFile.updates.whereNot((element) => element == kDummyEntry).toList();
+    final currentUpdates = dependabotFile.updates
+        .whereNot((element) => element == kDummyEntry)
+        .toList();
 
     for (final newEntry in newEntries) {
       final entryExists = currentUpdates.firstWhereOrNull((element) {
@@ -89,8 +90,9 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
     }
 
     for (final entry in currentUpdates) {
-      final isUnknownEcoststem =
-          !PackageEcosystem.values.map((e) => e.ecosystemName ?? e.name).contains(entry.ecosystem);
+      final isUnknownEcoststem = !PackageEcosystem.values
+          .map((e) => e.ecosystemName ?? e.name)
+          .contains(entry.ecosystem);
 
       final wasItFound = newEntries.firstWhereOrNull((element) {
             return element.directory == entry.directory &&
