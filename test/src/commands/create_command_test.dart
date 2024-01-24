@@ -44,6 +44,7 @@ void main() {
       setUp(() {
         logger = _MockLogger();
         commandRunner = DependabotGenCommandRunner(
+          executableName: 'depgen',
           logger: logger,
         );
       });

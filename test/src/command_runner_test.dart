@@ -18,7 +18,7 @@ const latestVersion = '0.0.0';
 
 final updatePrompt = '''
 ${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u2192 ${lightCyan.wrap(latestVersion)}
-Run ${lightCyan.wrap('$executableName update')} to update''';
+Run ${lightCyan.wrap('depgen update')} to update''';
 
 void main() {
   group('$DependabotGenCommandRunner', () {
@@ -36,6 +36,7 @@ void main() {
       logger = _MockLogger();
 
       commandRunner = DependabotGenCommandRunner(
+        executableName: 'depgen',
         logger: logger,
         pubUpdater: pubUpdater,
       );
@@ -98,7 +99,10 @@ void main() {
     });
 
     test('can be instantiated without an explicit logger instance', () {
-      final commandRunner = DependabotGenCommandRunner();
+      final commandRunner = DependabotGenCommandRunner(
+        executableName: 'depgen',
+      );
+
       expect(commandRunner, isNotNull);
       expect(commandRunner, isA<DependabotGenCommandRunner>());
     });

@@ -2,8 +2,15 @@ import 'dart:io';
 
 import 'package:dependabot_gen/src/command_runner.dart';
 
-Future<void> main(List<String> args) async {
-  await _flushThenExit(await DependabotGenCommandRunner().run(args));
+Future<void> main(List<String> args) => run(args, 'depgen');
+
+Future<void> run(
+  List<String> args,
+  String executable,
+) async {
+  await _flushThenExit(
+    await DependabotGenCommandRunner(executableName: executable).run(args),
+  );
 }
 
 /// Flushes the stdout and stderr streams, then exits the program with the given
