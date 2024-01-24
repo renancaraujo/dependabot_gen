@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:meta/meta.dart';
@@ -309,8 +310,13 @@ List<File> _findFilesRecursivelyOn({
   required Set<String> withNames,
 }) {
   final result = <File>[];
-  for (final entity in directory.absolute.listSync(recursive: true)) {
-    if (entity is File && withNames.contains(p.basename(entity.path))) {
+  final dirlist = directory.absolute
+      .listSync(recursive: true)
+      .whereType<File>()
+      .toList()
+    ..sort((l, r) => l.path.compareTo(r.path));
+  for (final entity in dirlist) {
+    if (withNames.contains(p.basename(entity.path))) {
       result.add(entity);
     }
   }

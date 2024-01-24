@@ -263,16 +263,6 @@ updates:
     milestone: 4
     target-branch: master
   - package-ecosystem: nuget
-    directory: /packages/nuget/p2
-    schedule:
-      interval: daily
-    labels:
-      - dependencies
-      - deps
-      - dependabot
-    milestone: 4
-    target-branch: master
-  - package-ecosystem: nuget
     directory: /packages/nuget/p1
     schedule:
       interval: daily
@@ -282,8 +272,18 @@ updates:
       - dependabot
     milestone: 4
     target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p2
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
   - package-ecosystem: pip
-    directory: /packages/pip/p3
+    directory: /packages/pip/p1
     schedule:
       interval: daily
     labels:
@@ -303,7 +303,7 @@ updates:
     milestone: 4
     target-branch: master
   - package-ecosystem: pip
-    directory: /packages/pip/p1
+    directory: /packages/pip/p3
     schedule:
       interval: daily
     labels:
