@@ -97,8 +97,7 @@ void main() {
       verifyNever(() => logger.info(updatePrompt));
     });
 
-    test('can be instantiated without an explicit logger instance',
-        () {
+    test('can be instantiated without an explicit logger instance', () {
       final commandRunner = DependabotGenCommandRunner();
       expect(commandRunner, isNotNull);
       expect(commandRunner, isA<DependabotGenCommandRunner>());

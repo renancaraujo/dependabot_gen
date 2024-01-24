@@ -4,7 +4,10 @@ import 'package:dependabot_gen/src/command_runner.dart';
 import 'package:dependabot_gen/src/commands/commands.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
+
+import '../../utils.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
@@ -32,51 +35,360 @@ Usage: depgen create [arguments]
 Run "depgen help" to see global options.''';
 
 void main() {
-  group('create', () {
-    late Logger logger;
-    late DependabotGenCommandRunner commandRunner;
+  group(
+    'create',
+    () {
+      late Logger logger;
+      late DependabotGenCommandRunner commandRunner;
 
-    setUp(() {
-      logger = _MockLogger();
-      commandRunner = DependabotGenCommandRunner(
-        logger: logger,
+      setUp(() {
+        logger = _MockLogger();
+        commandRunner = DependabotGenCommandRunner(
+          logger: logger,
+        );
+      });
+
+      test('can be instantiated', () {
+        final command = CreateCommand(logger: logger);
+        expect(command, isNotNull);
+      });
+
+      test('has all the mixins', () {
+        final command = CreateCommand(logger: logger);
+        expect(command, isA<EcosystemsOption>());
+        expect(command, isA<LoggerLevelOption>());
+        expect(command, isA<ScheduleOption>());
+        expect(command, isA<TargetBranchOption>());
+        expect(command, isA<LabelsOption>());
+        expect(command, isA<MilestoneOption>());
+        expect(command, isA<IgnorePathsOption>());
+        expect(command, isA<RepositoryRootOption>());
+      });
+
+      test('usage message', () async {
+        final result = await commandRunner.run(['create', '--help']);
+        expect(result, equals(ExitCode.success.code));
+        verify(() => logger.info(_usage)).called(1);
+      });
+
+      test(
+        'discovers new entries maintaning existing ones '
+        '(also maintains comments on troughout the doc) '
+        'removing extraneous entries, '
+        'validating messages along the way',
+        () async {
+          final repoRoot = prepareFixture(['create_command', 'packages']);
+
+          final result = await commandRunner.run([
+            'create',
+            '--repo-root',
+            repoRoot.path,
+            '-I',
+            'daily',
+            '--target-branch',
+            'master',
+            '--labels',
+            'dependencies,deps,dependabot',
+            '--milestone',
+            '4',
+          ]);
+
+          final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yaml');
+
+          verify(() => logger.level = Level.info).called(1);
+
+          verify(() => logger.info('Creating dependabot.yaml in $finalPath'))
+              .called(1);
+
+          verify(
+            () => logger.info('Entry for github-actions already exists for /'),
+          ).called(1);
+
+          verify(() => logger.success('Added docker entry for /')).called(1);
+          verify(() => logger.success('Added git-submodule entry for /'))
+              .called(1);
+          verify(
+            () => logger.success('Added bundler entry for /packages/bundler'),
+          ).called(1);
+          verify(() => logger.success('Added cargo entry for /packages/cargo'))
+              .called(1);
+          verify(
+            () => logger.success('Added composer entry for /packages/composer'),
+          ).called(1);
+          verify(() => logger.success('Added gomod entry for /packages/gomod'))
+              .called(1);
+          verify(() => logger.success('Added mix entry for /packages/hex'))
+              .called(1);
+          verify(() => logger.success('Added maven entry for /packages/maven'))
+              .called(1);
+          verify(() => logger.success('Added npm entry for /packages/npm'))
+              .called(1);
+          verify(
+            () => logger.success('Added nuget entry for /packages/nuget/p2'),
+          ).called(1);
+          verify(
+            () => logger.success('Added nuget entry for /packages/nuget/p1'),
+          ).called(1);
+          verify(() => logger.success('Added pip entry for /packages/pip/p3'))
+              .called(1);
+          verify(() => logger.success('Added pip entry for /packages/pip/p2'))
+              .called(1);
+          verify(() => logger.success('Added pip entry for /packages/pip/p1'))
+              .called(1);
+          verify(() => logger.success('Added pub entry for /packages/pub'))
+              .called(1);
+          verify(() => logger.success('Added swift entry for /packages/swift'))
+              .called(1);
+
+          verify(() => logger.info('Preserved github-actions entry for /'))
+              .called(1);
+
+          verify(() => logger.info(yellow.wrap('Removed pub entry for /')))
+              .called(1);
+
+          verify(() => logger.info('Preserved oogabooga entry for /'))
+              .called(1);
+
+          verify(
+            () => logger.info(
+              'Finished creating dependabot.yaml in $finalPath',
+            ),
+          ).called(1);
+
+          verifyNoMoreInteractions(logger);
+
+          final file = File(finalPath);
+
+          expect(result, equals(ExitCode.success.code));
+
+          expect(file.readAsStringSync(), '''
+version: 2 #keep this comment
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly #keep this comment
+  - package-ecosystem: oogabooga # this entry belongs to an ecossytem we dont know, preserve it
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: git-submodule
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: bundler
+    directory: /packages/bundler
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: cargo
+    directory: /packages/cargo
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: composer
+    directory: /packages/composer
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: gomod
+    directory: /packages/gomod
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: mix
+    directory: /packages/hex
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: maven
+    directory: /packages/maven
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: npm
+    directory: /packages/npm
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p2
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p1
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: pip
+    directory: /packages/pip/p3
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: pip
+    directory: /packages/pip/p2
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: pip
+    directory: /packages/pip/p1
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: pub
+    directory: /packages/pub
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: swift
+    directory: /packages/swift
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+''');
+        },
       );
-    });
 
-    test('can be instantiated', () {
-      final command = CreateCommand(logger: logger);
-      expect(command, isNotNull);
-    });
+      test(
+        'discovers new entries from passed and '
+        'ingored ecossytems, ignored paths, gitignored paths',
+        () async {
+          final repoRoot = prepareFixture(
+            ['create_command', 'packages'],
+            withGit: true,
+          );
 
-    test('has all the mixins', () {
-      final command = CreateCommand(logger: logger);
-      expect(command, isA<EcosystemsOption>());
-      expect(command, isA<LoggerLevelOption>());
-      expect(command, isA<ScheduleOption>());
-      expect(command, isA<TargetBranchOption>());
-      expect(command, isA<LabelsOption>());
-      expect(command, isA<MilestoneOption>());
-      expect(command, isA<IgnorePathsOption>());
-      expect(command, isA<RepositoryRootOption>());
-    });
+          File(p.join(repoRoot.path, '.gitignore'))
+              .writeAsStringSync('packages/pip/p1');
+          runCommand('git add --all', workingDirectory: repoRoot.path);
 
-    test('usage message', () async {
-      final result = await commandRunner.run(['create', '--help']);
-      expect(result, equals(ExitCode.success.code));
-       verify(() => logger.info(_usage)).called(1);
-    });
+          final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yaml');
 
-    test(
-      'discovers new entries maintaning existing ones '
-      '(also maintains commens on troughout the doc) '
-      'removing extraneous entries, validating messages along the way',
-      () async {},
-    );
+          final result = await commandRunner.run([
+            'create',
+            '--repo-root',
+            repoRoot.path,
+            '--ecosystems',
+            'githubActions,docker,cargo,npm,pip',
+            '--ignore-ecosystems',
+            'docker,npm',
+            '--ignore-paths',
+            p.join(repoRoot.path, 'packages', 'pip', 'p2'),
+          ]);
 
-    test(
-      'discovers new entries from passed and '
-      'ingore ecossytems, ignored paths',
-      () async {},
-    );
-  });
+          final file = File(finalPath);
+
+          expect(result, equals(ExitCode.success.code));
+
+          expect(file.readAsStringSync(), '''
+version: 2 #keep this comment
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly #keep this comment
+  - package-ecosystem: oogabooga # this entry belongs to an ecossytem we dont know, preserve it
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: cargo
+    directory: /packages/cargo
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /packages/pip/p3
+    schedule:
+      interval: weekly
+''');
+        },
+      );
+    },
+  );
 }

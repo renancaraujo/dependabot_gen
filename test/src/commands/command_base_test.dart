@@ -482,7 +482,6 @@ Path to the repository root. If ommited, the command will search for the closest
       final empty = prepareFixture(['empty'], withGit: true);
       final internal = p.join(empty.path, 'internal');
 
-
       final command = RepositoryRootOptionCommand(logger: logger);
       command
         ..argResults = command.argParser.parse([])
@@ -498,7 +497,6 @@ Path to the repository root. If ommited, the command will search for the closest
         'throw if not ina  git repo', () async {
       final empty = prepareFixture(['empty']);
       final internal = p.join(empty.path, 'internal');
-
 
       final command = RepositoryRootOptionCommand(logger: logger);
       command
