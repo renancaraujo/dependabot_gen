@@ -125,7 +125,6 @@ void main() {
           [
             entryWith(directory: '/packages/nuget/p1', ecosystem: 'nuget'),
             entryWith(directory: '/packages/nuget/p2', ecosystem: 'nuget'),
-            
           ],
           on: repoRoot,
         ),
@@ -169,9 +168,8 @@ void main() {
         PackageEcosystem.pip,
         findsEntries(
           [
-              entryWith(directory: '/packages/pip/p1', ecosystem: 'pip'),
+            entryWith(directory: '/packages/pip/p1', ecosystem: 'pip'),
             entryWith(directory: '/packages/pip/p3', ecosystem: 'pip'),
-          
           ],
           on: repoRoot,
           ignoreFinding: {
@@ -202,7 +200,6 @@ void main() {
         PackageEcosystem.pip,
         findsEntries(
           [
-            
             entryWith(directory: '/packages/pip/p2', ecosystem: 'pip'),
             entryWith(directory: '/packages/pip/p3', ecosystem: 'pip'),
           ],
