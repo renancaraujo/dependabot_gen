@@ -6,10 +6,6 @@ import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
 
-final _issuesUri = Uri.parse(
-  'https://github.com/renancaraujo/dependabot_gen/issues/new/choose',
-);
-
 /// The name of the package.
 const packageName = 'dependabot_gen';
 
@@ -76,8 +72,8 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
     } catch (e, stackTrace) {
       _logger
         ..err('Uknown Errror. This is likely a bug on $executableName.')
-        ..err(
-          'Please, file an issue on ${link(uri: _issuesUri)} with the '
+        ..info(
+          'Please, file an issue on ${link(uri: issuesUri)} with the '
           'information below:',
         )
         ..info('Error message: $e')
@@ -131,3 +127,8 @@ Run ${lightCyan.wrap('$executableName update')} to update''',
     } catch (_) {}
   }
 }
+
+/// URI where people can report when things go south.
+final issuesUri = Uri.parse(
+  'https://github.com/renancaraujo/dependabot_gen/issues/new/choose',
+);

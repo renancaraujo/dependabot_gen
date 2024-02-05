@@ -137,6 +137,34 @@ void main() {
       verify(() => logger.info('exception usage')).called(1);
     });
 
+    test('handles any exception', () async {
+      final exception = Exception('ticarica!');
+      var isFirstInvocation = true;
+      when(() => logger.info(any())).thenAnswer((_) {
+        if (isFirstInvocation) {
+          isFirstInvocation = false;
+          throw exception;
+        }
+      });
+      final result = await commandRunner.run(['--version']);
+      expect(result, equals(ExitCode.usage.code));
+      verify(() => logger.err('Uknown Errror. This is likely a bug on depgen.'))
+          .called(1);
+
+      verify(
+        () => logger.info(
+          'Please, file an issue on ${link(uri: issuesUri)} with the '
+          'information below:',
+        ),
+      ).called(1);
+
+      verify(
+        () => logger.info(
+          any(that: startsWith('Error message: ')),
+        ),
+      ).called(1);
+    });
+
     group('--version', () {
       test('outputs current version', () async {
         final result = await commandRunner.run(['--version']);
