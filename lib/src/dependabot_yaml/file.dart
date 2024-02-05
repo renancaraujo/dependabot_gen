@@ -33,15 +33,7 @@ class DependabotFile {
   @visibleForTesting
   factory DependabotFile.fromFile(File file) {
     String contents;
-    try {
-      contents = file.existsSync() ? file.readAsStringSync() : '';
-    } catch (e) {
-      throw DependabotFileParsingException(
-        internalError: e,
-        filePath: file.path,
-        message: 'Error reading dependabot config file',
-      );
-    }
+    contents = file.existsSync() ? file.readAsStringSync() : '';
 
     DependabotSpec content;
     if (contents.isEmpty) {

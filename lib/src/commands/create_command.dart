@@ -58,7 +58,7 @@ Will keep existing entries and add new ones for possibly uncovered packages.
       ..info(
         'This command will search for packages under '
         '${repoRoot.path} for the following package ecosystems: '
-        '${ecosystems.join(', ')}',
+        '${ecosystems.map((e) => e.name).toList().join(', ')}',
       );
 
     final newEntries = ecosystems.fold(

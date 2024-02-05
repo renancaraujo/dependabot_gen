@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dependabot_gen/src/command_runner.dart';
 import 'package:dependabot_gen/src/commands/commands.dart';
+import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart' as p;
@@ -98,8 +99,19 @@ void main() {
 
           verify(() => logger.level = Level.info).called(1);
 
-          verify(() => logger.info('Creating dependabot.yaml in $finalPath'))
+          verify(() => logger.info('Dependadot file config in $finalPath'))
               .called(1);
+
+          final ecosystems =
+              PackageEcosystem.values.map((e) => e.name).toList();
+
+          verify(
+            () => logger.info(
+              'This command will search for packages under '
+              '${repoRoot.path} for the following package ecosystems: '
+              '${ecosystems.join(', ')}',
+            ),
+          ).called(1);
 
           verify(
             () => logger.info('Entry for github-actions already exists for /'),

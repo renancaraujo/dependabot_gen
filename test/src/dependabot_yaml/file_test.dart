@@ -120,7 +120,28 @@ void main() {
 
         expect(
           () => DependabotFile.fromFile(file),
-          throwsA(isA<ParsedYamlException>()),
+          throwsA(
+            isA<DependabotFileParsingException>()
+                .having(
+                  (e) => e.internalError,
+                  'internal error',
+                  isA<ParsedYamlException>(),
+                )
+                .having(
+                  (e) => e.filePath,
+                  'file path',
+                  file.path,
+                )
+                .having(
+                  (e) => e.message,
+                  'message',
+                  startsWith(
+                    'Error parsing contents dependabot config file, verify '
+                    'if the file is compliant with the dependabot '
+                    'specification at ',
+                  ),
+                ),
+          ),
         );
       });
     });
@@ -205,7 +226,7 @@ updates:
 
         expect(
           () => DependabotFile.fromRepositoryRoot(repoRoot),
-          throwsA(isA<ParsedYamlException>()),
+          throwsA(isA<DependabotFileParsingException>()),
         );
       });
     });
