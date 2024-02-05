@@ -6,6 +6,10 @@ import 'package:dependabot_gen/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
 
+final _issuesUri = Uri.parse(
+  'https://github.com/renancaraujo/dependabot_gen/issues/new/choose',
+);
+
 /// The name of the package.
 const packageName = 'dependabot_gen';
 
@@ -37,6 +41,7 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
 
     // Add sub commands
     addCommand(CreateCommand(logger: _logger));
+    addCommand(DiagnoseCommand(logger: _logger));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
@@ -68,6 +73,17 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
         ..info('')
         ..info(e.usage);
       return ExitCode.usage.code;
+    } catch (e, stackTrace) {
+      _logger
+        ..err('Uknown Errror. This is likely a bug on $executableName.')
+        ..err(
+          'Please, file an issue on ${link(uri: _issuesUri)} with the '
+          'information below:',
+        )
+        ..info('Error message: $e')
+        ..info('')
+        ..info('$stackTrace');
+      return ExitCode.software.code;
     }
   }
 

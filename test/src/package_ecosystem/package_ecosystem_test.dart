@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -213,24 +212,12 @@ void main() {
         PackageEcosystem.gitModules,
         findsEntries(
           [
-            const UpdateEntry(
+            (
               directory: '/',
               ecosystem: 'git-submodule',
-              schedule: Schedule(
-                interval: ScheduleInterval.monthly,
-              ),
-              targetBranch: 'main',
-              labels: {'dependencies'},
-              milestone: 1,
             ),
           ],
           on: repoRoot,
-          schedule: const Schedule(
-            interval: ScheduleInterval.monthly,
-          ),
-          targetBranch: 'main',
-          labels: {'dependencies'},
-          milestone: 1,
         ),
       );
 
@@ -238,24 +225,12 @@ void main() {
         PackageEcosystem.npm,
         findsEntries(
           [
-            const UpdateEntry(
+            const (
               directory: '/packages/npm',
               ecosystem: 'npm',
-              schedule: Schedule(
-                interval: ScheduleInterval.monthly,
-              ),
-              targetBranch: 'main',
-              labels: {'dependencies'},
-              milestone: 1,
             ),
           ],
           on: repoRoot,
-          schedule: const Schedule(
-            interval: ScheduleInterval.monthly,
-          ),
-          targetBranch: 'main',
-          labels: {'dependencies'},
-          milestone: 1,
         ),
       );
     });
@@ -277,27 +252,17 @@ void main() {
 Matcher findsEntries(
   Iterable<Object> entries, {
   required Directory on,
-  Schedule schedule = const Schedule(
-    interval: ScheduleInterval.daily,
-  ),
-  String? targetBranch,
-  Set<String>? labels,
-  int? milestone,
   Set<String>? ignoreFinding,
 }) {
   return PackageEcosystemMatcher(
     entries,
     repoRoot: on,
-    schedule: schedule,
-    targetBranch: targetBranch,
-    labels: labels,
-    milestone: milestone,
     ignoreFinding: ignoreFinding,
   );
 }
 
 Matcher entryWith({required String directory, required String ecosystem}) {
-  return isA<UpdateEntry>()
+  return isA<UpdateEntryInfo>()
       .having((p0) => p0.directory, 'direcory', directory)
       .having((p0) => p0.ecosystem, 'ecosystem', ecosystem);
 }
@@ -306,10 +271,6 @@ class PackageEcosystemMatcher extends CustomMatcher {
   PackageEcosystemMatcher(
     Iterable<Object> entries, {
     required this.repoRoot,
-    required this.schedule,
-    this.targetBranch,
-    this.labels,
-    this.milestone,
     this.ignoreFinding,
   }) : super(
           'PackageEcosystem that finds packages',
@@ -318,10 +279,6 @@ class PackageEcosystemMatcher extends CustomMatcher {
         );
 
   final Directory repoRoot;
-  final Schedule schedule;
-  final String? targetBranch;
-  final Set<String>? labels;
-  final int? milestone;
   final Set<String>? ignoreFinding;
 
   @override
@@ -332,10 +289,6 @@ class PackageEcosystemMatcher extends CustomMatcher {
 
     return actual.findUpdateEntries(
       repoRoot: repoRoot,
-      schedule: schedule,
-      targetBranch: targetBranch,
-      labels: labels,
-      milestone: milestone,
       ignoreFinding: ignoreFinding,
     );
   }
