@@ -139,6 +139,8 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
       );
     }
 
+    dependabotFile.saveToFile();
+
     logger.info('Finished creating dependabot.yaml in ${dependabotFile.path}');
 
     return ExitCode.success.code;

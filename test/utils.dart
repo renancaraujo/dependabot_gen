@@ -9,7 +9,9 @@ File createDepedabotFile(
 }) {
   final file = File(
     p.join(
-        Directory.systemTemp.createTempSync().absolute.path, 'dependabot.yaml'),
+      Directory.systemTemp.createTempSync().absolute.path,
+      'dependabot.yaml',
+    ),
   );
 
   if (create) {

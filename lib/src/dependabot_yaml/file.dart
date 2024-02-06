@@ -28,8 +28,7 @@ class DependabotFile {
   /// If the file is empty, a default [DependabotSpec] will be created.
   @visibleForTesting
   factory DependabotFile.fromFile(File file) {
-    String contents;
-    contents = file.existsSync() ? file.readAsStringSync() : '';
+    var contents = file.existsSync() ? file.readAsStringSync() : '';
 
     DependabotSpec content;
     if (contents.isEmpty) {

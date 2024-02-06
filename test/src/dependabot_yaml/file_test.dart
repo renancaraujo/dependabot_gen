@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -123,7 +122,6 @@ void main() {
           () => DependabotFile.fromFile(file),
           throwsA(
             isA<DependabotFileParsingException>()
-       
                 .having(
                   (e) => e.filePath,
                   'file path',
