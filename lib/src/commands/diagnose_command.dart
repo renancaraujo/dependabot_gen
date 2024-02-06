@@ -50,14 +50,14 @@ class DiagnoseCommand extends CommandBase
       ..detail(
         'This command will search for packages under '
         '${repoRoot.path} for the following package ecosystems: '
-        '${ecosystems.join(', ')}',
+        '${ecosystems.map((e) => e.name).toList().join(', ')}',
       );
 
-    var violationFound = false;
+    final violations = <String>[];
 
     void fail(String message) {
-      violationFound = true;
-      logger.warn(tag: 'FAIL', message);
+      final treated = message.indent(2);
+      violations.add(treated);
     }
 
     final newEntriesInfo = ecosystems.fold(
@@ -90,7 +90,7 @@ class DiagnoseCommand extends CommandBase
     if (unnatendedEntries.isNotEmpty) {
       fail('''
 Missing entries for packages on (ecosystem:path):
-${unnatendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}\n')}''');
+${unnatendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}').join('\n')}''');
     }
 
     final updatesThatShouldNotBeHere = [...currentUpdates]
@@ -100,8 +100,8 @@ ${unnatendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}\n')}''');
 
         if (isUnknownEcoststem) {
           logger.detail(
-            'Even though ${currentEntry.ecosystem} is unkown '
-            'by ${runner!.executableName}, do not claim it as a fail.',
+            'Even though "${currentEntry.ecosystem}" is an ecosystem unkown '
+            'to ${runner!.executableName}, we do not claim this as a fail.',
           );
         }
 
@@ -116,10 +116,27 @@ ${unnatendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}\n')}''');
 
     if (updatesThatShouldNotBeHere.isNotEmpty) {
       fail('''
-Some existing update entries on dependabot seem to point to wrong locations (ecosystem:path):
-${updatesThatShouldNotBeHere.map((e) => '  - ${e.ecosystem}:${e.directory}\n')}''');
+Some existing update entries on dependabot seems to point to wrong locations (ecosystem:path):
+${updatesThatShouldNotBeHere.map((e) => '  - ${e.ecosystem}:${e.directory}').join('\n')}''');
     }
 
-    return violationFound ? ExitCode.data.code : ExitCode.success.code;
+    if (violations.isNotEmpty) {
+      logger.warn(tag: 'FAIL', '''
+Some issues were found in your dependabot setup:
+${violations.join('\n')}
+''');
+      return ExitCode.data.code;
+    }
+
+    logger.success('No issues found!');
+    return ExitCode.success.code;
+  }
+}
+
+extension on String {
+  String indent(int num) {
+    final space = ' ' * num;
+
+    return split('\n').map((e) => '$space$e').join('\n');
   }
 }

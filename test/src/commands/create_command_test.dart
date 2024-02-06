@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dependabot_gen/src/command_runner.dart';
 import 'package:dependabot_gen/src/commands/commands.dart';
+import 'package:dependabot_gen/src/dependabot_yaml/file.dart';
 import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
@@ -13,8 +14,7 @@ import '../../utils.dart';
 class _MockLogger extends Mock implements Logger {}
 
 const _usage = '''
-Create or update the dependabot.yaml file in a repository. 
-Will keep existing entries and add new ones for possibly uncovered packages.
+Create or update the dependabot.yaml file in a repository. Will keep existing entries and add new ones for possibly uncovered packages.
 
 
 Usage: depgen create [arguments]
@@ -36,145 +36,141 @@ Usage: depgen create [arguments]
 Run "depgen help" to see global options.''';
 
 void main() {
-  group(
-    'create',
-    () {
-      late Logger logger;
-      late DependabotGenCommandRunner commandRunner;
+  group('create', () {
+    late Logger logger;
+    late DependabotGenCommandRunner commandRunner;
 
-      setUp(() {
-        logger = _MockLogger();
-        commandRunner = DependabotGenCommandRunner(
-          executableName: 'depgen',
-          logger: logger,
-        );
-      });
+    setUp(() {
+      logger = _MockLogger();
+      commandRunner = DependabotGenCommandRunner(
+        executableName: 'depgen',
+        logger: logger,
+      );
+    });
 
-      test('can be instantiated', () {
-        final command = CreateCommand(logger: logger);
-        expect(command, isNotNull);
-      });
+    test('can be instantiated', () {
+      final command = CreateCommand(logger: logger);
+      expect(command, isNotNull);
+    });
 
-      test('has all the mixins', () {
-        final command = CreateCommand(logger: logger);
-        expect(command, isA<EcosystemsOption>());
-        expect(command, isA<LoggerLevelOption>());
-        expect(command, isA<ScheduleOption>());
-        expect(command, isA<TargetBranchOption>());
-        expect(command, isA<LabelsOption>());
-        expect(command, isA<MilestoneOption>());
-        expect(command, isA<IgnorePathsOption>());
-        expect(command, isA<RepositoryRootOption>());
-      });
+    test('has all the mixins', () {
+      final command = CreateCommand(logger: logger);
+      expect(command, isA<EcosystemsOption>());
+      expect(command, isA<LoggerLevelOption>());
+      expect(command, isA<ScheduleOption>());
+      expect(command, isA<TargetBranchOption>());
+      expect(command, isA<LabelsOption>());
+      expect(command, isA<MilestoneOption>());
+      expect(command, isA<IgnorePathsOption>());
+      expect(command, isA<RepositoryRootOption>());
+    });
 
-      test('usage message', () async {
-        final result = await commandRunner.run(['create', '--help']);
+    test('usage message', () async {
+      final result = await commandRunner.run(['create', '--help']);
+      expect(result, equals(ExitCode.success.code));
+      verify(() => logger.info(_usage)).called(1);
+    });
+
+    test(
+      'discovers new entries maintaning existing ones '
+      '(also maintains comments on troughout the doc) '
+      'removing extraneous entries, '
+      'validating messages along the way',
+      () async {
+        final repoRoot = prepareFixture(['setups', 'packages']);
+
+        final result = await commandRunner.run([
+          'create',
+          '--repo-root',
+          repoRoot.path,
+          '-I',
+          'daily',
+          '--target-branch',
+          'master',
+          '--labels',
+          'dependencies,deps,dependabot',
+          '--milestone',
+          '4',
+        ]);
+
+        final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yaml');
+
+        verify(() => logger.level = Level.info).called(1);
+
+        verify(() => logger.info('Dependadot file config in $finalPath'))
+            .called(1);
+
+        final ecosystems = PackageEcosystem.values.map((e) => e.name).toList();
+
+        verify(
+          () => logger.detail(
+            'This command will search for packages under '
+            '${repoRoot.path} for the following package ecosystems: '
+            '${ecosystems.join(', ')}',
+          ),
+        ).called(1);
+
+        verify(
+          () => logger.info('Entry for github-actions already exists for /'),
+        ).called(1);
+
+        verify(() => logger.success('Added docker entry for /')).called(1);
+        verify(() => logger.success('Added git-submodule entry for /'))
+            .called(1);
+        verify(
+          () => logger.success('Added bundler entry for /packages/bundler'),
+        ).called(1);
+        verify(() => logger.success('Added cargo entry for /packages/cargo'))
+            .called(1);
+        verify(
+          () => logger.success('Added composer entry for /packages/composer'),
+        ).called(1);
+        verify(() => logger.success('Added gomod entry for /packages/gomod'))
+            .called(1);
+        verify(() => logger.success('Added mix entry for /packages/hex'))
+            .called(1);
+        verify(() => logger.success('Added maven entry for /packages/maven'))
+            .called(1);
+        verify(() => logger.success('Added npm entry for /packages/npm'))
+            .called(1);
+        verify(
+          () => logger.success('Added nuget entry for /packages/nuget/p2'),
+        ).called(1);
+        verify(
+          () => logger.success('Added nuget entry for /packages/nuget/p1'),
+        ).called(1);
+        verify(() => logger.success('Added pip entry for /packages/pip/p3'))
+            .called(1);
+        verify(() => logger.success('Added pip entry for /packages/pip/p2'))
+            .called(1);
+        verify(() => logger.success('Added pip entry for /packages/pip/p1'))
+            .called(1);
+        verify(() => logger.success('Added pub entry for /packages/pub'))
+            .called(1);
+        verify(() => logger.success('Added swift entry for /packages/swift'))
+            .called(1);
+
+        verify(() => logger.info('Preserved github-actions entry for /'))
+            .called(1);
+
+        verify(() => logger.info(yellow.wrap('Removed pub entry for /')))
+            .called(1);
+
+        verify(() => logger.info('Preserved oogabooga entry for /')).called(1);
+
+        verify(
+          () => logger.info(
+            'Finished creating dependabot.yaml in $finalPath',
+          ),
+        ).called(1);
+
+        verifyNoMoreInteractions(logger);
+
+        final file = File(finalPath);
+
         expect(result, equals(ExitCode.success.code));
-        verify(() => logger.info(_usage)).called(1);
-      });
 
-      test(
-        'discovers new entries maintaning existing ones '
-        '(also maintains comments on troughout the doc) '
-        'removing extraneous entries, '
-        'validating messages along the way',
-        () async {
-          final repoRoot = prepareFixture(['create_command', 'packages']);
-
-          final result = await commandRunner.run([
-            'create',
-            '--repo-root',
-            repoRoot.path,
-            '-I',
-            'daily',
-            '--target-branch',
-            'master',
-            '--labels',
-            'dependencies,deps,dependabot',
-            '--milestone',
-            '4',
-          ]);
-
-          final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yaml');
-
-          verify(() => logger.level = Level.info).called(1);
-
-          verify(() => logger.info('Dependadot file config in $finalPath'))
-              .called(1);
-
-          final ecosystems =
-              PackageEcosystem.values.map((e) => e.name).toList();
-
-          verify(
-            () => logger.info(
-              'This command will search for packages under '
-              '${repoRoot.path} for the following package ecosystems: '
-              '${ecosystems.join(', ')}',
-            ),
-          ).called(1);
-
-          verify(
-            () => logger.info('Entry for github-actions already exists for /'),
-          ).called(1);
-
-          verify(() => logger.success('Added docker entry for /')).called(1);
-          verify(() => logger.success('Added git-submodule entry for /'))
-              .called(1);
-          verify(
-            () => logger.success('Added bundler entry for /packages/bundler'),
-          ).called(1);
-          verify(() => logger.success('Added cargo entry for /packages/cargo'))
-              .called(1);
-          verify(
-            () => logger.success('Added composer entry for /packages/composer'),
-          ).called(1);
-          verify(() => logger.success('Added gomod entry for /packages/gomod'))
-              .called(1);
-          verify(() => logger.success('Added mix entry for /packages/hex'))
-              .called(1);
-          verify(() => logger.success('Added maven entry for /packages/maven'))
-              .called(1);
-          verify(() => logger.success('Added npm entry for /packages/npm'))
-              .called(1);
-          verify(
-            () => logger.success('Added nuget entry for /packages/nuget/p2'),
-          ).called(1);
-          verify(
-            () => logger.success('Added nuget entry for /packages/nuget/p1'),
-          ).called(1);
-          verify(() => logger.success('Added pip entry for /packages/pip/p3'))
-              .called(1);
-          verify(() => logger.success('Added pip entry for /packages/pip/p2'))
-              .called(1);
-          verify(() => logger.success('Added pip entry for /packages/pip/p1'))
-              .called(1);
-          verify(() => logger.success('Added pub entry for /packages/pub'))
-              .called(1);
-          verify(() => logger.success('Added swift entry for /packages/swift'))
-              .called(1);
-
-          verify(() => logger.info('Preserved github-actions entry for /'))
-              .called(1);
-
-          verify(() => logger.info(yellow.wrap('Removed pub entry for /')))
-              .called(1);
-
-          verify(() => logger.info('Preserved oogabooga entry for /'))
-              .called(1);
-
-          verify(
-            () => logger.info(
-              'Finished creating dependabot.yaml in $finalPath',
-            ),
-          ).called(1);
-
-          verifyNoMoreInteractions(logger);
-
-          final file = File(finalPath);
-
-          expect(result, equals(ExitCode.success.code));
-
-          expect(file.readAsStringSync(), '''
+        expect(file.readAsStringSync(), '''
 version: 2 #keep this comment
 updates:
   - package-ecosystem: github-actions
@@ -346,44 +342,44 @@ updates:
     milestone: 4
     target-branch: master
 ''');
-        },
-      );
+      },
+    );
 
-      test(
-        'discovers new entries from passed and '
-        'ingored ecossytems, ignored paths, gitignored paths',
-        () async {
-          final repoRoot = prepareFixture(
-            ['create_command', 'packages'],
-            withGit: true,
-          );
+    test(
+      'discovers new entries from passed and '
+      'ingored ecossytems, ignored paths, gitignored paths',
+      () async {
+        final repoRoot = prepareFixture(
+          ['setups', 'packages'],
+          withGit: true,
+        );
 
-          File(p.join(repoRoot.path, '.gitignore'))
-              .writeAsStringSync('packages/pip/p1');
-          final existingPath =
-              p.join(repoRoot.path, '.github', 'dependabot.yaml');
+        File(p.join(repoRoot.path, '.gitignore'))
+            .writeAsStringSync('packages/pip/p1');
+        final existingPath =
+            p.join(repoRoot.path, '.github', 'dependabot.yaml');
 
-          File(existingPath).deleteSync();
+        File(existingPath).deleteSync();
 
-          runCommand('git add --all', workingDirectory: repoRoot.path);
+        runCommand('git add --all', workingDirectory: repoRoot.path);
 
-          final result = await commandRunner.run([
-            'create',
-            '--repo-root',
-            repoRoot.path,
-            '--ecosystems',
-            'githubActions,docker,cargo,npm,pip',
-            '--ignore-ecosystems',
-            'docker,npm',
-            '--ignore-paths',
-            p.join(repoRoot.path, 'packages', 'pip', 'p2'),
-          ]);
+        final result = await commandRunner.run([
+          'create',
+          '--repo-root',
+          repoRoot.path,
+          '--ecosystems',
+          'githubActions,docker,cargo,npm,pip',
+          '--ignore-ecosystems',
+          'docker,npm',
+          '--ignore-paths',
+          p.join(repoRoot.path, 'packages', 'pip', 'p2'),
+        ]);
 
-          final file = File(p.join(repoRoot.path, '.github', 'dependabot.yml'));
+        expect(result, equals(ExitCode.success.code));
 
-          expect(result, equals(ExitCode.success.code));
+        final file = File(p.join(repoRoot.path, '.github', 'dependabot.yml'));
 
-          expect(file.readAsStringSync(), '''
+        expect(file.readAsStringSync(), '''
 version: 2
 updates: 
   - package-ecosystem: github-actions
@@ -399,8 +395,38 @@ updates:
     schedule:
       interval: weekly
 ''');
-        },
-      );
-    },
-  );
+      },
+    );
+
+    test('handles bad yaml', () async {
+      final repoRoot = prepareFixture(['setups', 'bad_yaml']);
+
+      final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yml');
+
+      final result = await commandRunner.run([
+        'create',
+        '--repo-root',
+        repoRoot.path,
+        '-I',
+        'weekly',
+        '--target-branch',
+        'master',
+      ]);
+
+            expect(result, equals(ExitCode.unavailable.code));
+
+
+      verify(
+        () => logger.err('Error on parsing dependendabot file on $finalPath'),
+      ).called(1);
+
+      verify(
+        () => logger.err(
+          'Details: Error parsing the contents of the dependabot config file, '
+          'verify if it is compliant with the dependabot specification at '
+          '${link(uri: dependabotSpecUri)}',
+        ),
+      ).called(1);
+    });
+  });
 }

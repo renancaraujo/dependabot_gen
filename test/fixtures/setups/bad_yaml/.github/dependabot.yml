@@ -1,0 +1,6 @@
+version: pizza #lol, this gonna be a problem
+updates:
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: monthly

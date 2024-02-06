@@ -147,7 +147,7 @@ void main() {
         }
       });
       final result = await commandRunner.run(['--version']);
-      expect(result, equals(ExitCode.usage.code));
+      expect(result, equals(ExitCode.software.code));
       verify(() => logger.err('Uknown Errror. This is likely a bug on depgen.'))
           .called(1);
 

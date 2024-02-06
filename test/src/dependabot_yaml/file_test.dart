@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:js_util';
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
@@ -113,6 +114,7 @@ void main() {
 
         expect(dependabotFile.path, file.path);
         expect(dependabotFile.updates, [kDummyEntry]);
+        expect(File(dependabotFile.path).existsSync(), isFalse);
       });
 
       test('from an invalid dependabot file', () {

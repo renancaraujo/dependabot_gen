@@ -25,8 +25,7 @@ class CreateCommand extends CommandBase
 
   @override
   String get description => '''
-Create or update the dependabot.yaml file in a repository. 
-Will keep existing entries and add new ones for possibly uncovered packages.
+Create or update the dependabot.yaml file in a repository. Will keep existing entries and add new ones for possibly uncovered packages.
 ''';
 
   @override
@@ -55,7 +54,7 @@ Will keep existing entries and add new ones for possibly uncovered packages.
       ..info(
         'Dependadot file config in ${dependabotFile.path}',
       )
-      ..info(
+      ..detail(
         'This command will search for packages under '
         '${repoRoot.path} for the following package ecosystems: '
         '${ecosystems.map((e) => e.name).toList().join(', ')}',
@@ -138,8 +137,6 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
         ),
       );
     }
-
-    dependabotFile.saveToFile();
 
     logger.info('Finished creating dependabot.yaml in ${dependabotFile.path}');
 

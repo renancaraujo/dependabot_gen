@@ -8,10 +8,6 @@ import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
-final _dependabotSpecUri = Uri.parse(
-  'https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file',
-);
-
 /// A dummy [UpdateEntry] used to create a default dependabot.yaml file.
 const kDummyEntry = UpdateEntry(
   directory: 'dummy',
@@ -53,10 +49,9 @@ class DependabotFile {
         throw DependabotFileParsingException(
           internalError: e,
           filePath: file.path,
-          message:
-              'Error parsing contents dependabot config file, verify if the '
-              'file is compliant with the dependabot specification at '
-              '${link(uri: _dependabotSpecUri)}',
+          message: 'Error parsing the contents of the dependabot config file, '
+              'verify if it is compliant with the dependabot specification at '
+              '${link(uri: dependabotSpecUri)}',
         );
       }
     }
@@ -183,3 +178,8 @@ class DependabotFileParsingException implements Exception {
   /// Some more deets.
   final String message;
 }
+
+/// The uri of some dependabot docs
+final dependabotSpecUri = Uri.parse(
+  'https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file',
+);
