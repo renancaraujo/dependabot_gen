@@ -31,36 +31,36 @@ class _TestCommand extends CommandBase {
 }
 
 class _LoggerLevelOptionCommand extends _TestCommand with LoggerLevelOption {
-  _LoggerLevelOptionCommand({required super.logger, super.runProcess});
+  _LoggerLevelOptionCommand({required super.logger});
 }
 
 class _ScheduleOptionCommand extends _TestCommand with ScheduleOption {
-  _ScheduleOptionCommand({required super.logger, super.runProcess});
+  _ScheduleOptionCommand({required super.logger});
 }
 
 class _TargetBranchOptionCommand extends _TestCommand with TargetBranchOption {
-  _TargetBranchOptionCommand({required super.logger, super.runProcess});
+  _TargetBranchOptionCommand({required super.logger});
 }
 
 class _IgnorePathsOptionCommand extends _TestCommand with IgnorePathsOption {
-  _IgnorePathsOptionCommand({required super.logger, super.runProcess});
+  _IgnorePathsOptionCommand({required super.logger});
 }
 
 class _LabelsOptionCommand extends _TestCommand with LabelsOption {
-  _LabelsOptionCommand({required super.logger, super.runProcess});
+  _LabelsOptionCommand({required super.logger});
 }
 
 class _MilestoneOptionCommand extends _TestCommand with MilestoneOption {
-  _MilestoneOptionCommand({required super.logger, super.runProcess});
+  _MilestoneOptionCommand({required super.logger});
 }
 
 class _EcosystemsOptionCommand extends _TestCommand with EcosystemsOption {
-  _EcosystemsOptionCommand({required super.logger, super.runProcess});
+  _EcosystemsOptionCommand({required super.logger});
 }
 
 class _RepositoryRootOptionCommand extends _TestCommand
     with RepositoryRootOption {
-  _RepositoryRootOptionCommand({required super.logger, super.runProcess});
+  _RepositoryRootOptionCommand({required super.logger});
 }
 
 void main() {

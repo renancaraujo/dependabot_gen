@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:js_util';
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
@@ -101,7 +100,7 @@ void main() {
   group('$DependabotFile', () {
     group('fromFile', () {
       test('from a valid dependabot file', () {
-        final file = createFile(_kValidDependabotYaml);
+        final file = createDepedabotFile(_kValidDependabotYaml);
         final dependabotFile = DependabotFile.fromFile(file);
 
         expect(dependabotFile.path, file.path);
@@ -109,7 +108,7 @@ void main() {
       });
 
       test('from an empty dependabot file', () {
-        final file = createFile('');
+        final file = createDepedabotFile('', create: false);
         final dependabotFile = DependabotFile.fromFile(file);
 
         expect(dependabotFile.path, file.path);
@@ -118,17 +117,13 @@ void main() {
       });
 
       test('from an invalid dependabot file', () {
-        final file = createFile(_kInvalidDependabotYaml);
+        final file = createDepedabotFile(_kInvalidDependabotYaml);
 
         expect(
           () => DependabotFile.fromFile(file),
           throwsA(
             isA<DependabotFileParsingException>()
-                .having(
-                  (e) => e.internalError,
-                  'internal error',
-                  isA<ParsedYamlException>(),
-                )
+       
                 .having(
                   (e) => e.filePath,
                   'file path',
@@ -138,9 +133,9 @@ void main() {
                   (e) => e.message,
                   'message',
                   startsWith(
-                    'Error parsing contents dependabot config file, verify '
-                    'if the file is compliant with the dependabot '
-                    'specification at ',
+                    'Error parsing the contents of the dependabot config file, '
+                    'verify if it is compliant with the dependabot '
+                    'specification at',
                   ),
                 ),
           ),
@@ -235,7 +230,7 @@ updates:
 
     group('editing', () {
       test('adding and removing update entries', () {
-        final file = createFile(_kValidDependabotYaml);
+        final file = createDepedabotFile(_kValidDependabotYaml);
         final dependabotFile = DependabotFile.fromFile(file);
         expect(dependabotFile.updates, hasLength(3));
 

@@ -170,7 +170,7 @@ class DependabotFileParsingException implements Exception {
   });
 
   /// The containing exception or error
-  final Object internalError;
+  final ParsedYamlException internalError;
 
   /// The path tot he dependabot file in question
   final String filePath;

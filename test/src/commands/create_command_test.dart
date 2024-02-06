@@ -413,8 +413,7 @@ updates:
         'master',
       ]);
 
-            expect(result, equals(ExitCode.unavailable.code));
-
+      expect(result, equals(ExitCode.unavailable.code));
 
       verify(
         () => logger.err('Error on parsing dependendabot file on $finalPath'),

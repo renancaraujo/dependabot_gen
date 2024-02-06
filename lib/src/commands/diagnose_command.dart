@@ -39,7 +39,8 @@ class DiagnoseCommand extends CommandBase
     } on DependabotFileParsingException catch (e) {
       logger
         ..err('Error on parsing dependendabot file on ${e.filePath}')
-        ..err('Details: ${e.message}');
+        ..err('Details: ${e.message}')
+        ..detail('Error: ${e.internalError.formattedMessage}');
       return ExitCode.unavailable.code;
     }
 
