@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
@@ -37,11 +38,21 @@ class DependabotFile {
       );
       contents = YamlWriter().write(content);
     } else {
-      content = checkedYamlDecode(
-        contents,
-        (m) => DependabotSpec.fromJson(m!),
-        sourceUrl: file.uri,
-      );
+      try {
+        content = checkedYamlDecode(
+          contents,
+          (m) => DependabotSpec.fromJson(m!),
+          sourceUrl: file.uri,
+        );
+      } on ParsedYamlException catch (e) {
+        throw DependabotFileParsingException(
+          internalError: e,
+          filePath: file.path,
+          message: 'Error parsing the contents of the dependabot config file, '
+              'verify if it is compliant with the dependabot specification at '
+              '${link(uri: dependabotSpecUri)}',
+        );
+      }
     }
 
     final editor = YamlEditor(contents);
@@ -147,3 +158,27 @@ class DependabotFile {
     file.writeAsStringSync(_editor.toString());
   }
 }
+
+/// An exception that is thrown when parsing a Dependabot file fails.
+class DependabotFileParsingException implements Exception {
+  /// Creates a [DependabotFileParsingException]
+  DependabotFileParsingException({
+    required this.internalError,
+    required this.filePath,
+    required this.message,
+  });
+
+  /// The containing exception or error
+  final ParsedYamlException internalError;
+
+  /// The path tot he dependabot file in question
+  final String filePath;
+
+  /// Some more deets.
+  final String message;
+}
+
+/// The uri of some dependabot docs
+final dependabotSpecUri = Uri.parse(
+  'https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file',
+);

@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
-import 'package:dependabot_gen/src/commands/command_base.dart';
+import 'package:dependabot_gen/src/commands/commands.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 /// {@template create_command}
 ///
-/// `depgen create` command which creates a new dependabot.yaml file.
+/// `depgen create` command which creates a new dependabot.yml file.
 /// {@endtemplate}
 class CreateCommand extends CommandBase
     with
@@ -25,8 +25,7 @@ class CreateCommand extends CommandBase
 
   @override
   String get description => '''
-Create or update the dependabot.yaml file in a repository. 
-Will keep existing entries and add new ones for possibly uncovered packages.
+Create or update the dependabot.yaml file in a repository. Will keep existing entries and add new ones for possibly uncovered packages.
 ''';
 
   @override
@@ -41,11 +40,26 @@ Will keep existing entries and add new ones for possibly uncovered packages.
 
     final repoRoot = await getRepositoryRoot();
 
-    final dependabotFile = DependabotFile.fromRepositoryRoot(repoRoot);
+    final DependabotFile dependabotFile;
+    try {
+      dependabotFile = DependabotFile.fromRepositoryRoot(repoRoot);
+    } on DependabotFileParsingException catch (e) {
+      logger
+        ..err('Error on parsing dependendabot file on ${e.filePath}')
+        ..err('Details: ${e.message}')
+        ..detail('Error: ${e.internalError.formattedMessage}');
+      return ExitCode.unavailable.code;
+    }
 
-    logger.info(
-      'Creating dependabot.yaml in ${dependabotFile.path}',
-    );
+    logger
+      ..info(
+        'Dependadot file config in ${dependabotFile.path}',
+      )
+      ..detail(
+        'This command will search for packages under '
+        '${repoRoot.path} for the following package ecosystems: '
+        '${ecosystems.map((e) => e.name).toList().join(', ')}',
+      );
 
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
@@ -53,11 +67,17 @@ Will keep existing entries and add new ones for possibly uncovered packages.
         ecosystem
             .findUpdateEntries(
               repoRoot: repoRoot,
-              schedule: schedule,
-              targetBranch: targetBranch,
-              labels: labels,
-              milestone: milestone,
               ignoreFinding: ignorePaths,
+            )
+            .map(
+              (e) => UpdateEntry(
+                directory: e.directory,
+                ecosystem: e.ecosystem,
+                schedule: schedule,
+                targetBranch: targetBranch,
+                labels: labels,
+                milestone: milestone,
+              ),
             )
             .forEach(previousValue.add);
 
@@ -89,30 +109,33 @@ Entry for ${newEntry.ecosystem} already exists for ${newEntry.directory}''',
       }
     }
 
-    for (final entry in currentUpdates) {
-      final isUnknownEcoststem = !PackageEcosystem.values
-          .map((e) => e.ecosystemName ?? e.name)
-          .contains(entry.ecosystem);
+    for (final currentEntry in currentUpdates) {
+      final isUnknownEcosystem =
+          !PackageEcosystem.isKnownEcosystem(currentEntry.ecosystem);
 
       final wasItFound = newEntries.firstWhereOrNull((element) {
-            return element.directory == entry.directory &&
-                element.ecosystem == entry.ecosystem;
+            return element.directory == currentEntry.directory &&
+                element.ecosystem == currentEntry.ecosystem;
           }) !=
           null;
 
-      if (isUnknownEcoststem || wasItFound) {
+      if (isUnknownEcosystem || wasItFound) {
         logger.info(
-          'Preserved ${entry.ecosystem} entry for ${entry.directory}',
+          'Preserved ${currentEntry.ecosystem} entry for '
+          '${currentEntry.directory}',
         );
         continue;
       }
 
       dependabotFile.removeUpdateEntry(
-        ecosystem: entry.ecosystem,
-        directory: entry.directory,
+        ecosystem: currentEntry.ecosystem,
+        directory: currentEntry.directory,
       );
       logger.info(
-        yellow.wrap('Removed ${entry.ecosystem} entry for ${entry.directory}'),
+        yellow.wrap(
+          'Removed ${currentEntry.ecosystem} entry for '
+          '${currentEntry.directory}',
+        ),
       );
     }
 

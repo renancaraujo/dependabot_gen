@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:checked_yaml/checked_yaml.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -100,7 +99,7 @@ void main() {
   group('$DependabotFile', () {
     group('fromFile', () {
       test('from a valid dependabot file', () {
-        final file = createFile(_kValidDependabotYaml);
+        final file = createDepedabotFile(_kValidDependabotYaml);
         final dependabotFile = DependabotFile.fromFile(file);
 
         expect(dependabotFile.path, file.path);
@@ -108,19 +107,36 @@ void main() {
       });
 
       test('from an empty dependabot file', () {
-        final file = createFile('');
+        final file = createDepedabotFile('', create: false);
         final dependabotFile = DependabotFile.fromFile(file);
 
         expect(dependabotFile.path, file.path);
         expect(dependabotFile.updates, [kDummyEntry]);
+        expect(File(dependabotFile.path).existsSync(), isFalse);
       });
 
       test('from an invalid dependabot file', () {
-        final file = createFile(_kInvalidDependabotYaml);
+        final file = createDepedabotFile(_kInvalidDependabotYaml);
 
         expect(
           () => DependabotFile.fromFile(file),
-          throwsA(isA<ParsedYamlException>()),
+          throwsA(
+            isA<DependabotFileParsingException>()
+                .having(
+                  (e) => e.filePath,
+                  'file path',
+                  file.path,
+                )
+                .having(
+                  (e) => e.message,
+                  'message',
+                  startsWith(
+                    'Error parsing the contents of the dependabot config file, '
+                    'verify if it is compliant with the dependabot '
+                    'specification at',
+                  ),
+                ),
+          ),
         );
       });
     });
@@ -205,14 +221,14 @@ updates:
 
         expect(
           () => DependabotFile.fromRepositoryRoot(repoRoot),
-          throwsA(isA<ParsedYamlException>()),
+          throwsA(isA<DependabotFileParsingException>()),
         );
       });
     });
 
     group('editing', () {
       test('adding and removing update entries', () {
-        final file = createFile(_kValidDependabotYaml);
+        final file = createDepedabotFile(_kValidDependabotYaml);
         final dependabotFile = DependabotFile.fromFile(file);
         expect(dependabotFile.updates, hasLength(3));
 

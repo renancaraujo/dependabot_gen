@@ -3,10 +3,22 @@ import 'dart:io';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 
-File createFile(String content, [String name = 'dependabot.yaml']) {
-  return File(
-    p.join(Directory.systemTemp.absolute.path, name),
-  )..writeAsStringSync(content);
+File createDepedabotFile(
+  String content, {
+  bool create = true,
+}) {
+  final file = File(
+    p.join(
+      Directory.systemTemp.createTempSync().absolute.path,
+      'dependabot.yaml',
+    ),
+  );
+
+  if (create) {
+    file.writeAsStringSync(content);
+  }
+
+  return file;
 }
 
 Directory prepareFixture(

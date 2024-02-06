@@ -37,6 +37,7 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
 
     // Add sub commands
     addCommand(CreateCommand(logger: _logger));
+    addCommand(DiagnoseCommand(logger: _logger));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
@@ -68,6 +69,17 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
         ..info('')
         ..info(e.usage);
       return ExitCode.usage.code;
+    } catch (e, stackTrace) {
+      _logger
+        ..err('Uknown Errror. This is likely a bug on $executableName.')
+        ..info(
+          'Please, file an issue on ${link(uri: issuesUri)} with the '
+          'information below:',
+        )
+        ..info('Error message: $e')
+        ..info('')
+        ..info('$stackTrace');
+      return ExitCode.software.code;
     }
   }
 
@@ -115,3 +127,8 @@ Run ${lightCyan.wrap('$executableName update')} to update''',
     } catch (_) {}
   }
 }
+
+/// URI where people can report when things go south.
+final issuesUri = Uri.parse(
+  'https://github.com/renancaraujo/dependabot_gen/issues/new/choose',
+);

@@ -1,9 +1,14 @@
 import 'dart:io';
 
-import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
 import 'package:meta/meta.dart';
-
 import 'package:path/path.dart' as p;
+
+/// Info of update entries regarding their ecosystem and locaton
+/// within the repo.
+typedef UpdateEntryInfo = ({
+  String directory,
+  String ecosystem,
+});
 
 /// The package ecosystems supported by dependabot.
 enum PackageEcosystem {
@@ -139,6 +144,11 @@ enum PackageEcosystem {
     this.ecosystemName,
   });
 
+  /// Checks if the provided ecosystem name is known.
+  static bool isKnownEcosystem(String name) {
+    return values.map((e) => e.ecosystemName ?? e.name).contains(name);
+  }
+
   /// The respective [_PackageEcosystemFinder] for this [PackageEcosystem].
   final _PackageEcosystemFinder _finder;
 
@@ -146,21 +156,13 @@ enum PackageEcosystem {
   final String? ecosystemName;
 
   /// Finds the packages that may have its dependencies updated by dependabot.
-  Iterable<UpdateEntry> findUpdateEntries({
+  Iterable<UpdateEntryInfo> findUpdateEntries({
     required Directory repoRoot,
-    required Schedule schedule,
-    required String? targetBranch,
-    required Set<String>? labels,
-    required int? milestone,
     required Set<String>? ignoreFinding,
   }) =>
       _finder.findUpdateEntries(
         ecosystem: ecosystemName ?? name,
         repoRoot: repoRoot,
-        schedule: schedule,
-        targetBranch: targetBranch,
-        labels: labels,
-        milestone: milestone,
         ignoreFinding: ignoreFinding,
       );
 }
@@ -195,13 +197,9 @@ bool _gitmodulesHeuristics(Directory repoRoot) {
 @immutable
 abstract interface class _PackageEcosystemFinder {
   /// Finds the packages that may have its dependencies updated by dependabot.
-  Iterable<UpdateEntry> findUpdateEntries({
-    required String ecosystem,
+  Iterable<UpdateEntryInfo> findUpdateEntries({
     required Directory repoRoot,
-    required Schedule schedule,
-    required String? targetBranch,
-    required Set<String>? labels,
-    required int? milestone,
+    required String ecosystem,
     required Set<String>? ignoreFinding,
   });
 }
@@ -219,23 +217,15 @@ class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
   final bool Function(Directory repoRoot) repoHeuristics;
 
   @override
-  Iterable<UpdateEntry> findUpdateEntries({
-    required String ecosystem,
+  Iterable<UpdateEntryInfo> findUpdateEntries({
     required Directory repoRoot,
-    required Schedule schedule,
-    required String? targetBranch,
-    required Set<String>? labels,
-    required int? milestone,
+    required String ecosystem,
     required Set<String>? ignoreFinding,
   }) sync* {
     if (repoHeuristics(repoRoot)) {
-      yield UpdateEntry(
+      yield (
         directory: '/',
         ecosystem: ecosystem,
-        schedule: schedule,
-        targetBranch: targetBranch,
-        labels: labels,
-        milestone: milestone,
       );
     }
   }
@@ -255,13 +245,9 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
   final Set<String> indexFiles;
 
   @override
-  Iterable<UpdateEntry> findUpdateEntries({
-    required String ecosystem,
+  Iterable<UpdateEntryInfo> findUpdateEntries({
     required Directory repoRoot,
-    required Schedule schedule,
-    required String? targetBranch,
-    required Set<String>? labels,
-    required int? milestone,
+    required String ecosystem,
     required Set<String>? ignoreFinding,
   }) sync* {
     final paths = _findFilesRecursivelyOn(
@@ -292,13 +278,9 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
         convertedPath = '/$convertedPath';
       }
 
-      yield UpdateEntry(
+      yield (
         directory: convertedPath,
         ecosystem: ecosystem,
-        schedule: schedule,
-        targetBranch: targetBranch,
-        labels: labels,
-        milestone: milestone,
       );
     }
   }
