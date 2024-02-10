@@ -72,8 +72,8 @@ void main() {
     });
 
     test(
-      'discovers new entries maintaning existing ones '
-      '(also maintains comments on troughout the doc) '
+      'discovers new entries maintaining existing ones '
+      '(also maintains comments on throughout the doc) '
       'removing extraneous entries, '
       'validating messages along the way',
       () async {
@@ -347,7 +347,7 @@ updates:
 
     test(
       'discovers new entries from passed and '
-      'ingored ecossytems, ignored paths, gitignored paths',
+      'ingnored ecosytems, ignored paths, gitignored paths',
       () async {
         final repoRoot = prepareFixture(
           ['setups', 'packages'],

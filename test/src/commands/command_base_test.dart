@@ -98,7 +98,7 @@ void main() {
       expect(argumentsCache, ['--version']);
     });
 
-    test('handles git unstalled', () async {
+    test('handles git uninstalled', () async {
       ProcessResult runProcess(String executable, List<String> arguments) {
         return ProcessResult(1, 1, '', '');
       }

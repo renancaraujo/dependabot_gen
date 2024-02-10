@@ -30,6 +30,8 @@
     "Pipfile",
     "pyproject",
     "deets",
-    "ticarica"
+    "ticarica",
+    "oogabooga",
+    "reporoot"
   ]
 }

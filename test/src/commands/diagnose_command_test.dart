@@ -61,7 +61,7 @@ void main() {
       verify(() => logger.info(_usage)).called(1);
     });
 
-    test('reports new entries, reports extraeous entries', () async {
+    test('reports new entries, reports extraneous entries', () async {
       final repoRoot = prepareFixture(['setups', 'packages']);
 
       final result =
