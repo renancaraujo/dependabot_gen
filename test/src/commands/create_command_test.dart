@@ -347,7 +347,7 @@ updates:
 
     test(
       'discovers new entries from passed and '
-      'ingnored ecosystems, ignored paths, gitignored paths',
+      'ignored ecosystems, ignored paths, gitignored paths',
       () async {
         final repoRoot = prepareFixture(
           ['setups', 'packages'],
