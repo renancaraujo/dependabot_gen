@@ -1,3 +1,4 @@
+
 ## dependabot_gen
 
 
@@ -5,6 +6,8 @@
 [![License: BSD-3][license_badge]][license_link]
 
 Keep your dependabot.yaml up to date.
+
+![thumbnail](https://raw.githubusercontent.com/renancaraujo/dependabot_gen/main/docs/thumbnail.jpg)
 
 ---
 
