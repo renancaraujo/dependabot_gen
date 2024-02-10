@@ -97,7 +97,7 @@ void main() {
 
         verify(() => logger.level = Level.info).called(1);
 
-        verify(() => logger.info('Dependadot file config in $finalPath'))
+        verify(() => logger.info('Dependabot file config in $finalPath'))
             .called(1);
 
         final ecosystems = PackageEcosystem.values.map((e) => e.name).toList();
@@ -416,7 +416,7 @@ updates:
       expect(result, equals(ExitCode.unavailable.code));
 
       verify(
-        () => logger.err('Error on parsing dependendabot file on $finalPath'),
+        () => logger.err('Error on parsing dependabot file on $finalPath'),
       ).called(1);
 
       verify(

@@ -19,7 +19,7 @@ class DiagnoseCommand extends CommandBase
 
   @override
   String get description => 'Verify the current dependabot setup for potential '
-      'issues, doesnt make and modifications';
+      'issues, does not make and modifications';
 
   @override
   String get name => 'diagnose';
@@ -38,7 +38,7 @@ class DiagnoseCommand extends CommandBase
       dependabotFile = DependabotFile.fromRepositoryRoot(repoRoot);
     } on DependabotFileParsingException catch (e) {
       logger
-        ..err('Error on parsing dependendabot file on ${e.filePath}')
+        ..err('Error on parsing dependabot file on ${e.filePath}')
         ..err('Details: ${e.message}')
         ..detail('Error: ${e.internalError.formattedMessage}');
       return ExitCode.unavailable.code;
@@ -46,7 +46,7 @@ class DiagnoseCommand extends CommandBase
 
     logger
       ..detail(
-        'Dependadot file config in ${dependabotFile.path}',
+        'Dependabot file config in ${dependabotFile.path}',
       )
       ..detail(
         'This command will search for packages under '
@@ -79,7 +79,7 @@ class DiagnoseCommand extends CommandBase
         .whereNot((element) => element == kDummyEntry)
         .toList();
 
-    final unnatendedEntries = [...newEntriesInfo]..removeWhere((newEntry) {
+    final unattendedEntries = [...newEntriesInfo]..removeWhere((newEntry) {
         return currentUpdates.firstWhereOrNull(
               (element) =>
                   element.directory == newEntry.directory &&
@@ -88,20 +88,20 @@ class DiagnoseCommand extends CommandBase
             null;
       });
 
-    if (unnatendedEntries.isNotEmpty) {
+    if (unattendedEntries.isNotEmpty) {
       fail('''
 Missing entries for packages on (ecosystem:path):
-${unnatendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}').join('\n')}''');
+${unattendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}').join('\n')}''');
     }
 
     final updatesThatShouldNotBeHere = [...currentUpdates]
       ..removeWhere((currentEntry) {
-        final isUnknownEcoststem =
+        final isUnknownEcosystem =
             !PackageEcosystem.isKnownEcosystem(currentEntry.ecosystem);
 
-        if (isUnknownEcoststem) {
+        if (isUnknownEcosystem) {
           logger.detail(
-            'Even though "${currentEntry.ecosystem}" is an ecosystem unkown '
+            'Even though "${currentEntry.ecosystem}" is an ecosystem unknown '
             'to ${runner!.executableName}, we do not claim this as a fail.',
           );
         }
@@ -112,7 +112,7 @@ ${unnatendedEntries.map((e) => '  - ${e.ecosystem}:${e.directory}').join('\n')}'
             }) !=
             null;
 
-        return isUnknownEcoststem || wasItFound;
+        return isUnknownEcosystem || wasItFound;
       });
 
     if (updatesThatShouldNotBeHere.isNotEmpty) {
