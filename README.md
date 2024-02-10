@@ -4,6 +4,8 @@
 
 ![coverage][coverage_badge]
 [![License: BSD-3][license_badge]][license_link]
+[![pub package][pub_badge]][pub_link]
+
 
 Keep your dependabot.yaml up to date.
 
@@ -101,3 +103,8 @@ $ depgen diagnose --help
 [coverage_badge]: coverage_badge.svg
 [license_badge]: https://img.shields.io/badge/license-BSD-blue.svg
 [license_link]: https://opensource.org/license/bsd-3-clause/
+[pub_link]: https://dependabot_gen.pckg.pub
+[pub_badge]: https://img.shields.io/pub/v/dependabot_gen.svg
+
+
+
