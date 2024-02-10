@@ -133,7 +133,7 @@ void main() {
                 interval: ScheduleInterval.weekly,
                 day: ScheduleDay.monday,
                 time: '06:00',
-                timeZone: 'America/New_York',
+                timezone: 'America/New_York',
               ),
               allow: [
                 AllowDependencyType(dependencyType: 'direct'),
@@ -206,7 +206,7 @@ void main() {
                     interval: ScheduleInterval.weekly,
                     day: ScheduleDay.monday,
                     time: '06:00',
-                    timeZone: 'America/New_York',
+                    timezone: 'America/New_York',
                   ),
                   allow: [
                     AllowDependencyType(dependencyType: 'direct'),

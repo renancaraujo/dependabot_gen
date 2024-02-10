@@ -239,7 +239,7 @@ class Schedule extends Equatable {
     required this.interval,
     this.day,
     this.time,
-    this.timeZone,
+    this.timezone,
   });
 
   /// Creates a new [Schedule] from a JSON map.
@@ -263,14 +263,14 @@ class Schedule extends Equatable {
 
   /// The timezone to use.
   @JsonKey(disallowNullValue: true)
-  final String? timeZone;
+  final String? timezone;
 
   @override
   List<Object?> get props => [
         interval,
         day,
         time,
-        timeZone,
+        timezone,
       ];
 }
 
