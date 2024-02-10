@@ -25,7 +25,7 @@ Usage: depgen diagnose [arguments]
 -S, --silent               Silences all output.
 -V, --verbose              Show verbose output.
 -i, --ignore-paths         Paths to ignore when searching for packages. Example: "__brick__/**"
--r, --repo-root            Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.
+-r, --repo-root            Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.
 
 Run "depgen help" to see global options.''';
 

@@ -286,7 +286,7 @@ mixin RepositoryRootOption on CommandBase {
       'repo-root',
       abbr: 'r',
       help: '''
-Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''',
+Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.''',
     );
   }
 
@@ -298,7 +298,16 @@ Path to the repository root. If ommited, the command will search for the closest
       return _fetchRepositoryRoot();
     }
 
-    return Directory(path);
+    final dir = Directory(path);
+
+    if (!dir.existsSync()) {
+      throw UsageException(
+        'The provided repository root does not exist.',
+        'Make sure the path is correct and the directory exists.',
+      );
+    }
+
+    return dir;
   }
 
   /// For testing puposes only, overrides the current working directory.
