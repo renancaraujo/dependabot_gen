@@ -31,7 +31,7 @@ Usage: depgen create [arguments]
     --labels               Labels to add to the pull requests.
     --milestone            The milestone to add to the pull requests. Must be a number.
 -i, --ignore-paths         Paths to ignore when searching for packages. Example: "__brick__/**"
--r, --repo-root            Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.
+-r, --repo-root            Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.
 
 Run "depgen help" to see global options.''';
 
@@ -72,8 +72,8 @@ void main() {
     });
 
     test(
-      'discovers new entries maintaning existing ones '
-      '(also maintains comments on troughout the doc) '
+      'discovers new entries maintaining existing ones '
+      '(also maintains comments on throughout the doc) '
       'removing extraneous entries, '
       'validating messages along the way',
       () async {
@@ -97,7 +97,7 @@ void main() {
 
         verify(() => logger.level = Level.info).called(1);
 
-        verify(() => logger.info('Dependadot file config in $finalPath'))
+        verify(() => logger.info('Dependabot file config in $finalPath'))
             .called(1);
 
         final ecosystems = PackageEcosystem.values.map((e) => e.name).toList();
@@ -177,7 +177,7 @@ updates:
     directory: /
     schedule:
       interval: monthly #keep this comment
-  - package-ecosystem: oogabooga # this entry belongs to an ecossytem we dont know, preserve it
+  - package-ecosystem: oogabooga # this entry belongs to an ecosystem we do not know, preserve it
     directory: /
     schedule:
       interval: monthly
@@ -347,7 +347,7 @@ updates:
 
     test(
       'discovers new entries from passed and '
-      'ingored ecossytems, ignored paths, gitignored paths',
+      'ignored ecosystems, ignored paths, gitignored paths',
       () async {
         final repoRoot = prepareFixture(
           ['setups', 'packages'],
@@ -416,7 +416,7 @@ updates:
       expect(result, equals(ExitCode.unavailable.code));
 
       verify(
-        () => logger.err('Error on parsing dependendabot file on $finalPath'),
+        () => logger.err('Error on parsing dependabot file on $finalPath'),
       ).called(1);
 
       verify(

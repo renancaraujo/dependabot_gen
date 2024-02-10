@@ -45,7 +45,7 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
       dependabotFile = DependabotFile.fromRepositoryRoot(repoRoot);
     } on DependabotFileParsingException catch (e) {
       logger
-        ..err('Error on parsing dependendabot file on ${e.filePath}')
+        ..err('Error on parsing dependabot file on ${e.filePath}')
         ..err('Details: ${e.message}')
         ..detail('Error: ${e.internalError.formattedMessage}');
       return ExitCode.unavailable.code;
@@ -53,7 +53,7 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
 
     logger
       ..info(
-        'Dependadot file config in ${dependabotFile.path}',
+        'Dependabot file config in ${dependabotFile.path}',
       )
       ..detail(
         'This command will search for packages under '

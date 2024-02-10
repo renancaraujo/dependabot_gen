@@ -8,14 +8,29 @@
       "path": "https://raw.githubusercontent.com/verygoodopensource/very_good_dictionaries/main/allowed.txt",
       "description": "Allowed VGV Spellings"
     },
-    {
-      "name": "vgv_forbidden",
-      "path": "https://raw.githubusercontent.com/verygoodopensource/very_good_dictionaries/main/forbidden.txt",
-      "description": "Forbidden VGV Spellings"
-    }
+
   ],
   "useGitignore": true,
   "words": [
-    "depgen"
+    "depgen",
+    "Depedabot",
+    "rubocop",
+    "ruboconfig",
+    "gocardless",
+    "octocat",
+    "npmjs",
+    "renancaraujo",
+    "gomod",
+    "gitmodules",
+    "Pipfile",
+    "pyproject",
+    "deets",
+    "ticarica",
+    "oogabooga",
+    "reporoot"
+  ],
+  "ignoreWords" : [
+    "timezone"
   ]
+
 }

@@ -216,7 +216,7 @@ updates:
         expect(dependabotFile.updates, hasLength(3));
       });
 
-      test('thowns when there is an invalid file there', () {
+      test('throws when there is an invalid file there', () {
         final repoRoot = prepareFixture(['file', 'repo_dependabot_invalid']);
 
         expect(

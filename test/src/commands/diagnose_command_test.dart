@@ -14,7 +14,7 @@ import '../../utils.dart';
 class _MockLogger extends Mock implements Logger {}
 
 const _usage = '''
-Verify the current dependabot setup for potential issues, doesnt make and modifications
+Verify the current dependabot setup for potential issues, does not make and modifications
 
 Usage: depgen diagnose [arguments]
 -h, --help                 Print this usage information.
@@ -25,7 +25,7 @@ Usage: depgen diagnose [arguments]
 -S, --silent               Silences all output.
 -V, --verbose              Show verbose output.
 -i, --ignore-paths         Paths to ignore when searching for packages. Example: "__brick__/**"
--r, --repo-root            Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.
+-r, --repo-root            Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.
 
 Run "depgen help" to see global options.''';
 
@@ -61,7 +61,7 @@ void main() {
       verify(() => logger.info(_usage)).called(1);
     });
 
-    test('reports new entries, reports extraeous entries', () async {
+    test('reports new entries, reports extraneous entries', () async {
       final repoRoot = prepareFixture(['setups', 'packages']);
 
       final result =
@@ -71,7 +71,7 @@ void main() {
 
       final finalPath = p.join(repoRoot.path, '.github', 'dependabot.yaml');
 
-      verify(() => logger.detail('Dependadot file config in $finalPath'))
+      verify(() => logger.detail('Dependabot file config in $finalPath'))
           .called(1);
 
       final ecosystems = PackageEcosystem.values.map((e) => e.name).toList();
@@ -88,7 +88,7 @@ void main() {
 
       verify(
         () => logger.detail(
-          'Even though "oogabooga" is an ecosystem unkown '
+          'Even though "oogabooga" is an ecosystem unknown '
           'to depgen, we do not claim this as a fail.',
         ),
       ).called(1);
@@ -184,7 +184,7 @@ Some issues were found in your dependabot setup:
       expect(result, equals(ExitCode.unavailable.code));
 
       verify(
-        () => logger.err('Error on parsing dependendabot file on $finalPath'),
+        () => logger.err('Error on parsing dependabot file on $finalPath'),
       ).called(1);
 
       verify(

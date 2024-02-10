@@ -23,7 +23,7 @@ ProcessResult defaultRunProcess(
     Process.runSync(executable, arguments);
 
 /// {@template mixins_command}
-/// A subclass of [Command] that allwos usages of mixins to add options.
+/// A subclass of [Command] that allows usages of mixins to add options.
 /// {@endtemplate}
 abstract class CommandBase extends Command<int?> {
   /// {@macro mixins_command}
@@ -286,7 +286,7 @@ mixin RepositoryRootOption on CommandBase {
       'repo-root',
       abbr: 'r',
       help: '''
-Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''',
+Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.''',
     );
   }
 
@@ -298,14 +298,23 @@ Path to the repository root. If ommited, the command will search for the closest
       return _fetchRepositoryRoot();
     }
 
-    return Directory(path);
+    final dir = Directory(path);
+
+    if (!dir.existsSync()) {
+      throw UsageException(
+        'The provided repository root does not exist.',
+        'Make sure the path is correct and the directory exists.',
+      );
+    }
+
+    return dir;
   }
 
-  /// For testing puposes only, overrides the current working directory.
+  /// For testing purposes only, overrides the current working directory.
   @visibleForTesting
   String? testWorkingDir;
 
-  /// For testing puposes only, gets the current working directory.
+  /// For testing purposes only, gets the current working directory.
   @visibleForTesting
   String get workingDir => testWorkingDir ?? Directory.current.path;
 

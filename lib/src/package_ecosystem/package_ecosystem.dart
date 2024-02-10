@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
-/// Info of update entries regarding their ecosystem and locaton
+/// Info of update entries regarding their ecosystem and location
 /// within the repo.
 typedef UpdateEntryInfo = ({
   String directory,
@@ -291,12 +291,12 @@ List<File> _findFilesRecursivelyOn({
   required Set<String> withNames,
 }) {
   final result = <File>[];
-  final dirlist = directory.absolute
+  final dirList = directory.absolute
       .listSync(recursive: true)
       .whereType<File>()
       .toList()
     ..sort((l, r) => l.path.compareTo(r.path));
-  for (final entity in dirlist) {
+  for (final entity in dirList) {
     if (withNames.contains(p.basename(entity.path))) {
       result.add(entity);
     }

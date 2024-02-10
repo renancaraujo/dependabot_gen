@@ -98,7 +98,7 @@ void main() {
       expect(argumentsCache, ['--version']);
     });
 
-    test('handles git unstalled', () async {
+    test('handles git uninstalled', () async {
       ProcessResult runProcess(String executable, List<String> arguments) {
         return ProcessResult(1, 1, '', '');
       }
@@ -459,21 +459,35 @@ The package ecosystems to ignore when searching for packages. Defaults to none.'
       expect(
         command.argParser.options['repo-root'],
         isA<Option>().having((e) => e.help, 'help', '''
-Path to the repository root. If ommited, the command will search for the closest git repository root from the current working directory.''').having((e) => e.abbr, 'abbr', 'r'),
+Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.''').having((e) => e.abbr, 'abbr', 'r'),
       );
     });
 
     test('when reporoot is specified', () async {
+      final empty = prepareFixture(['setups', 'empty'], withGit: true);
+
+      final command = _RepositoryRootOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--repo-root', empty.absolute.path],
+      );
+
+      final repoRoot = await command.getRepositoryRoot();
+
+      expect(repoRoot.path, empty.absolute.path);
+
+      expect(command.workingDir, Directory.current.path);
+    });
+
+    test('when invalid reporoot is specified', () async {
       final command = _RepositoryRootOptionCommand(logger: logger);
       command.argResults = command.argParser.parse(
         ['--repo-root', 'my/path'],
       );
 
-      final repoRoot = await command.getRepositoryRoot();
-
-      expect(repoRoot.path, 'my/path');
-
-      expect(command.workingDir, Directory.current.path);
+      await expectLater(
+        command.getRepositoryRoot,
+        throwsA(isA<UsageException>()),
+      );
     });
 
     test(

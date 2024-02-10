@@ -263,7 +263,7 @@ Matcher findsEntries(
 
 Matcher entryWith({required String directory, required String ecosystem}) {
   return isA<UpdateEntryInfo>()
-      .having((p0) => p0.directory, 'direcory', directory)
+      .having((p0) => p0.directory, 'directory', directory)
       .having((p0) => p0.ecosystem, 'ecosystem', ecosystem);
 }
 

@@ -71,7 +71,7 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
       return ExitCode.usage.code;
     } catch (e, stackTrace) {
       _logger
-        ..err('Uknown Errror. This is likely a bug on $executableName.')
+        ..err('Unknown Error. This is likely a bug on $executableName.')
         ..info(
           'Please, file an issue on ${link(uri: issuesUri)} with the '
           'information below:',
