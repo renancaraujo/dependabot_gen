@@ -177,7 +177,7 @@ updates:
     directory: /
     schedule:
       interval: monthly #keep this comment
-  - package-ecosystem: oogabooga # this entry belongs to an ecossytem we dont know, preserve it
+  - package-ecosystem: oogabooga # this entry belongs to an ecosystem we do not know, preserve it
     directory: /
     schedule:
       interval: monthly
@@ -347,7 +347,7 @@ updates:
 
     test(
       'discovers new entries from passed and '
-      'ingnored ecosytems, ignored paths, gitignored paths',
+      'ingnored ecosystems, ignored paths, gitignored paths',
       () async {
         final repoRoot = prepareFixture(
           ['setups', 'packages'],

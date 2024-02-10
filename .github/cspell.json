@@ -18,7 +18,6 @@
   "words": [
     "depgen",
     "Depedabot",
-    "timezone",
     "rubocop",
     "ruboconfig",
     "gocardless",
@@ -32,6 +31,7 @@
     "deets",
     "ticarica",
     "oogabooga",
-    "reporoot"
+    "reporoot",
+    "timezone"
   ]
 }

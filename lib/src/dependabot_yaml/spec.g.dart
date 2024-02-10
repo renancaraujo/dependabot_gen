@@ -249,9 +249,9 @@ Schedule _$ScheduleFromJson(Map json) => $checkedCreate(
       ($checkedConvert) {
         $checkKeys(
           json,
-          allowedKeys: const ['interval', 'day', 'time', 'timezone'],
+          allowedKeys: const ['interval', 'day', 'time', 'timeZone'],
           requiredKeys: const ['interval'],
-          disallowNullValues: const ['day', 'time', 'timezone'],
+          disallowNullValues: const ['day', 'time', 'timeZone'],
         );
         final val = Schedule(
           interval: $checkedConvert(
@@ -259,7 +259,7 @@ Schedule _$ScheduleFromJson(Map json) => $checkedCreate(
           day: $checkedConvert(
               'day', (v) => $enumDecodeNullable(_$ScheduleDayEnumMap, v)),
           time: $checkedConvert('time', (v) => v as String?),
-          timezone: $checkedConvert('timezone', (v) => v as String?),
+          timeZone: $checkedConvert('timeZone', (v) => v as String?),
         );
         return val;
       },
@@ -278,7 +278,7 @@ Map<String, dynamic> _$ScheduleToJson(Schedule instance) {
 
   writeNotNull('day', _$ScheduleDayEnumMap[instance.day]);
   writeNotNull('time', instance.time);
-  writeNotNull('timezone', instance.timezone);
+  writeNotNull('timeZone', instance.timeZone);
   return val;
 }
 
