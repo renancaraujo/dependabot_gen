@@ -7,7 +7,7 @@ Keep your dependabot.yaml up to date.
 
 ---
 
-Dependabot gen is a [Dart CLI](https://dart.dev/tutorials/server/cmdline) tool to assist in the creation and maintenance of `dependeabot.yaml` files in a project.
+Dependabot gen is a [Dart CLI](https://dart.dev/tutorials/server/cmdline) tool to assist in the creation and maintenance of `dependabot.yaml` files in a project.
 
 It aims to create, validate, and maintain such files.
 
@@ -16,11 +16,11 @@ It aims to create, validate, and maintain such files.
 
 The life of an OSS maintainer is often plagued with repetitive and boring tasks. That is why some of us are obsessed with automation. One of such task is to keep a project's dependencies up to date, entering dependabot. 
 
-Depedabot does a heck of a job automating the process of monitoring and updating dependencies. But (there's always a but) it introduces a new task: keep the `dependeabot.yaml` up to date, with the correct configurations, pointing to the correct paths within the project. 
+Depedabot does a heck of a job automating the process of monitoring and updating dependencies. But (there's always a but) it introduces a new task: keep the `dependabot.yaml` up to date, with the correct configurations, pointing to the correct paths within the project. 
 
-- What if you move a project within the repo and forget to update that `dependeabot.yaml` file?
-- What if I have a mono repo and there are a ton of projects inside and I want to create a brand new `dependeabot.yaml`?
-- What if I wanna make sure the packages in the `dependeabot.yaml` covers all the different package ecosystems I use?
+- What if you move a project within the repo and forget to update that `dependabot.yaml` file?
+- What if I have a mono repo and there are a ton of projects inside and I want to create a brand new `dependabot.yaml`?
+- What if I wanna make sure the packages in the `dependabot.yaml` covers all the different package ecosystems I use?
 
 
 Well, in all of those cases, you are dead. Or the equivalent of that: you have to do manual work.
