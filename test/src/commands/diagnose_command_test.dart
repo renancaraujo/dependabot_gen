@@ -19,9 +19,9 @@ Verify the current dependabot setup for potential issues, does not make and modi
 Usage: depgen diagnose [arguments]
 -h, --help                 Print this usage information.
 -e, --ecosystems           The package ecosystems to consider when searching for packages. Defaults to all available.
-                           [githubActions (default), docker (default), gitModules (default), bundler (default), cargo (default), composer (default), gomod (default), hex (default), maven (default), npm (default), nuget (default), pip (default), pub (default), swift (default)]
+                           [githubActions (default), docker (default), gitModules (default), bundler (default), cargo (default), composer (default), elm (default), gomod (default), gradle (default), hex (default), maven (default), npm (default), nuget (default), pip (default), pub (default), swift (default), terraform (default)]
     --ignore-ecosystems    The package ecosystems to ignore when searching for packages. Defaults to none.
-                           [githubActions, docker, gitModules, bundler, cargo, composer, gomod, hex, maven, npm, nuget, pip, pub, swift]
+                           [githubActions, docker, gitModules, bundler, cargo, composer, elm, gomod, gradle, hex, maven, npm, nuget, pip, pub, swift, terraform]
 -S, --silent               Silences all output.
 -V, --verbose              Show verbose output.
 -i, --ignore-paths         Paths to ignore when searching for packages. Example: "__brick__/**"
@@ -105,7 +105,10 @@ Some issues were found in your dependabot setup:
     - bundler:/packages/bundler
     - cargo:/packages/cargo
     - composer:/packages/composer
+    - elm:/packages/elm
     - gomod:/packages/gomod
+    - gradle:/packages/gradle/p1
+    - gradle:/packages/gradle/p2
     - mix:/packages/hex
     - maven:/packages/maven
     - npm:/packages/npm
@@ -116,6 +119,7 @@ Some issues were found in your dependabot setup:
     - pip:/packages/pip/p3
     - pub:/packages/pub
     - swift:/packages/swift
+    - terraform:/packages/terraform
   Some existing update entries on dependabot seems to point to wrong locations (ecosystem:path):
     - pub:/
 ''',

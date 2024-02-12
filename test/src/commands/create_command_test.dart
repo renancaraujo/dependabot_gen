@@ -20,9 +20,9 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
 Usage: depgen create [arguments]
 -h, --help                 Print this usage information.
 -e, --ecosystems           The package ecosystems to consider when searching for packages. Defaults to all available.
-                           [githubActions (default), docker (default), gitModules (default), bundler (default), cargo (default), composer (default), gomod (default), hex (default), maven (default), npm (default), nuget (default), pip (default), pub (default), swift (default)]
+                           [githubActions (default), docker (default), gitModules (default), bundler (default), cargo (default), composer (default), elm (default), gomod (default), gradle (default), hex (default), maven (default), npm (default), nuget (default), pip (default), pub (default), swift (default), terraform (default)]
     --ignore-ecosystems    The package ecosystems to ignore when searching for packages. Defaults to none.
-                           [githubActions, docker, gitModules, bundler, cargo, composer, gomod, hex, maven, npm, nuget, pip, pub, swift]
+                           [githubActions, docker, gitModules, bundler, cargo, composer, elm, gomod, gradle, hex, maven, npm, nuget, pip, pub, swift, terraform]
 -S, --silent               Silences all output.
 -V, --verbose              Show verbose output.
 -I, --schedule-interval    The interval to check for updates on new update entries (does not affect existing ones).
@@ -125,8 +125,16 @@ void main() {
         verify(
           () => logger.success('Added composer entry for /packages/composer'),
         ).called(1);
+        verify(() => logger.success('Added elm entry for /packages/elm'))
+            .called(1);
         verify(() => logger.success('Added gomod entry for /packages/gomod'))
             .called(1);
+        verify(
+          () => logger.success('Added gradle entry for /packages/gradle/p1'),
+        ).called(1);
+        verify(
+          () => logger.success('Added gradle entry for /packages/gradle/p2'),
+        ).called(1);
         verify(() => logger.success('Added mix entry for /packages/hex'))
             .called(1);
         verify(() => logger.success('Added maven entry for /packages/maven'))
@@ -149,6 +157,9 @@ void main() {
             .called(1);
         verify(() => logger.success('Added swift entry for /packages/swift'))
             .called(1);
+        verify(
+          () => logger.success('Added terraform entry for /packages/terraform'),
+        ).called(1);
 
         verify(() => logger.info('Preserved github-actions entry for /'))
             .called(1);
@@ -231,8 +242,38 @@ updates:
       - dependabot
     milestone: 4
     target-branch: master
+  - package-ecosystem: elm
+    directory: /packages/elm
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
   - package-ecosystem: gomod
     directory: /packages/gomod
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: gradle
+    directory: /packages/gradle/p1
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: gradle
+    directory: /packages/gradle/p2
     schedule:
       interval: daily
     labels:
@@ -333,6 +374,16 @@ updates:
     target-branch: master
   - package-ecosystem: swift
     directory: /packages/swift
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: terraform
+    directory: /packages/terraform
     schedule:
       interval: daily
     labels:
