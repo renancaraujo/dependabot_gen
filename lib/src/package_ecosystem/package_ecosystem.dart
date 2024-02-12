@@ -62,7 +62,7 @@ enum PackageEcosystem {
     ),
   ),
 
-  /// The elm packag ecosystem
+  /// The elm package ecosystem
   elm(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
