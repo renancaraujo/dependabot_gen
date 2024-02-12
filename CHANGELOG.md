@@ -1,3 +1,8 @@
+# v1.1.0
+
+- feat: add elm, gradle, and terraform support ([#14](https://github.com/renancaraujo/dependabot_gen/pull/14))
+- code: update README.md ([#15](https://github.com/renancaraujo/dependabot_gen/pull/15))
+
 # v1.0.0
 
 - chore: recreate package ([#7](https://github.com/renancaraujo/dependabot_gen/pull/7))
@@ -6,5 +11,3 @@
 - feat: true alias ([#10](https://github.com/renancaraujo/dependabot_gen/pull/10))
 - chore(deps): bump actions/github-script from 3 to 7 ([#11](https://github.com/renancaraujo/dependabot_gen/pull/11))
 - feat: add diagnose command ([#12](https://github.com/renancaraujo/dependabot_gen/pull/12))
-
-
