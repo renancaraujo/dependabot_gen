@@ -9,7 +9,7 @@
 
 Keep your dependabot.yaml up to date.
 
-![thumbnail](https://raw.githubusercontent.com/renancaraujo/dependabot_gen/main/docs/thumbnail.jpg)
+![thumbnail](https://raw.githubusercontent.com/renancaraujo/dependabot_gen/main/doc/thumbnail.jpg)
 
 ---
 
