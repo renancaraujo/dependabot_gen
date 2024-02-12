@@ -398,7 +398,9 @@ The package ecosystems to ignore when searching for packages. Defaults to none.'
         PackageEcosystem.bundler,
         PackageEcosystem.cargo,
         PackageEcosystem.composer,
+        PackageEcosystem.elm,
         PackageEcosystem.gomod,
+        PackageEcosystem.gradle,
         PackageEcosystem.hex,
         PackageEcosystem.maven,
         PackageEcosystem.npm,
@@ -406,6 +408,7 @@ The package ecosystems to ignore when searching for packages. Defaults to none.'
         PackageEcosystem.pip,
         PackageEcosystem.pub,
         PackageEcosystem.swift,
+        PackageEcosystem.terraform,
       ]);
     });
 
@@ -420,13 +423,16 @@ The package ecosystems to ignore when searching for packages. Defaults to none.'
         PackageEcosystem.bundler,
         PackageEcosystem.cargo,
         PackageEcosystem.composer,
+        PackageEcosystem.elm,
         PackageEcosystem.gomod,
+        PackageEcosystem.gradle,
         PackageEcosystem.hex,
         PackageEcosystem.maven,
         PackageEcosystem.nuget,
         PackageEcosystem.pip,
         PackageEcosystem.pub,
         PackageEcosystem.swift,
+        PackageEcosystem.terraform,
       ]);
     });
 

@@ -62,12 +62,32 @@ enum PackageEcosystem {
     ),
   ),
 
+  /// The elm packag ecosystem
+  elm(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'elm.json',
+      },
+    ),
+  ),
+
   /// The go.mod package ecosystem for Go.
   gomod(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
         'go.mod',
       },
+    ),
+  ),
+
+  /// The gradle package ecosystem
+  gradle(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        'build.gradle',
+        'build.gradle.kts',
+      },
+      endsWith: true,
     ),
   ),
 
@@ -135,6 +155,17 @@ enum PackageEcosystem {
       indexFiles: {
         'Package.swift',
       },
+    ),
+  ),
+
+  /// The terraform package ecosystem
+  terraform(
+    _ManifestPackageEcosystemFinder(
+      indexFiles: {
+        '.tf',
+        '.hcl',
+      },
+      endsWith: true,
     ),
   ),
   ;
@@ -239,10 +270,13 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro manifest_package_ecosystem_finder}
   const _ManifestPackageEcosystemFinder({
     required this.indexFiles,
+    this.endsWith = false,
   });
 
   /// The index files used to find the package manifests.
   final Set<String> indexFiles;
+
+  final bool endsWith;
 
   @override
   Iterable<UpdateEntryInfo> findUpdateEntries({
@@ -253,6 +287,7 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
     final paths = _findFilesRecursivelyOn(
       directory: repoRoot,
       withNames: indexFiles,
+      endsWith: endsWith,
     ).where((e) => e.isNotIgnored()).map((e) => e.path);
 
     outer:
@@ -289,6 +324,7 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
 List<File> _findFilesRecursivelyOn({
   required Directory directory,
   required Set<String> withNames,
+  required bool endsWith,
 }) {
   final result = <File>[];
   final dirList = directory.absolute
@@ -297,8 +333,16 @@ List<File> _findFilesRecursivelyOn({
       .toList()
     ..sort((l, r) => l.path.compareTo(r.path));
   for (final entity in dirList) {
-    if (withNames.contains(p.basename(entity.path))) {
+    final filename = p.basename(entity.path);
+    if (withNames.contains(filename)) {
       result.add(entity);
+    } else if (endsWith) {
+      for (final indexName in withNames) {
+        if (filename.endsWith(indexName)) {
+          result.add(entity);
+          break;
+        }
+      }
     }
   }
   return result;
