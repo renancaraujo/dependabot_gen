@@ -22,7 +22,7 @@ It aims to create, validate, and maintain such files.
 
 The life of an OSS maintainer is often plagued with repetitive and boring tasks. That is why some of us are obsessed with automation. One of such task is to keep a project's dependencies up to date, entering [dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file). 
 
-Depedabot does a heck of a job automating the process of monitoring and updating dependencies. But (there's always a but) it introduces a new task: keep the `dependabot.yaml` up to date, with the correct configurations, pointing to the correct paths within the project. 
+Dependabot does a heck of a job automating the process of monitoring and updating dependencies. But (there's always a but) it introduces a new task: keep the `dependabot.yaml` up to date, with the correct configurations, pointing to the correct paths within the project. 
 
 - What if you move a project within the repo and forget to update that `dependabot.yaml` file?
 - What if I have a mono repo and there are a ton of projects inside and I want to create a brand new `dependabot.yaml`?
