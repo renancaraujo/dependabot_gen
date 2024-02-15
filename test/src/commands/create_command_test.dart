@@ -145,7 +145,7 @@ void main() {
             .called(1);
         verify(() => logger.success('Added npm entry for /packages/npm'))
             .called(1);
-        
+
         verify(
           () => logger.success('Added nuget entry for /packages/nuget/p1'),
         ).called(1);
