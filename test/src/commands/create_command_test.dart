@@ -135,6 +135,9 @@ void main() {
         verify(
           () => logger.success('Added gradle entry for /packages/gradle/p2'),
         ).called(1);
+        verify(
+          () => logger.success('Added gradle entry for /packages/gradle/p3'),
+        ).called(1);
         verify(() => logger.success('Added mix entry for /packages/hex'))
             .called(1);
         verify(() => logger.success('Added maven entry for /packages/maven'))
@@ -274,6 +277,16 @@ updates:
     target-branch: master
   - package-ecosystem: gradle
     directory: /packages/gradle/p2
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: gradle
+    directory: /packages/gradle/p3
     schedule:
       interval: daily
     labels:

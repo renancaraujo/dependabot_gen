@@ -89,6 +89,18 @@ void main() {
       );
 
       expect(
+        PackageEcosystem.gradle,
+        findsEntries(
+          [
+            entryWith(directory: '/packages/gradle/p1', ecosystem: 'gradle'),
+            entryWith(directory: '/packages/gradle/p2', ecosystem: 'gradle'),
+            entryWith(directory: '/packages/gradle/p3', ecosystem: 'gradle'),
+          ],
+          on: repoRoot,
+        ),
+      );
+
+      expect(
         PackageEcosystem.hex,
         findsEntries(
           [
