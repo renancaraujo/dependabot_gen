@@ -138,17 +138,31 @@ void main() {
         verify(
           () => logger.success('Added gradle entry for /packages/gradle/p3'),
         ).called(1);
+
         verify(() => logger.success('Added mix entry for /packages/hex'))
             .called(1);
         verify(() => logger.success('Added maven entry for /packages/maven'))
             .called(1);
         verify(() => logger.success('Added npm entry for /packages/npm'))
             .called(1);
+        
+        verify(
+          () => logger.success('Added nuget entry for /packages/nuget/p1'),
+        ).called(1);
         verify(
           () => logger.success('Added nuget entry for /packages/nuget/p2'),
         ).called(1);
         verify(
-          () => logger.success('Added nuget entry for /packages/nuget/p1'),
+          () => logger.success('Added nuget entry for /packages/nuget/p3'),
+        ).called(1);
+        verify(
+          () => logger.success('Added nuget entry for /packages/nuget/p4'),
+        ).called(1);
+        verify(
+          () => logger.success('Added nuget entry for /packages/nuget/p5'),
+        ).called(1);
+        verify(
+          () => logger.success('Added nuget entry for /packages/nuget/p6'),
         ).called(1);
         verify(() => logger.success('Added pip entry for /packages/pip/p3'))
             .called(1);
@@ -337,6 +351,46 @@ updates:
     target-branch: master
   - package-ecosystem: nuget
     directory: /packages/nuget/p2
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p3
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p4
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p5
+    schedule:
+      interval: daily
+    labels:
+      - dependencies
+      - deps
+      - dependabot
+    milestone: 4
+    target-branch: master
+  - package-ecosystem: nuget
+    directory: /packages/nuget/p6
     schedule:
       interval: daily
     labels:

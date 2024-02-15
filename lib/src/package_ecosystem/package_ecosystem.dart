@@ -121,8 +121,10 @@ enum PackageEcosystem {
   nuget(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        '.nuspec',
-        '.csproj',
+        'packages.config',
+        r'__\.proj$',
+        r'__\.(cs|vb|fs)proj$',
+        r'__\.sln$',
       },
     ),
   ),

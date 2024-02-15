@@ -115,6 +115,10 @@ Some issues were found in your dependabot setup:
     - npm:/packages/npm
     - nuget:/packages/nuget/p1
     - nuget:/packages/nuget/p2
+    - nuget:/packages/nuget/p3
+    - nuget:/packages/nuget/p4
+    - nuget:/packages/nuget/p5
+    - nuget:/packages/nuget/p6
     - pip:/packages/pip/p1
     - pip:/packages/pip/p2
     - pip:/packages/pip/p3

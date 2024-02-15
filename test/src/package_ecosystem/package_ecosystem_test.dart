@@ -136,6 +136,10 @@ void main() {
           [
             entryWith(directory: '/packages/nuget/p1', ecosystem: 'nuget'),
             entryWith(directory: '/packages/nuget/p2', ecosystem: 'nuget'),
+            entryWith(directory: '/packages/nuget/p3', ecosystem: 'nuget'),
+            entryWith(directory: '/packages/nuget/p4', ecosystem: 'nuget'),
+            entryWith(directory: '/packages/nuget/p5', ecosystem: 'nuget'),
+            entryWith(directory: '/packages/nuget/p6', ecosystem: 'nuget'),
           ],
           on: repoRoot,
         ),
