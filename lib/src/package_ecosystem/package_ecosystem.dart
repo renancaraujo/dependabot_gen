@@ -84,10 +84,8 @@ enum PackageEcosystem {
   gradle(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        'build.gradle',
-        'build.gradle.kts',
+        r'__build\.(gradle|gradle\.kts)$',
       },
-      endsWith: true,
     ),
   ),
 
@@ -123,8 +121,10 @@ enum PackageEcosystem {
   nuget(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        '.nuspec',
-        '.csproj',
+        'packages.config',
+        r'__\.proj$',
+        r'__\.(cs|vb|fs)proj$',
+        r'__\.sln$',
       },
     ),
   ),
@@ -162,10 +162,9 @@ enum PackageEcosystem {
   terraform(
     _ManifestPackageEcosystemFinder(
       indexFiles: {
-        '.tf',
-        '.hcl',
+        r'__\.tf$',
+        r'__\.hcl$',
       },
-      endsWith: true,
     ),
   ),
   ;
@@ -270,13 +269,10 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro manifest_package_ecosystem_finder}
   const _ManifestPackageEcosystemFinder({
     required this.indexFiles,
-    this.endsWith = false,
   });
 
   /// The index files used to find the package manifests.
   final Set<String> indexFiles;
-
-  final bool endsWith;
 
   @override
   Iterable<UpdateEntryInfo> findUpdateEntries({
@@ -286,8 +282,7 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
   }) sync* {
     final paths = _findFilesRecursivelyOn(
       directory: repoRoot,
-      withNames: indexFiles,
-      endsWith: endsWith,
+      thatMatches: indexFiles,
     ).where((e) => e.isNotIgnored()).map((e) => e.path);
 
     outer:
@@ -323,8 +318,7 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
 
 List<File> _findFilesRecursivelyOn({
   required Directory directory,
-  required Set<String> withNames,
-  required bool endsWith,
+  required Set<String> thatMatches,
 }) {
   final result = <File>[];
   final dirList = directory.absolute
@@ -334,14 +328,16 @@ List<File> _findFilesRecursivelyOn({
     ..sort((l, r) => l.path.compareTo(r.path));
   for (final entity in dirList) {
     final filename = p.basename(entity.path);
-    if (withNames.contains(filename)) {
-      result.add(entity);
-    } else if (endsWith) {
-      for (final indexName in withNames) {
-        if (filename.endsWith(indexName)) {
+
+    for (final pattern in thatMatches) {
+      final isRegex = pattern.startsWith('__');
+      if (isRegex) {
+        final regex = RegExp(pattern.substring(2));
+        if (regex.hasMatch(filename)) {
           result.add(entity);
-          break;
         }
+      } else if (filename == pattern) {
+        result.add(entity);
       }
     }
   }

@@ -109,11 +109,16 @@ Some issues were found in your dependabot setup:
     - gomod:/packages/gomod
     - gradle:/packages/gradle/p1
     - gradle:/packages/gradle/p2
+    - gradle:/packages/gradle/p3
     - mix:/packages/hex
     - maven:/packages/maven
     - npm:/packages/npm
     - nuget:/packages/nuget/p1
     - nuget:/packages/nuget/p2
+    - nuget:/packages/nuget/p3
+    - nuget:/packages/nuget/p4
+    - nuget:/packages/nuget/p5
+    - nuget:/packages/nuget/p6
     - pip:/packages/pip/p1
     - pip:/packages/pip/p2
     - pip:/packages/pip/p3

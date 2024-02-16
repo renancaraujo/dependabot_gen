@@ -383,10 +383,14 @@ class _AllowedEntryConverter
 
   @override
   Map<dynamic, dynamic> toJson(AllowEntry object) {
-    return switch (object) {
-      final AllowDependency dep => _$AllowDependencyToJson(dep),
-      final AllowDependencyType depType => _$AllowDependencyTypeToJson(depType),
-    };
+    // Not using switch expressions because https://github.com/dart-lang/sdk/issues/54941
+    if (object is AllowDependency) {
+      return _$AllowDependencyToJson(object);
+    }
+
+    object as AllowDependencyType;
+
+    return _$AllowDependencyTypeToJson(object);
   }
 }
 
