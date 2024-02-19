@@ -8,7 +8,7 @@ documentation: https://github.com/renancaraujo/dependabot_gen
 topics: [cli, automation, bash, code-generation, dependabot]
 screenshots:
   - description: 'This screenshot shows a usage example of the dependabot_gen CLI tool.'
-    path: doc/thumbnail.jpg
+    path: docs/thumbnail.jpg
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
