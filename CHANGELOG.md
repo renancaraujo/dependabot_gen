@@ -1,3 +1,8 @@
+# 1.1.1
+
+- docs: Update README.md ([#17](https://github.com/renancaraujo/dependabot_gen/pull/17))
+- fix: nuget package discovering ([#18](https://github.com/renancaraujo/dependabot_gen/pull/18))
+
 # v1.1.0
 
 - feat: add elm, gradle, and terraform support ([#14](https://github.com/renancaraujo/dependabot_gen/pull/14))
