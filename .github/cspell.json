@@ -27,7 +27,8 @@
     "deets",
     "ticarica",
     "oogabooga",
-    "reporoot"
+    "reporoot",
+    "recase"
   ],
   "ignoreWords" : [
     "timezone"

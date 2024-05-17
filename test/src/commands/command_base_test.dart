@@ -63,6 +63,10 @@ class _RepositoryRootOptionCommand extends _TestCommand
   _RepositoryRootOptionCommand({required super.logger});
 }
 
+class _GroupsOptionCommand extends _TestCommand with GroupsOption {
+  _GroupsOptionCommand({required super.logger});
+}
+
 void main() {
   late Logger logger;
 
@@ -346,6 +350,32 @@ The milestone to add to the pull requests. Must be a number.'''),
       final command = _MilestoneOptionCommand(logger: logger);
       command.argResults = command.argParser.parse([]);
       expect(command.milestone, isNull);
+    });
+  });
+
+  group('GroupsOption', () {
+    test('adds options', () {
+      final command = _GroupsOptionCommand(logger: logger);
+
+      expect(
+        command.argParser.options['use-groups'],
+        isA<Option>().having((e) => e.help, 'help', '''
+Use groups on update entries.'''),
+      );
+    });
+
+    test('sets use-groups', () async {
+      final command = _GroupsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--no-use-groups'],
+      );
+      expect(command.useGroups, false);
+    });
+
+    test('sets use-groups as true by default', () async {
+      final command = _GroupsOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse([]);
+      expect(command.useGroups, true);
     });
   });
 

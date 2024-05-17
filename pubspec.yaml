@@ -8,7 +8,7 @@ documentation: https://github.com/renancaraujo/dependabot_gen
 topics: [cli, automation, bash, code-generation, dependabot]
 screenshots:
   - description: 'This screenshot shows a usage example of the dependabot_gen CLI tool.'
-    path: docs/thumbnail.jpg
+    path: doc/thumbnail.jpg
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -25,6 +25,7 @@ dependencies:
   meta: ^1.11.0
   path: ^1.9.0
   pub_updater: ^0.4.0
+  recase: ^4.1.0
   yaml_edit: ^2.1.1
   yaml_writer: ^2.0.0
 

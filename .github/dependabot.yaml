@@ -1,10 +1,18 @@
 version: 2
-updates:
+updates: 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly #keep this comment
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
   - package-ecosystem: pub
     directory: /
     schedule:
       interval: monthly
+    groups:
+      root-pub:
+        patterns:
+          - "*"

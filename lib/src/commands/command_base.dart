@@ -237,6 +237,22 @@ mixin MilestoneOption on CommandBase {
   }
 }
 
+/// Adds the `--use-groups` flag to the command.
+mixin GroupsOption on CommandBase {
+  @override
+  void addOptions() {
+    super.addOptions();
+    argParser.addFlag(
+      'use-groups',
+      help: 'Use groups on update entries.',
+      defaultsTo: true,
+    );
+  }
+
+  /// Whether to use groups.
+  bool get useGroups => argResults!['use-groups'] as bool;
+}
+
 /// Adds the `--ecosystems` option to the command.
 mixin EcosystemsOption on CommandBase {
   @override
