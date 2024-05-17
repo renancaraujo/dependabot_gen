@@ -154,9 +154,9 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
                   _$InsecureExternalCodeExecutionEnumMap, v)),
           labels: $checkedConvert('labels',
               (v) => (v as List<dynamic>?)?.map((e) => e as String).toSet()),
-          milestone: $checkedConvert('milestone', (v) => v as int?),
-          openPullRequestsLimit:
-              $checkedConvert('open-pull-requests-limit', (v) => v as int?),
+          milestone: $checkedConvert('milestone', (v) => (v as num?)?.toInt()),
+          openPullRequestsLimit: $checkedConvert(
+              'open-pull-requests-limit', (v) => (v as num?)?.toInt()),
           pullRequestBranchName: $checkedConvert(
               'pull-request-branch-name',
               (v) =>
