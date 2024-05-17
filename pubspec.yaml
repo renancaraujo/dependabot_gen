@@ -1,6 +1,6 @@
 name: dependabot_gen
 description: Dependabot gen is a Dart CLI tool to assist in the creation and maintenance of dependabot.yaml files in a project.
-version: 1.1.1
+version: 1.2.0
 repository: https://github.com/renancaraujo/dependabot_gen
 issue_tracker: https://github.com/renancaraujo/dependabot_gen/issues
 homepage: https://github.com/renancaraujo/dependabot_gen
