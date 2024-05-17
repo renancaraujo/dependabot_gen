@@ -1,3 +1,7 @@
+# 1.2.0
+
+- feat: use groups ([#20](https://github.com/renancaraujo/dependabot_gen/pull/20))
+
 # 1.1.1
 
 - docs: Update README.md ([#17](https://github.com/renancaraujo/dependabot_gen/pull/17))
