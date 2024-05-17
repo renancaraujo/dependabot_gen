@@ -16,6 +16,7 @@ class CreateCommand extends CommandBase
         TargetBranchOption,
         LabelsOption,
         MilestoneOption,
+        GroupsOption,
         IgnorePathsOption,
         RepositoryRootOption {
   /// {@macro create_command}
@@ -61,6 +62,8 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
         '${ecosystems.map((e) => e.name).toList().join(', ')}',
       );
 
+    final useGroups = this.useGroups;
+
     final newEntries = ecosystems.fold(
       <UpdateEntry>[],
       (previousValue, ecosystem) {
@@ -77,6 +80,13 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
                 targetBranch: targetBranch,
                 labels: labels,
                 milestone: milestone,
+                groups: useGroups
+                    ? {
+                        e.groupName: const {
+                          'patterns': ['*'],
+                        },
+                      }
+                    : null,
               ),
             )
             .forEach(previousValue.add);

@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
+import 'package:recase/recase.dart';
 
 /// Info of update entries regarding their ecosystem and location
 /// within the repo.
 typedef UpdateEntryInfo = ({
+  String groupName,
   String directory,
   String ecosystem,
 });
@@ -16,6 +18,7 @@ enum PackageEcosystem {
   githubActions(
     ecosystemName: 'github-actions',
     _HeuristicPackageEcosystemFinder(
+      groupName: 'github-actions',
       repoHeuristics: _githubActionsHeuristics,
     ),
   ),
@@ -23,6 +26,7 @@ enum PackageEcosystem {
   /// The Docker package ecosystem.
   docker(
     _HeuristicPackageEcosystemFinder(
+      groupName: 'docker',
       repoHeuristics: _dockerHeuristics,
     ),
   ),
@@ -31,6 +35,7 @@ enum PackageEcosystem {
   gitModules(
     ecosystemName: 'git-submodule',
     _HeuristicPackageEcosystemFinder(
+      groupName: 'git-submodule',
       repoHeuristics: _gitmodulesHeuristics,
     ),
   ),
@@ -241,10 +246,12 @@ class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
   /// {@macro heuristic_package_ecosystem_finder}
   const _HeuristicPackageEcosystemFinder({
     required this.repoHeuristics,
+    required this.groupName,
   });
 
   /// The heuristics to find the package manifests.
   final bool Function(Directory repoRoot) repoHeuristics;
+  final String groupName;
 
   @override
   Iterable<UpdateEntryInfo> findUpdateEntries({
@@ -254,6 +261,7 @@ class _HeuristicPackageEcosystemFinder implements _PackageEcosystemFinder {
   }) sync* {
     if (repoHeuristics(repoRoot)) {
       yield (
+        groupName: groupName,
         directory: '/',
         ecosystem: ecosystem,
       );
@@ -308,9 +316,17 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
         convertedPath = '/$convertedPath';
       }
 
+      var groupPrefix = convertedPath.paramCase;
+      if (groupPrefix.isEmpty) {
+        groupPrefix = 'root';
+      }
+
+      final groupName = '$groupPrefix-$ecosystem';
+
       yield (
         directory: convertedPath,
         ecosystem: ecosystem,
+        groupName: groupName,
       );
     }
   }

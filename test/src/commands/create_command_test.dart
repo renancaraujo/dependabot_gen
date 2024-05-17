@@ -30,6 +30,8 @@ Usage: depgen create [arguments]
     --target-branch        The target branch to create pull requests against.
     --labels               Labels to add to the pull requests.
     --milestone            The milestone to add to the pull requests. Must be a number.
+    --[no-]use-groups      Use groups on update entries.
+                           (defaults to on)
 -i, --ignore-paths         Paths to ignore when searching for packages. Example: "__brick__/**"
 -r, --repo-root            Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.
 
@@ -61,6 +63,7 @@ void main() {
       expect(command, isA<TargetBranchOption>());
       expect(command, isA<LabelsOption>());
       expect(command, isA<MilestoneOption>());
+      expect(command, isA<GroupsOption>());
       expect(command, isA<IgnorePathsOption>());
       expect(command, isA<RepositoryRootOption>());
     });
@@ -75,7 +78,8 @@ void main() {
       'discovers new entries maintaining existing ones '
       '(also maintains comments on throughout the doc) '
       'removing extraneous entries, '
-      'validating messages along the way',
+      'validating messages along the way '
+      'using groups',
       () async {
         final repoRoot = prepareFixture(['setups', 'packages']);
 
@@ -213,6 +217,10 @@ updates:
     directory: /
     schedule:
       interval: daily
+    groups:
+      docker:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -223,6 +231,10 @@ updates:
     directory: /
     schedule:
       interval: daily
+    groups:
+      git-submodule:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -233,6 +245,10 @@ updates:
     directory: /packages/bundler
     schedule:
       interval: daily
+    groups:
+      packages-bundler-bundler:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -243,6 +259,10 @@ updates:
     directory: /packages/cargo
     schedule:
       interval: daily
+    groups:
+      packages-cargo-cargo:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -253,6 +273,10 @@ updates:
     directory: /packages/composer
     schedule:
       interval: daily
+    groups:
+      packages-composer-composer:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -263,6 +287,10 @@ updates:
     directory: /packages/elm
     schedule:
       interval: daily
+    groups:
+      packages-elm-elm:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -273,6 +301,10 @@ updates:
     directory: /packages/gomod
     schedule:
       interval: daily
+    groups:
+      packages-gomod-gomod:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -283,6 +315,10 @@ updates:
     directory: /packages/gradle/p1
     schedule:
       interval: daily
+    groups:
+      packages-gradle-p1-gradle:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -293,6 +329,10 @@ updates:
     directory: /packages/gradle/p2
     schedule:
       interval: daily
+    groups:
+      packages-gradle-p2-gradle:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -303,6 +343,10 @@ updates:
     directory: /packages/gradle/p3
     schedule:
       interval: daily
+    groups:
+      packages-gradle-p3-gradle:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -313,6 +357,10 @@ updates:
     directory: /packages/hex
     schedule:
       interval: daily
+    groups:
+      packages-hex-mix:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -323,6 +371,10 @@ updates:
     directory: /packages/maven
     schedule:
       interval: daily
+    groups:
+      packages-maven-maven:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -333,6 +385,10 @@ updates:
     directory: /packages/npm
     schedule:
       interval: daily
+    groups:
+      packages-npm-npm:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -343,6 +399,10 @@ updates:
     directory: /packages/nuget/p1
     schedule:
       interval: daily
+    groups:
+      packages-nuget-p1-nuget:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -353,6 +413,10 @@ updates:
     directory: /packages/nuget/p2
     schedule:
       interval: daily
+    groups:
+      packages-nuget-p2-nuget:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -363,6 +427,10 @@ updates:
     directory: /packages/nuget/p3
     schedule:
       interval: daily
+    groups:
+      packages-nuget-p3-nuget:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -373,6 +441,10 @@ updates:
     directory: /packages/nuget/p4
     schedule:
       interval: daily
+    groups:
+      packages-nuget-p4-nuget:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -383,6 +455,10 @@ updates:
     directory: /packages/nuget/p5
     schedule:
       interval: daily
+    groups:
+      packages-nuget-p5-nuget:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -393,6 +469,10 @@ updates:
     directory: /packages/nuget/p6
     schedule:
       interval: daily
+    groups:
+      packages-nuget-p6-nuget:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -403,6 +483,10 @@ updates:
     directory: /packages/pip/p1
     schedule:
       interval: daily
+    groups:
+      packages-pip-p1-pip:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -413,6 +497,10 @@ updates:
     directory: /packages/pip/p2
     schedule:
       interval: daily
+    groups:
+      packages-pip-p2-pip:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -423,6 +511,10 @@ updates:
     directory: /packages/pip/p3
     schedule:
       interval: daily
+    groups:
+      packages-pip-p3-pip:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -433,6 +525,10 @@ updates:
     directory: /packages/pub
     schedule:
       interval: daily
+    groups:
+      packages-pub-pub:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -443,6 +539,10 @@ updates:
     directory: /packages/swift
     schedule:
       interval: daily
+    groups:
+      packages-swift-swift:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -453,6 +553,10 @@ updates:
     directory: /packages/terraform
     schedule:
       interval: daily
+    groups:
+      packages-terraform-terraform:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - deps
@@ -465,7 +569,7 @@ updates:
 
     test(
       'discovers new entries from passed and '
-      'ignored ecosystems, ignored paths, gitignored paths',
+      'ignored ecosystems, ignored paths, gitignored paths, no groups',
       () async {
         final repoRoot = prepareFixture(
           ['setups', 'packages'],
@@ -491,6 +595,7 @@ updates:
           'docker,npm',
           '--ignore-paths',
           p.join(repoRoot.path, 'packages', 'pip', 'p2'),
+          '--no-use-groups',
         ]);
 
         expect(result, equals(ExitCode.success.code));

@@ -22,7 +22,11 @@ void main() {
         PackageEcosystem.bundler,
         findsEntries(
           [
-            entryWith(directory: '/packages/bundler', ecosystem: 'bundler'),
+            entryWith(
+              directory: '/packages/bundler',
+              ecosystem: 'bundler',
+              groupName: 'packages-bundler-bundler',
+            ),
           ],
           on: repoRoot,
         ),
@@ -32,7 +36,11 @@ void main() {
         PackageEcosystem.cargo,
         findsEntries(
           [
-            entryWith(directory: '/packages/cargo', ecosystem: 'cargo'),
+            entryWith(
+              directory: '/packages/cargo',
+              ecosystem: 'cargo',
+              groupName: 'packages-cargo-cargo',
+            ),
           ],
           on: repoRoot,
         ),
@@ -42,7 +50,11 @@ void main() {
         PackageEcosystem.composer,
         findsEntries(
           [
-            entryWith(directory: '/packages/composer', ecosystem: 'composer'),
+            entryWith(
+              directory: '/packages/composer',
+              ecosystem: 'composer',
+              groupName: 'packages-composer-composer',
+            ),
           ],
           on: repoRoot,
         ),
@@ -52,7 +64,11 @@ void main() {
         PackageEcosystem.docker,
         findsEntries(
           [
-            entryWith(directory: '/', ecosystem: 'docker'),
+            entryWith(
+              directory: '/',
+              ecosystem: 'docker',
+              groupName: 'docker',
+            ),
           ],
           on: repoRoot,
         ),
@@ -62,7 +78,11 @@ void main() {
         PackageEcosystem.githubActions,
         findsEntries(
           [
-            entryWith(directory: '/', ecosystem: 'github-actions'),
+            entryWith(
+              directory: '/',
+              ecosystem: 'github-actions',
+              groupName: 'github-actions',
+            ),
           ],
           on: repoRoot,
         ),
@@ -72,7 +92,11 @@ void main() {
         PackageEcosystem.gitModules,
         findsEntries(
           [
-            entryWith(directory: '/', ecosystem: 'git-submodule'),
+            entryWith(
+              directory: '/',
+              ecosystem: 'git-submodule',
+              groupName: 'git-submodule',
+            ),
           ],
           on: repoRoot,
         ),
@@ -82,7 +106,11 @@ void main() {
         PackageEcosystem.gomod,
         findsEntries(
           [
-            entryWith(directory: '/packages/gomod', ecosystem: 'gomod'),
+            entryWith(
+              directory: '/packages/gomod',
+              ecosystem: 'gomod',
+              groupName: 'packages-gomod-gomod',
+            ),
           ],
           on: repoRoot,
         ),
@@ -92,9 +120,21 @@ void main() {
         PackageEcosystem.gradle,
         findsEntries(
           [
-            entryWith(directory: '/packages/gradle/p1', ecosystem: 'gradle'),
-            entryWith(directory: '/packages/gradle/p2', ecosystem: 'gradle'),
-            entryWith(directory: '/packages/gradle/p3', ecosystem: 'gradle'),
+            entryWith(
+              directory: '/packages/gradle/p1',
+              ecosystem: 'gradle',
+              groupName: 'packages-gradle-p1-gradle',
+            ),
+            entryWith(
+              directory: '/packages/gradle/p2',
+              ecosystem: 'gradle',
+              groupName: 'packages-gradle-p2-gradle',
+            ),
+            entryWith(
+              directory: '/packages/gradle/p3',
+              ecosystem: 'gradle',
+              groupName: 'packages-gradle-p3-gradle',
+            ),
           ],
           on: repoRoot,
         ),
@@ -104,7 +144,11 @@ void main() {
         PackageEcosystem.hex,
         findsEntries(
           [
-            entryWith(directory: '/packages/hex', ecosystem: 'mix'),
+            entryWith(
+              directory: '/packages/hex',
+              ecosystem: 'mix',
+              groupName: 'packages-hex-mix',
+            ),
           ],
           on: repoRoot,
         ),
@@ -114,7 +158,11 @@ void main() {
         PackageEcosystem.maven,
         findsEntries(
           [
-            entryWith(directory: '/packages/maven', ecosystem: 'maven'),
+            entryWith(
+              directory: '/packages/maven',
+              ecosystem: 'maven',
+              groupName: 'packages-maven-maven',
+            ),
           ],
           on: repoRoot,
         ),
@@ -124,7 +172,11 @@ void main() {
         PackageEcosystem.npm,
         findsEntries(
           [
-            entryWith(directory: '/packages/npm', ecosystem: 'npm'),
+            entryWith(
+              directory: '/packages/npm',
+              ecosystem: 'npm',
+              groupName: 'packages-npm-npm',
+            ),
           ],
           on: repoRoot,
         ),
@@ -134,12 +186,36 @@ void main() {
         PackageEcosystem.nuget,
         findsEntries(
           [
-            entryWith(directory: '/packages/nuget/p1', ecosystem: 'nuget'),
-            entryWith(directory: '/packages/nuget/p2', ecosystem: 'nuget'),
-            entryWith(directory: '/packages/nuget/p3', ecosystem: 'nuget'),
-            entryWith(directory: '/packages/nuget/p4', ecosystem: 'nuget'),
-            entryWith(directory: '/packages/nuget/p5', ecosystem: 'nuget'),
-            entryWith(directory: '/packages/nuget/p6', ecosystem: 'nuget'),
+            entryWith(
+              directory: '/packages/nuget/p1',
+              ecosystem: 'nuget',
+              groupName: 'packages-nuget-p1-nuget',
+            ),
+            entryWith(
+              directory: '/packages/nuget/p2',
+              ecosystem: 'nuget',
+              groupName: 'packages-nuget-p2-nuget',
+            ),
+            entryWith(
+              directory: '/packages/nuget/p3',
+              ecosystem: 'nuget',
+              groupName: 'packages-nuget-p3-nuget',
+            ),
+            entryWith(
+              directory: '/packages/nuget/p4',
+              ecosystem: 'nuget',
+              groupName: 'packages-nuget-p4-nuget',
+            ),
+            entryWith(
+              directory: '/packages/nuget/p5',
+              ecosystem: 'nuget',
+              groupName: 'packages-nuget-p5-nuget',
+            ),
+            entryWith(
+              directory: '/packages/nuget/p6',
+              ecosystem: 'nuget',
+              groupName: 'packages-nuget-p6-nuget',
+            ),
           ],
           on: repoRoot,
         ),
@@ -149,9 +225,21 @@ void main() {
         PackageEcosystem.pip,
         findsEntries(
           [
-            entryWith(directory: '/packages/pip/p1', ecosystem: 'pip'),
-            entryWith(directory: '/packages/pip/p2', ecosystem: 'pip'),
-            entryWith(directory: '/packages/pip/p3', ecosystem: 'pip'),
+            entryWith(
+              directory: '/packages/pip/p1',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p1-pip',
+            ),
+            entryWith(
+              directory: '/packages/pip/p2',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p2-pip',
+            ),
+            entryWith(
+              directory: '/packages/pip/p3',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p3-pip',
+            ),
           ],
           on: repoRoot,
         ),
@@ -161,7 +249,11 @@ void main() {
         PackageEcosystem.pub,
         findsEntries(
           [
-            entryWith(directory: '/packages/pub', ecosystem: 'pub'),
+            entryWith(
+              directory: '/packages/pub',
+              ecosystem: 'pub',
+              groupName: 'packages-pub-pub',
+            ),
           ],
           on: repoRoot,
         ),
@@ -171,7 +263,11 @@ void main() {
         PackageEcosystem.swift,
         findsEntries(
           [
-            entryWith(directory: '/packages/swift', ecosystem: 'swift'),
+            entryWith(
+              directory: '/packages/swift',
+              ecosystem: 'swift',
+              groupName: 'packages-swift-swift',
+            ),
           ],
           on: repoRoot,
         ),
@@ -183,8 +279,16 @@ void main() {
         PackageEcosystem.pip,
         findsEntries(
           [
-            entryWith(directory: '/packages/pip/p1', ecosystem: 'pip'),
-            entryWith(directory: '/packages/pip/p3', ecosystem: 'pip'),
+            entryWith(
+              directory: '/packages/pip/p1',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p1-pip',
+            ),
+            entryWith(
+              directory: '/packages/pip/p3',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p3-pip',
+            ),
           ],
           on: repoRoot,
           ignoreFinding: {
@@ -215,8 +319,16 @@ void main() {
         PackageEcosystem.pip,
         findsEntries(
           [
-            entryWith(directory: '/packages/pip/p2', ecosystem: 'pip'),
-            entryWith(directory: '/packages/pip/p3', ecosystem: 'pip'),
+            entryWith(
+              directory: '/packages/pip/p2',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p2-pip',
+            ),
+            entryWith(
+              directory: '/packages/pip/p3',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p3-pip',
+            ),
           ],
           on: repoRoot,
         ),
@@ -228,9 +340,10 @@ void main() {
         PackageEcosystem.gitModules,
         findsEntries(
           [
-            (
+            entryWith(
               directory: '/',
               ecosystem: 'git-submodule',
+              groupName: 'git-submodule',
             ),
           ],
           on: repoRoot,
@@ -241,9 +354,10 @@ void main() {
         PackageEcosystem.npm,
         findsEntries(
           [
-            const (
+            entryWith(
               directory: '/packages/npm',
               ecosystem: 'npm',
+              groupName: 'packages-npm-npm',
             ),
           ],
           on: repoRoot,
@@ -256,7 +370,11 @@ void main() {
         PackageEcosystem.npm,
         findsEntries(
           [
-            entryWith(directory: '/', ecosystem: 'npm'),
+            entryWith(
+              directory: '/',
+              ecosystem: 'npm',
+              groupName: 'root-npm',
+            ),
           ],
           on: Directory(p.join(repoRoot.path, 'packages', 'npm')),
         ),
@@ -277,10 +395,15 @@ Matcher findsEntries(
   );
 }
 
-Matcher entryWith({required String directory, required String ecosystem}) {
+Matcher entryWith({
+  required String directory,
+  required String ecosystem,
+  required String groupName,
+}) {
   return isA<UpdateEntryInfo>()
       .having((p0) => p0.directory, 'directory', directory)
-      .having((p0) => p0.ecosystem, 'ecosystem', ecosystem);
+      .having((p0) => p0.ecosystem, 'ecosystem', ecosystem)
+      .having((p0) => p0.groupName, 'group', groupName);
 }
 
 class PackageEcosystemMatcher extends CustomMatcher {
@@ -300,7 +423,7 @@ class PackageEcosystemMatcher extends CustomMatcher {
   @override
   Object? featureValueOf(dynamic actual) {
     if (actual is! PackageEcosystem) {
-      throw Exception('Expected PackageEcosystem, got ${actual.runtimeType}');
+      throw Exception('Expected $PackageEcosystem, got ${actual.runtimeType}');
     }
 
     return actual.findUpdateEntries(
