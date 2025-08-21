@@ -98,6 +98,17 @@ void main() {
       verifyNever(() => logger.info(updatePrompt));
     });
 
+    test('handles exception when checking for updates', () async {
+      when(
+        () => pubUpdater.getLatestVersion(any()),
+      ).thenThrow(Exception('Network error'));
+
+      final result = await commandRunner.run(['--version']);
+      expect(result, equals(ExitCode.success.code));
+      verify(() => logger.info(packageVersion)).called(1);
+      verifyNever(() => logger.info(updatePrompt));
+    });
+
     test('can be instantiated without an explicit logger instance', () {
       final commandRunner = DependabotGenCommandRunner(
         executableName: 'depgen',
