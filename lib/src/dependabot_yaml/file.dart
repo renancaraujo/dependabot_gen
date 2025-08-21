@@ -179,6 +179,6 @@ class DependabotFileParsingException implements Exception {
 }
 
 /// The uri of some dependabot docs
-final dependabotSpecUri = Uri.parse(
+final Uri dependabotSpecUri = Uri.parse(
   'https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file',
 );

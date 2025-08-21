@@ -38,7 +38,7 @@ class UpdateCommand extends CommandBase with LoggerLevelOption {
     late final String latestVersion;
     try {
       latestVersion = await _pubUpdater.getLatestVersion(packageName);
-    } catch (error) {
+    } on Exception catch (error) {
       updateCheckProgress.fail();
       logger.err('$error');
       return ExitCode.software.code;
@@ -59,7 +59,7 @@ class UpdateCommand extends CommandBase with LoggerLevelOption {
         packageName: packageName,
         versionConstraint: latestVersion,
       );
-    } catch (error) {
+    } on Exception catch (error) {
       updateProgress.fail();
       logger.err('$error');
       return ExitCode.software.code;
