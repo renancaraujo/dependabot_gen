@@ -376,10 +376,10 @@ extension on File {
 ///
 /// Supports both exact path matching and glob patterns.
 ///
-/// For exact paths, it uses the original logic with [p.isWithin] and 
+/// For exact paths, it uses the original logic with [p.isWithin] and
 /// [p.equals].
-/// For glob patterns (containing *, ?, [, or **), it uses glob pattern 
-/// smatching.
+/// For glob patterns (containing *, ?, [, or **), it uses glob pattern
+/// matching.
 bool _shouldIgnorePath(String manifestPath, String pattern, String repoRoot) {
   // Check if pattern contains glob metacharacters
   final hasGlobChars = pattern.contains('*') ||
