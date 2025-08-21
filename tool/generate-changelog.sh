@@ -1,7 +1,11 @@
 
 
-old_version=$(dart pub deps --json | pcregrep -o1 -i '"version": "(.*?)"' | head -1)
-new_version="$1";
+new_version="$1"
+old_version="$2"
+
+if [[ "$old_version" == "" ]]; then
+  old_version=$(dart pub deps --json | pcregrep -o1 -i '"version": "(.*?)"' | head -1)
+fi
 
 if [[ "$new_version" == "" ]]; then 
   echo "No new version supplied, please provide one"
@@ -13,10 +17,15 @@ if [[ "$new_version" == "$old_version" ]]; then
   exit 1
 fi
 
+echo "Updating from $old_version to $new_version"
+
 previousTag="v${old_version}"
 raw_commits="$(git log --pretty=format:"%s" --no-merges --reverse $previousTag..HEAD -- .)"
 
-markdown_commits=$(echo "$raw_commits" | sed -En "s/\(#([0-9]+)\)/([#\1](https:\/\/github.com\/renancaraujo\/dependabot_gen\/pull\/\1))/p")
+# Filter out chore commits (commits starting with "chore:" or "chore(")
+filtered_commits=$(echo "$raw_commits" | grep -v -E "^chore(\(|:)")
+
+markdown_commits=$(echo "$filtered_commits" | sed -En "s/\(#([0-9]+)\)/([#\1](https:\/\/github.com\/renancaraujo\/dependabot_gen\/pull\/\1))/p")
 
 if [[ "$markdown_commits" == "" ]]; then
   echo "No commits since last tag, can't update."

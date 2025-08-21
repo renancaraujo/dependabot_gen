@@ -1,3 +1,7 @@
+# 1.3.0
+
+- feat([#27](https://github.com/renancaraujo/dependabot_gen/pull/27)): Include wildcards in --ignore-paths option (#32)
+
 # 1.2.0
 
 - feat: use groups ([#20](https://github.com/renancaraujo/dependabot_gen/pull/20))
