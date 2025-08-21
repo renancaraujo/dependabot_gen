@@ -15,7 +15,7 @@ const description = 'Keep your dependabot.yaml up to date';
 /// {@template dependabot_gen_command_runner}
 /// A [CommandRunner] for the depgen CLI.
 ///
-/// ```dart
+/// ```sh
 /// $ depgen --version
 /// ```
 /// {@endtemplate}

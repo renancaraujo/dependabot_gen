@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:glob/glob.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
@@ -296,9 +297,8 @@ class _ManifestPackageEcosystemFinder implements _PackageEcosystemFinder {
     outer:
     for (final manifestPath in paths) {
       if (ignoreFinding != null) {
-        for (final parent in ignoreFinding) {
-          if (p.isWithin(parent, manifestPath) ||
-              p.equals(parent, manifestPath)) {
+        for (final pattern in ignoreFinding) {
+          if (_shouldIgnorePath(manifestPath, pattern, repoRoot.path)) {
             continue outer;
           }
         }
@@ -369,5 +369,45 @@ extension on File {
     );
 
     return result.exitCode != 0;
+  }
+}
+
+/// Checks if a path should be ignored based on a pattern.
+///
+/// Supports both exact path matching and glob patterns.
+///
+/// For exact paths, it uses the original logic with [p.isWithin] and
+/// [p.equals].
+/// For glob patterns (containing *, ?, [, or **), it uses glob pattern
+/// matching.
+bool _shouldIgnorePath(String manifestPath, String pattern, String repoRoot) {
+  // Check if pattern contains glob metacharacters
+  final hasGlobChars = pattern.contains('*') ||
+      pattern.contains('?') ||
+      pattern.contains('[') ||
+      pattern.contains('**');
+
+  if (hasGlobChars) {
+    // Use glob pattern matching
+    final glob = Glob(pattern);
+
+    // Get the relative path from repo root for glob matching
+    final relativePath = p.relative(manifestPath, from: repoRoot);
+
+    // Check against the relative path
+    if (glob.matches(relativePath)) {
+      return true;
+    }
+
+    // Also check against the directory containing the manifest
+    final relativeDir = p.relative(p.dirname(manifestPath), from: repoRoot);
+    if (glob.matches(relativeDir)) {
+      return true;
+    }
+
+    return false;
+  } else {
+    // Legacy behavior: exact path matching
+    return p.isWithin(pattern, manifestPath) || p.equals(pattern, manifestPath);
   }
 }

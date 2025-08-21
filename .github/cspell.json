@@ -28,7 +28,8 @@
     "ticarica",
     "oogabooga",
     "reporoot",
-    "recase"
+    "recase",
+    "metacharacters"
   ],
   "ignoreWords" : [
     "timezone"

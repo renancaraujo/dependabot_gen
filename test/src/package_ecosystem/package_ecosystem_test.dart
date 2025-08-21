@@ -309,6 +309,78 @@ void main() {
       );
     });
 
+    test('skip ignored entries with wildcards', () {
+      // Test with wildcard pattern that matches p2 directory
+      expect(
+        PackageEcosystem.pip,
+        findsEntries(
+          [
+            entryWith(
+              directory: '/packages/pip/p1',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p1-pip',
+            ),
+            entryWith(
+              directory: '/packages/pip/p3',
+              ecosystem: 'pip',
+              groupName: 'packages-pip-p3-pip',
+            ),
+          ],
+          on: repoRoot,
+          ignoreFinding: {
+            '**/pip/p2',
+          },
+        ),
+      );
+
+      // Test with wildcard pattern that matches all pip directories
+      expect(
+        PackageEcosystem.pip,
+        findsEntries(
+          [],
+          on: repoRoot,
+          ignoreFinding: {
+            '**/pip/**',
+          },
+        ),
+      );
+
+      // Test with wildcard pattern that matches directories containing 'p'
+      expect(
+        PackageEcosystem.nuget,
+        findsEntries(
+          [], // All nuget packages are in directories with 'p' (p1, p2, etc.)
+          on: repoRoot,
+          ignoreFinding: {
+            '**/p*',
+          },
+        ),
+      );
+
+      // Test with simple glob that matches files ending with specific pattern
+      expect(
+        PackageEcosystem.gradle,
+        findsEntries(
+          [
+            entryWith(
+              directory: '/packages/gradle/p2',
+              ecosystem: 'gradle',
+              groupName: 'packages-gradle-p2-gradle',
+            ),
+            entryWith(
+              directory: '/packages/gradle/p3',
+              ecosystem: 'gradle',
+              groupName: 'packages-gradle-p3-gradle',
+            ),
+          ],
+          on: repoRoot,
+          ignoreFinding: {
+            '**/**/p1',
+          },
+        ),
+      );
+    });
+
     test('skip git ignored entries', () async {
       File(p.join(repoRoot.path, '.gitignore'))
           .writeAsStringSync('packages/pip/p1');
