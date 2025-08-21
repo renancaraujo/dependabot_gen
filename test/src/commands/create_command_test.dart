@@ -604,7 +604,7 @@ updates:
 
         expect(file.readAsStringSync(), '''
 version: 2
-updates: 
+updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:

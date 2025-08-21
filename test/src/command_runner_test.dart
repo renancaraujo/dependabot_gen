@@ -87,14 +87,25 @@ void main() {
 
       final progress = _MockProgress();
       final progressLogs = <String>[];
-      when(() => progress.complete(any())).thenAnswer((_) {
-        final message = _.positionalArguments.elementAt(0) as String?;
+      when(() => progress.complete(any())).thenAnswer((invocation) {
+        final message = invocation.positionalArguments.elementAt(0) as String?;
         if (message != null) progressLogs.add(message);
       });
       when(() => logger.progress(any())).thenReturn(progress);
 
       final result = await commandRunner.run(['update']);
       expect(result, equals(ExitCode.success.code));
+      verifyNever(() => logger.info(updatePrompt));
+    });
+
+    test('handles exception when checking for updates', () async {
+      when(
+        () => pubUpdater.getLatestVersion(any()),
+      ).thenThrow(Exception('Network error'));
+
+      final result = await commandRunner.run(['--version']);
+      expect(result, equals(ExitCode.success.code));
+      verify(() => logger.info(packageVersion)).called(1);
       verifyNever(() => logger.info(updatePrompt));
     });
 

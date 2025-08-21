@@ -15,7 +15,7 @@ const description = 'Keep your dependabot.yaml up to date';
 /// {@template dependabot_gen_command_runner}
 /// A [CommandRunner] for the depgen CLI.
 ///
-/// ```
+/// ```dart
 /// $ depgen --version
 /// ```
 /// {@endtemplate}
@@ -69,7 +69,7 @@ class DependabotGenCommandRunner extends CompletionCommandRunner<int?> {
         ..info('')
         ..info(e.usage);
       return ExitCode.usage.code;
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _logger
         ..err('Unknown Error. This is likely a bug on $executableName.')
         ..info(
@@ -124,11 +124,11 @@ ${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u219
 Run ${lightCyan.wrap('$executableName update')} to update''',
           );
       }
-    } catch (_) {}
+    } on Exception catch (_) {}
   }
 }
 
 /// URI where people can report when things go south.
-final issuesUri = Uri.parse(
+final Uri issuesUri = Uri.parse(
   'https://github.com/renancaraujo/dependabot_gen/issues/new/choose',
 );

@@ -164,7 +164,7 @@ void main() {
         expect(File(dependabotFile.path).existsSync(), true);
         expect(File(dependabotFile.path).readAsStringSync(), '''
 version: 2
-updates: 
+updates:
   []
 ''');
       });
@@ -192,7 +192,7 @@ updates:
         expect(File(dependabotFile.path).existsSync(), true);
         expect(File(dependabotFile.path).readAsStringSync(), '''
 version: 2
-updates: 
+updates:
   []
 ''');
       });
