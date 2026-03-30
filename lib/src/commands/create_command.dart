@@ -17,6 +17,7 @@ class CreateCommand extends CommandBase
         LabelsOption,
         MilestoneOption,
         GroupsOption,
+        CommitMessageOption,
         IgnorePathsOption,
         RepositoryRootOption {
   /// {@macro create_command}
@@ -80,6 +81,7 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
                 targetBranch: targetBranch,
                 labels: labels,
                 milestone: milestone,
+                commitMessage: commitMessage,
                 groups: useGroups
                     ? {
                         e.groupName: const {

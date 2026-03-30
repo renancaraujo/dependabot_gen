@@ -427,8 +427,8 @@ class CommitMessage extends Equatable {
   final String? prefixDevelopment;
 
   /// The scope to use for commit messages.
-  @JsonKey(defaultValue: 'scope', disallowNullValue: true)
-  final String? include;
+  @JsonKey(defaultValue: CommitMessageInclude.scope, disallowNullValue: true)
+  final CommitMessageInclude? include;
 
   @override
   List<Object?> get props => [
@@ -565,4 +565,11 @@ enum InsecureExternalCodeExecution {
   /// Deny code execution in manifest files.
   @JsonValue('deny')
   deny,
+}
+
+/// Follow the commit message prefix with additional information.
+enum CommitMessageInclude {
+  /// Include the scope of the update in the commit message: deps or deps-dev.
+  @JsonValue('scope')
+  scope,
 }
