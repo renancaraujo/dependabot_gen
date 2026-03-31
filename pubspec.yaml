@@ -37,7 +37,7 @@ dev_dependencies:
   json_serializable: ^6.10.0
   mocktail: ^1.0.4
   test: ^1.26.3
-  very_good_analysis: "^9.0.0"
+  very_good_analysis: ">=9.0.0 <11.0.0"
 
 executables:
   depgen:
