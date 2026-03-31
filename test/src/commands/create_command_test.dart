@@ -18,22 +18,26 @@ Create or update the dependabot.yaml file in a repository. Will keep existing en
 
 
 Usage: depgen create [arguments]
--h, --help                 Print this usage information.
--e, --ecosystems           The package ecosystems to consider when searching for packages. Defaults to all available.
-                           [githubActions (default), docker (default), gitModules (default), bundler (default), cargo (default), composer (default), elm (default), gomod (default), gradle (default), hex (default), maven (default), npm (default), nuget (default), pip (default), pub (default), swift (default), terraform (default)]
-    --ignore-ecosystems    The package ecosystems to ignore when searching for packages. Defaults to none.
-                           [githubActions, docker, gitModules, bundler, cargo, composer, elm, gomod, gradle, hex, maven, npm, nuget, pip, pub, swift, terraform]
--S, --silent               Silences all output.
--V, --verbose              Show verbose output.
--I, --schedule-interval    The interval to check for updates on new update entries (does not affect existing ones).
-                           [daily, weekly (default), monthly]
-    --target-branch        The target branch to create pull requests against.
-    --labels               Labels to add to the pull requests.
-    --milestone            The milestone to add to the pull requests. Must be a number.
-    --[no-]use-groups      Use groups on update entries.
-                           (defaults to on)
--i, --ignore-paths         Paths to ignore when searching for packages. Example: "__brick__/**"
--r, --repo-root            Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.
+-h, --help                                 Print this usage information.
+-e, --ecosystems                           The package ecosystems to consider when searching for packages. Defaults to all available.
+                                           [githubActions (default), docker (default), gitModules (default), bundler (default), cargo (default), composer (default), elm (default), gomod (default), gradle (default), hex (default), maven (default), npm (default), nuget (default), pip (default), pub (default), swift (default), terraform (default)]
+    --ignore-ecosystems                    The package ecosystems to ignore when searching for packages. Defaults to none.
+                                           [githubActions, docker, gitModules, bundler, cargo, composer, elm, gomod, gradle, hex, maven, npm, nuget, pip, pub, swift, terraform]
+-S, --silent                               Silences all output.
+-V, --verbose                              Show verbose output.
+-I, --schedule-interval                    The interval to check for updates on new update entries (does not affect existing ones).
+                                           [daily, weekly (default), monthly]
+    --target-branch                        The target branch to create pull requests against.
+    --labels                               Labels to add to the pull requests.
+    --milestone                            The milestone to add to the pull requests. Must be a number.
+    --[no-]use-groups                      Use groups on update entries.
+                                           (defaults to on)
+    --commit-message-prefix                Prefix for all commit messages and pull request titles. 
+    --commit-message-prefix-development    Prefix used only for commit messages that update dependencies in the Development dependency group. Supported by: bundler, composer, mix, maven, npm, pip, and uv. Behaves like --commit-message-prefix for all other cases.
+    --commit-message-include               Follow the commit message prefix with additional information. Currently only "scope" is supported, which appends the type of dependencies updated in the commit: deps or deps-dev.
+                                           [scope]
+-i, --ignore-paths                         Paths to ignore when searching for packages. Example: "__brick__/**"
+-r, --repo-root                            Path to the repository root. If omitted, the command will search for the closest git repository root from the current working directory.
 
 Run "depgen help" to see global options.''';
 
@@ -64,6 +68,7 @@ void main() {
       expect(command, isA<LabelsOption>());
       expect(command, isA<MilestoneOption>());
       expect(command, isA<GroupsOption>());
+      expect(command, isA<CommitMessageOption>());
       expect(command, isA<IgnorePathsOption>());
       expect(command, isA<RepositoryRootOption>());
     });

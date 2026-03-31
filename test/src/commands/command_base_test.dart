@@ -67,6 +67,11 @@ class _GroupsOptionCommand extends _TestCommand with GroupsOption {
   _GroupsOptionCommand({required super.logger});
 }
 
+class _CommitMessageOptionCommand extends _TestCommand
+    with CommitMessageOption {
+  _CommitMessageOptionCommand({required super.logger});
+}
+
 void main() {
   late Logger logger;
 
@@ -485,6 +490,114 @@ The package ecosystems to ignore when searching for packages. Defaults to none.'
       expect(command.ecosystems, [
         PackageEcosystem.githubActions,
       ]);
+    });
+  });
+
+  group('CommitMessageOption', () {
+    test('adds options', () {
+      final command = _CommitMessageOptionCommand(logger: logger);
+
+      expect(
+        command.argParser.options['commit-message-prefix'],
+        isA<Option>().having((e) => e.help, 'help',
+            'Prefix for all commit messages and pull request titles. '),
+      );
+
+      expect(
+        command.argParser.options['commit-message-prefix-development'],
+        isA<Option>().having(
+          (e) => e.help,
+          'help',
+          'Prefix used only for commit messages that update dependencies '
+              'in the Development dependency group. Supported by: bundler, '
+              'composer, mix, maven, npm, pip, and uv. Behaves like '
+              '--commit-message-prefix for all other cases.',
+        ),
+      );
+
+      expect(
+        command.argParser.options['commit-message-include'],
+        isA<Option>()
+            .having(
+          (e) => e.help,
+          'help',
+          'Follow the commit message prefix with additional information. '
+              'Currently only "scope" is supported, which appends the type of '
+              'dependencies updated in the commit: deps or deps-dev.',
+        )
+            .having((e) => e.allowed, 'allowed', ['scope']),
+      );
+    });
+
+    test('returns null when no options are provided', () {
+      final command = _CommitMessageOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse([]);
+      expect(command.commitMessage, isNull);
+    });
+
+    test('sets commit message with prefix only', () {
+      final command = _CommitMessageOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--commit-message-prefix', 'chore(deps):'],
+      );
+      expect(
+        command.commitMessage,
+        const CommitMessage(
+          prefix: 'chore(deps):',
+          prefixDevelopment: null,
+          include: null,
+        ),
+      );
+    });
+
+    test('sets commit message with prefix-development only', () {
+      final command = _CommitMessageOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--commit-message-prefix-development', 'chore(deps-dev):'],
+      );
+      expect(
+        command.commitMessage,
+        const CommitMessage(
+          prefix: null,
+          prefixDevelopment: 'chore(deps-dev):',
+          include: null,
+        ),
+      );
+    });
+
+    test('sets commit message with include only', () {
+      final command = _CommitMessageOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse(
+        ['--commit-message-include', 'scope'],
+      );
+      expect(
+        command.commitMessage,
+        const CommitMessage(
+          prefix: null,
+          prefixDevelopment: null,
+          include: CommitMessageInclude.scope,
+        ),
+      );
+    });
+
+    test('sets commit message with all options', () {
+      final command = _CommitMessageOptionCommand(logger: logger);
+      command.argResults = command.argParser.parse([
+        '--commit-message-prefix',
+        'chore(deps):',
+        '--commit-message-prefix-development',
+        'chore(deps-dev):',
+        '--commit-message-include',
+        'scope',
+      ]);
+      expect(
+        command.commitMessage,
+        const CommitMessage(
+          prefix: 'chore(deps):',
+          prefixDevelopment: 'chore(deps-dev):',
+          include: CommitMessageInclude.scope,
+        ),
+      );
     });
   });
 

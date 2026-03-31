@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:dependabot_gen/src/dependabot_yaml/dependabot_yaml.dart';
+import 'package:dependabot_gen/src/dependabot_yaml/spec.dart';
 import 'package:dependabot_gen/src/package_ecosystem/package_ecosystem.dart';
 import 'package:git/git.dart';
 import 'package:mason_logger/mason_logger.dart';
@@ -251,6 +252,56 @@ mixin GroupsOption on CommandBase {
 
   /// Whether to use groups.
   bool get useGroups => argResults!['use-groups'] as bool;
+}
+
+/// Adds the `--commit-message-prefix`, `--commit-message-prefix-development`,
+/// and `--commit-message-include` options to the command.
+mixin CommitMessageOption on CommandBase {
+  @override
+  void addOptions() {
+    super.addOptions();
+    argParser
+      ..addOption(
+        'commit-message-prefix',
+        help: 'Prefix for all commit messages and pull request titles. ',
+      )
+      ..addOption(
+        'commit-message-prefix-development',
+        help: 'Prefix used only for commit messages that update dependencies '
+            'in the Development dependency group. Supported by: bundler, '
+            'composer, mix, maven, npm, pip, and uv. Behaves like '
+            '--commit-message-prefix for all other cases.',
+      )
+      ..addOption(
+        'commit-message-include',
+        allowed: CommitMessageInclude.values.map((e) => e.name),
+        help: 'Follow the commit message prefix with additional information. '
+            'Currently only "scope" is supported, which appends the type of '
+            'dependencies updated in the commit: deps or deps-dev.',
+      );
+  }
+
+  /// Gets the [CommitMessage] for the command, or `null` if none was provided.
+  CommitMessage? get commitMessage {
+    final prefix = argResults!['commit-message-prefix'] as String?;
+    final prefixDevelopment =
+        argResults!['commit-message-prefix-development'] as String?;
+    final includeRaw = argResults!['commit-message-include'] as String?;
+
+    if (prefix == null && prefixDevelopment == null && includeRaw == null) {
+      return null;
+    }
+
+    final include = includeRaw == null
+        ? null
+        : CommitMessageInclude.values.firstWhere((e) => e.name == includeRaw);
+
+    return CommitMessage(
+      prefix: prefix,
+      prefixDevelopment: prefixDevelopment,
+      include: include,
+    );
+  }
 }
 
 /// Adds the `--ecosystems` option to the command.

@@ -143,7 +143,7 @@ void main() {
               commitMessage: CommitMessage(
                 prefix: 'chore(deps):',
                 prefixDevelopment: 'chore(deps-dev):',
-                include: 'scope',
+                include: CommitMessageInclude.scope,
               ),
               ignore: [
                 Ignore(
@@ -216,7 +216,7 @@ void main() {
                   commitMessage: CommitMessage(
                     prefix: 'chore(deps):',
                     prefixDevelopment: 'chore(deps-dev):',
-                    include: 'scope',
+                    include: CommitMessageInclude.scope,
                   ),
                   ignore: [
                     Ignore(

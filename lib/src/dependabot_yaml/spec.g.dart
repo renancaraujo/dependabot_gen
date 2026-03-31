@@ -54,23 +54,15 @@ DependabotSpec _$DependabotSpecFromJson(Map json) => $checkedCreate(
       fieldKeyMap: const {'enableBetaEcosystems': 'enable-beta-ecosystems'},
     );
 
-Map<String, dynamic> _$DependabotSpecToJson(DependabotSpec instance) {
-  final val = <String, dynamic>{
-    'version': _$DependabotVersionEnumMap[instance.version]!,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('enable-beta-ecosystems', instance.enableBetaEcosystems);
-  writeNotNull('ignore', _ignoresToJson(instance.ignore));
-  writeNotNull('registries', instance.registries);
-  val['updates'] = _updatesToJson(instance.updates);
-  return val;
-}
+Map<String, dynamic> _$DependabotSpecToJson(DependabotSpec instance) =>
+    <String, dynamic>{
+      'version': _$DependabotVersionEnumMap[instance.version]!,
+      if (instance.enableBetaEcosystems case final value?)
+        'enable-beta-ecosystems': value,
+      if (_ignoresToJson(instance.ignore) case final value?) 'ignore': value,
+      if (instance.registries case final value?) 'registries': value,
+      'updates': _updatesToJson(instance.updates),
+    };
 
 const _$DependabotVersionEnumMap = {
   DependabotVersion.v2: 2,
@@ -186,44 +178,39 @@ UpdateEntry _$UpdateEntryFromJson(Map json) => $checkedCreate(
       },
     );
 
-Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) {
-  final val = <String, dynamic>{
-    'package-ecosystem': instance.ecosystem,
-    'directory': instance.directory,
-    'schedule': instance.schedule.toJson(),
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('allow',
-      instance.allow?.map(const _AllowedEntryConverter().toJson).toList());
-  writeNotNull('assignees', instance.assignees?.toList());
-  writeNotNull('commit-message', instance.commitMessage?.toJson());
-  writeNotNull('groups', instance.groups);
-  writeNotNull('ignore', _ignoresToJson(instance.ignore));
-  writeNotNull(
-      'insecure-external-code-execution',
-      _$InsecureExternalCodeExecutionEnumMap[
-          instance.insecureExternalCodeExecution]);
-  writeNotNull('labels', instance.labels?.toList());
-  writeNotNull('milestone', instance.milestone);
-  writeNotNull('open-pull-requests-limit', instance.openPullRequestsLimit);
-  writeNotNull(
-      'pull-request-branch-name', instance.pullRequestBranchName?.toJson());
-  writeNotNull(
-      'rebase-strategy', _$RebaseStrategyEnumMap[instance.rebaseStrategy]);
-  writeNotNull('registries', instance.registries);
-  writeNotNull('reviewers', instance.reviewers);
-  writeNotNull('target-branch', instance.targetBranch);
-  writeNotNull('vendor', instance.vendor);
-  writeNotNull('versioning-strategy',
-      _$VersioningStrategyEnumMap[instance.versioningStrategy]);
-  return val;
-}
+Map<String, dynamic> _$UpdateEntryToJson(UpdateEntry instance) =>
+    <String, dynamic>{
+      'package-ecosystem': instance.ecosystem,
+      'directory': instance.directory,
+      'schedule': instance.schedule.toJson(),
+      if (instance.allow?.map(const _AllowedEntryConverter().toJson).toList()
+          case final value?)
+        'allow': value,
+      if (instance.assignees?.toList() case final value?) 'assignees': value,
+      if (instance.commitMessage?.toJson() case final value?)
+        'commit-message': value,
+      if (instance.groups case final value?) 'groups': value,
+      if (_ignoresToJson(instance.ignore) case final value?) 'ignore': value,
+      if (_$InsecureExternalCodeExecutionEnumMap[
+              instance.insecureExternalCodeExecution]
+          case final value?)
+        'insecure-external-code-execution': value,
+      if (instance.labels?.toList() case final value?) 'labels': value,
+      if (instance.milestone case final value?) 'milestone': value,
+      if (instance.openPullRequestsLimit case final value?)
+        'open-pull-requests-limit': value,
+      if (instance.pullRequestBranchName?.toJson() case final value?)
+        'pull-request-branch-name': value,
+      if (_$RebaseStrategyEnumMap[instance.rebaseStrategy] case final value?)
+        'rebase-strategy': value,
+      if (instance.registries case final value?) 'registries': value,
+      if (instance.reviewers case final value?) 'reviewers': value,
+      if (instance.targetBranch case final value?) 'target-branch': value,
+      if (instance.vendor case final value?) 'vendor': value,
+      if (_$VersioningStrategyEnumMap[instance.versioningStrategy]
+          case final value?)
+        'versioning-strategy': value,
+    };
 
 const _$InsecureExternalCodeExecutionEnumMap = {
   InsecureExternalCodeExecution.allow: 'allow',
@@ -265,22 +252,12 @@ Schedule _$ScheduleFromJson(Map json) => $checkedCreate(
       },
     );
 
-Map<String, dynamic> _$ScheduleToJson(Schedule instance) {
-  final val = <String, dynamic>{
-    'interval': _$ScheduleIntervalEnumMap[instance.interval]!,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('day', _$ScheduleDayEnumMap[instance.day]);
-  writeNotNull('time', instance.time);
-  writeNotNull('timezone', instance.timezone);
-  return val;
-}
+Map<String, dynamic> _$ScheduleToJson(Schedule instance) => <String, dynamic>{
+      'interval': _$ScheduleIntervalEnumMap[instance.interval]!,
+      if (_$ScheduleDayEnumMap[instance.day] case final value?) 'day': value,
+      if (instance.time case final value?) 'time': value,
+      if (instance.timezone case final value?) 'timezone': value,
+    };
 
 const _$ScheduleIntervalEnumMap = {
   ScheduleInterval.daily: 'daily',
@@ -357,27 +334,29 @@ CommitMessage _$CommitMessageFromJson(Map json) => $checkedCreate(
           prefix: $checkedConvert('prefix', (v) => v as String?),
           prefixDevelopment:
               $checkedConvert('prefix-development', (v) => v as String?),
-          include: $checkedConvert('include', (v) => v as String? ?? 'scope'),
+          include: $checkedConvert(
+              'include',
+              (v) =>
+                  $enumDecodeNullable(_$CommitMessageIncludeEnumMap, v) ??
+                  CommitMessageInclude.scope),
         );
         return val;
       },
       fieldKeyMap: const {'prefixDevelopment': 'prefix-development'},
     );
 
-Map<String, dynamic> _$CommitMessageToJson(CommitMessage instance) {
-  final val = <String, dynamic>{};
+Map<String, dynamic> _$CommitMessageToJson(CommitMessage instance) =>
+    <String, dynamic>{
+      if (instance.prefix case final value?) 'prefix': value,
+      if (instance.prefixDevelopment case final value?)
+        'prefix-development': value,
+      if (_$CommitMessageIncludeEnumMap[instance.include] case final value?)
+        'include': value,
+    };
 
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('prefix', instance.prefix);
-  writeNotNull('prefix-development', instance.prefixDevelopment);
-  writeNotNull('include', instance.include);
-  return val;
-}
+const _$CommitMessageIncludeEnumMap = {
+  CommitMessageInclude.scope: 'scope',
+};
 
 Ignore _$IgnoreFromJson(Map json) => $checkedCreate(
       'Ignore',
@@ -408,22 +387,13 @@ Ignore _$IgnoreFromJson(Map json) => $checkedCreate(
       },
     );
 
-Map<String, dynamic> _$IgnoreToJson(Ignore instance) {
-  final val = <String, dynamic>{
-    'dependency-name': instance.dependencyName,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('versions', instance.versions);
-  writeNotNull('update-types',
-      instance.updateTypes?.map((e) => _$UpdateTypeEnumMap[e]!).toList());
-  return val;
-}
+Map<String, dynamic> _$IgnoreToJson(Ignore instance) => <String, dynamic>{
+      'dependency-name': instance.dependencyName,
+      if (instance.versions case final value?) 'versions': value,
+      if (instance.updateTypes?.map((e) => _$UpdateTypeEnumMap[e]!).toList()
+          case final value?)
+        'update-types': value,
+    };
 
 const _$UpdateTypeEnumMap = {
   UpdateType.major: 'version-update:semver-major',
